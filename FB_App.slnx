@@ -1,0 +1,12 @@
+<Solution>
+  <Project Path="FB_App/src/AppHost/AppHost.csproj" />
+  <Project Path="FB_App/src/Application/Application.csproj" />
+  <Project Path="FB_App/src/Domain/Domain.csproj" />
+  <Project Path="FB_App/src/Infrastructure/Infrastructure.csproj" />
+  <Project Path="FB_App/src/ServiceDefaults/ServiceDefaults.csproj" />
+  <Project Path="FB_App/src/Web/Web.csproj" />
+  <Project Path="FB_App/tests/Application.FunctionalTests/Application.FunctionalTests.csproj" />
+  <Project Path="FB_App/tests/Application.UnitTests/Application.UnitTests.csproj" />
+  <Project Path="FB_App/tests/Domain.UnitTests/Domain.UnitTests.csproj" />
+  <Project Path="FB_App/tests/Infrastructure.IntegrationTests/Infrastructure.IntegrationTests.csproj" />
+</Solution>
