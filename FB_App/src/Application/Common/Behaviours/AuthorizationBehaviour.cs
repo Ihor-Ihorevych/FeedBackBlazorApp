@@ -42,7 +42,7 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
                 {
                     foreach (var role in roles)
                     {
-                        var isInRole = _user.Roles?.Any(x => role == x) ?? false;
+                        var isInRole = _user.Roles?.Contains(role) ?? false;
                         if (isInRole)
                         {
                             authorized = true;
@@ -75,6 +75,6 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
         }
 
         // User is authorized / authorization not required
-        return await next();
+        return await next(cancellationToken);
     }
 }

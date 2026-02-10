@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
+using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException;
+
 namespace FB_App.Web.Infrastructure;
 
 public class CustomExceptionHandler : IExceptionHandler
