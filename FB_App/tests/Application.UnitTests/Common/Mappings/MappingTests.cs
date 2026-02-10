@@ -1,9 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using AutoMapper;
 using FB_App.Application.Common.Interfaces;
-using FB_App.Application.Common.Models;
-using FB_App.Application.TodoItems.Queries.GetTodoItemsWithPagination;
-using FB_App.Application.TodoLists.Queries.GetTodos;
+using FB_App.Application.Movies.Queries.GetMovies;
+using FB_App.Application.Comments.Queries;
 using FB_App.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
@@ -36,11 +35,8 @@ public class MappingTests
     }
 
     [Test]
-    [TestCase(typeof(TodoList), typeof(TodoListDto))]
-    [TestCase(typeof(TodoItem), typeof(TodoItemDto))]
-    [TestCase(typeof(TodoList), typeof(LookupDto))]
-    [TestCase(typeof(TodoItem), typeof(LookupDto))]
-    [TestCase(typeof(TodoItem), typeof(TodoItemBriefDto))]
+    [TestCase(typeof(Movie), typeof(MovieDto))]
+    [TestCase(typeof(Comment), typeof(CommentDto))]
     public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
     {
         var instance = GetInstanceOf(source);
