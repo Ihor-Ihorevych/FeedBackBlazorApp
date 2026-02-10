@@ -3,8 +3,6 @@ using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
 using FB_App.Domain.Entities;
-using FB_App.Domain.Enums;
-using FB_App.Domain.Events;
 
 using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException;
 
@@ -30,25 +28,19 @@ public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand,
 
     public async Task<int> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
     {
-        var movieExists = await _context.Movies
-            .AnyAsync(m => m.Id == request.MovieId, cancellationToken);
+        var movie = await _context.Movies
+            .FirstOrDefaultAsync(m => m.Id == request.MovieId, cancellationToken);
 
-        if (!movieExists)
+        if (movie == null)
         {
             throw new NotFoundException(nameof(Movie), request.MovieId.ToString());
         }
 
-        var comment = new Comment
-        {
-            MovieId = request.MovieId,
-            UserId = _user.Id ?? throw new UnauthorizedAccessException("User ID not found"),
-            Text = request.Text,
-            Status = CommentStatus.Pending
-        };
+        var comment = movie.AddComment(
+            _user.Id ?? throw new UnauthorizedAccessException("User ID not found"),
+            request.Text
+        );
 
-        comment.AddDomainEvent(new CommentCreatedEvent(comment));
-
-        _context.Comments.Add(comment);
         await _context.SaveChangesAsync(cancellationToken);
 
         return comment.Id;

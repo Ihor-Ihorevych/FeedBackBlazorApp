@@ -2,6 +2,7 @@ using FB_App.Application.Comments.Commands.ApproveComment;
 using FB_App.Application.Comments.Commands.CreateComment;
 using FB_App.Application.Comments.Commands.RejectComment;
 using FB_App.Application.Comments.Queries.GetCommentsByMovie;
+using FB_App.Domain.Entities.Values;
 using FB_App.Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -11,13 +12,10 @@ public class Comments : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
-        // User endpoint - create comments
         groupBuilder.MapPost(CreateComment, "/").RequireAuthorization();
-        
-        // Admin endpoints - moderation
         groupBuilder.MapGet(GetCommentsByMovie, "/movie/{movieId}").RequireAuthorization();
-        groupBuilder.MapPut(ApproveComment, "/{id}/approve").RequireAuthorization();
-        groupBuilder.MapPut(RejectComment, "/{id}/reject").RequireAuthorization();
+        groupBuilder.MapPut(ApproveComment, "/movie/{movieId}/{id}/approve").RequireAuthorization();
+        groupBuilder.MapPut(RejectComment, "/movie/{movieId}/{id}/reject").RequireAuthorization();
     }
 
     public async Task<Created<int>> CreateComment(ISender sender, CreateCommentCommand command)
@@ -41,11 +39,11 @@ public class Comments : EndpointGroupBase
         return TypedResults.Ok(comments);
     }
 
-    public async Task<Results<NoContent, NotFound>> ApproveComment(ISender sender, int id)
+    public async Task<Results<NoContent, NotFound>> ApproveComment(ISender sender, int movieId, int id)
     {
         try
         {
-            await sender.Send(new ApproveCommentCommand(id));
+            await sender.Send(new ApproveCommentCommand(movieId, id));
             return TypedResults.NoContent();
         }
         catch (NotFoundException)
@@ -54,11 +52,11 @@ public class Comments : EndpointGroupBase
         }
     }
 
-    public async Task<Results<NoContent, NotFound>> RejectComment(ISender sender, int id)
+    public async Task<Results<NoContent, NotFound>> RejectComment(ISender sender, int movieId, int id)
     {
         try
         {
-            await sender.Send(new RejectCommentCommand(id));
+            await sender.Send(new RejectCommentCommand(movieId, id));
             return TypedResults.NoContent();
         }
         catch (NotFoundException)

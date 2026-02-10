@@ -43,7 +43,7 @@ public class GetMoviesQueryHandler : IRequestHandler<GetMoviesQuery, PaginatedLi
         }
 
         return await query
-            .OrderByDescending(m => m.Created)
+            .OrderByDescending(m => m.Id)
             .ProjectTo<MovieDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
     }

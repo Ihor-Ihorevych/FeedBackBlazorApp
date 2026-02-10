@@ -1,5 +1,7 @@
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FB_App.Domain.Constants;
 using FB_App.Domain.Enums;
 
@@ -35,7 +37,7 @@ public class GetCommentsByMovieQueryHandler : IRequestHandler<GetCommentsByMovie
         }
 
         return await query
-            .OrderByDescending(c => c.Created)
+            .OrderByDescending(c => c.Id)
             .ProjectTo<CommentDetailDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
     }

@@ -8,6 +8,10 @@ public class MovieConfiguration : IEntityTypeConfiguration<Movie>
 {
     public void Configure(EntityTypeBuilder<Movie> builder)
     {
+        // Key configuration
+        builder.HasKey(m => m.Id);
+
+        // Property configurations
         builder.Property(m => m.Title)
             .HasMaxLength(200)
             .IsRequired();
@@ -27,6 +31,10 @@ public class MovieConfiguration : IEntityTypeConfiguration<Movie>
         builder.HasMany(m => m.Comments)
             .WithOne(c => c.Movie)
             .HasForeignKey(c => c.MovieId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired();
+
+        builder.HasIndex(m => m.Title);
+        builder.HasIndex(m => m.Genre);
     }
 }

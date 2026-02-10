@@ -2,7 +2,6 @@ using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace FB_App.Infrastructure.Identity;
 

@@ -3,15 +3,13 @@ using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
 using FB_App.Domain.Entities;
-using FB_App.Domain.Enums;
-using FB_App.Domain.Events;
 
 using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException;
 
 namespace FB_App.Application.Comments.Commands.ApproveComment;
 
 [Authorize(Roles = Roles.Administrator)]
-public record ApproveCommentCommand(int Id) : IRequest;
+public record ApproveCommentCommand(int MovieId, int CommentId) : IRequest;
 
 public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentCommand>
 {
@@ -26,19 +24,23 @@ public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentComman
 
     public async Task Handle(ApproveCommentCommand request, CancellationToken cancellationToken)
     {
-        var comment = await _context.Comments
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+        var movie = await _context.Movies
+            .FirstOrDefaultAsync(m => m.Id == request.MovieId, cancellationToken);
 
-        if (comment == null)
+        if (movie == null)
         {
-            throw new NotFoundException(nameof(Comment), request.Id.ToString());
+            throw new NotFoundException(nameof(Movie), request.MovieId.ToString());
         }
 
-        comment.Status = CommentStatus.Approved;
-        comment.ReviewedBy = _user.Id;
-        comment.ReviewedAt = DateTimeOffset.UtcNow;
+        var comment = movie.GetComment(request.CommentId);
+        if (comment == null)
+        {
+            throw new NotFoundException(nameof(Comment), request.CommentId.ToString());
+        }
 
-        comment.AddDomainEvent(new CommentApprovedEvent(comment));
+
+        var userId = _user.Id ?? throw new UnauthorizedAccessException("User ID not found");
+        movie.ApproveComment(request.CommentId, userId);
 
         await _context.SaveChangesAsync(cancellationToken);
     }

@@ -5,7 +5,7 @@ public class CreateCommentCommandValidator : AbstractValidator<CreateCommentComm
     public CreateCommentCommandValidator()
     {
         RuleFor(v => v.MovieId)
-            .GreaterThan(0).WithMessage("Movie ID must be greater than 0.");
+            .NotEmpty().WithMessage("Movie ID cannot be empty.");
 
         RuleFor(v => v.Text)
             .NotEmpty().WithMessage("Comment text is required.")

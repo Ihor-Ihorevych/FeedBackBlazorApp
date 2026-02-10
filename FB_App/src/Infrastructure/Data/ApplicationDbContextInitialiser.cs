@@ -165,54 +165,22 @@ public class ApplicationDbContextInitialiser
             
             if (regularUser != null)
             {
-                var comments = new List<Comment>
-                {
-                    new Comment
-                    {
-                        MovieId = movies[0].Id,
-                        UserId = regularUser.Id,
-                        Text = "One of the best movies ever made! A masterpiece.",
-                        Status = CommentStatus.Approved,
-                        ReviewedBy = administrator.Id,
-                        ReviewedAt = DateTimeOffset.UtcNow
-                    },
-                    new Comment
-                    {
-                        MovieId = movies[0].Id,
-                        UserId = regularUser.Id,
-                        Text = "The friendship between Andy and Red is so touching.",
-                        Status = CommentStatus.Approved,
-                        ReviewedBy = administrator.Id,
-                        ReviewedAt = DateTimeOffset.UtcNow
-                    },
-                    new Comment
-                    {
-                        MovieId = movies[1].Id,
-                        UserId = regularUser.Id,
-                        Text = "A timeless classic. Marlon Brando's performance is legendary.",
-                        Status = CommentStatus.Approved,
-                        ReviewedBy = administrator.Id,
-                        ReviewedAt = DateTimeOffset.UtcNow
-                    },
-                    new Comment
-                    {
-                        MovieId = movies[2].Id,
-                        UserId = regularUser.Id,
-                        Text = "Heath Ledger's Joker is unforgettable!",
-                        Status = CommentStatus.Pending
-                    },
-                    new Comment
-                    {
-                        MovieId = movies[3].Id,
-                        UserId = regularUser.Id,
-                        Text = "Mind-bending and visually stunning.",
-                        Status = CommentStatus.Approved,
-                        ReviewedBy = administrator.Id,
-                        ReviewedAt = DateTimeOffset.UtcNow
-                    }
-                };
+                // Add comments through the Movie aggregate root
+                var comment1 = movies[0].AddComment(regularUser.Id, "One of the best movies ever made! A masterpiece.");
+                movies[0].ApproveComment(comment1.Id, administrator.Id);
 
-                _context.Comments.AddRange(comments);
+                var comment2 = movies[0].AddComment(regularUser.Id, "The friendship between Andy and Red is so touching.");
+                movies[0].ApproveComment(comment2.Id, administrator.Id);
+
+                var comment3 = movies[1].AddComment(regularUser.Id, "A timeless classic. Marlon Brando's performance is legendary.");
+                movies[1].ApproveComment(comment3.Id, administrator.Id);
+
+                var comment4 = movies[2].AddComment(regularUser.Id, "Heath Ledger's Joker is unforgettable!");
+                // This comment remains pending
+
+                var comment5 = movies[3].AddComment(regularUser.Id, "Mind-bending and visually stunning.");
+                movies[3].ApproveComment(comment5.Id, administrator.Id);
+
                 await _context.SaveChangesAsync();
             }
         }
