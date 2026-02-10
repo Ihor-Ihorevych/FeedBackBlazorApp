@@ -2,7 +2,6 @@ using FB_App.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.AddServiceDefaults();
 builder.AddKeyVaultIfConfigured();
 builder.AddApplicationServices();
@@ -25,19 +24,18 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.MapDefaultEndpoints();
+app.MapEndpoints();
+
+app.UseOpenApi();
 app.UseSwaggerUi(settings =>
 {
     settings.Path = "/api";
-    settings.DocumentPath = "/api/specification.json";
 });
-
 
 app.UseExceptionHandler(options => { });
 
 app.Map("/", () => Results.Redirect("/api"));
-
-app.MapDefaultEndpoints();
-app.MapEndpoints();
 
 app.Run();
 

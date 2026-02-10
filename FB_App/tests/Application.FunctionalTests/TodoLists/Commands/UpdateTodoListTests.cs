@@ -4,6 +4,7 @@ using FB_App.Application.TodoLists.Commands.UpdateTodoList;
 using FB_App.Domain.Entities;
 
 using static FB_App.Application.FunctionalTests.Testing;
+using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException;
 
 namespace FB_App.Application.FunctionalTests.TodoLists.Commands;
 

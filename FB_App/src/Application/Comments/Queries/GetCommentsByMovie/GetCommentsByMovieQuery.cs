@@ -1,5 +1,3 @@
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
@@ -7,8 +5,7 @@ using FB_App.Domain.Enums;
 
 namespace FB_App.Application.Comments.Queries.GetCommentsByMovie;
 
-// Administrators can see all comments (pending, approved, rejected)
-// Regular users can only see approved comments
+
 [Authorize(Roles = Roles.Administrator)]
 public record GetCommentsByMovieQuery : IRequest<List<CommentDetailDto>>
 {
