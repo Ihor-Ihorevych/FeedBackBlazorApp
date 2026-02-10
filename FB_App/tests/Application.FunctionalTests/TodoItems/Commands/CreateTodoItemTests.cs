@@ -3,7 +3,7 @@ using FB_App.Application.TodoItems.Commands.CreateTodoItem;
 using FB_App.Application.TodoLists.Commands.CreateTodoList;
 using FB_App.Domain.Entities;
 
-using static Testing;
+using static FB_App.Application.FunctionalTests.Testing;
 
 namespace FB_App.Application.FunctionalTests.TodoItems.Commands;
 

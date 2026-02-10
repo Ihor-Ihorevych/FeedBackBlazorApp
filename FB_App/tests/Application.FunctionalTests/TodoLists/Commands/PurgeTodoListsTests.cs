@@ -3,9 +3,7 @@ using FB_App.Application.Common.Security;
 using FB_App.Application.TodoLists.Commands.CreateTodoList;
 using FB_App.Application.TodoLists.Commands.PurgeTodoLists;
 using FB_App.Domain.Entities;
-
-using static Testing;
-
+using static FB_App.Application.FunctionalTests.Testing;
 namespace FB_App.Application.FunctionalTests.TodoLists.Commands;
 
 public class PurgeTodoListsTests : BaseTestFixture
@@ -27,7 +25,7 @@ public class PurgeTodoListsTests : BaseTestFixture
     [Test]
     public async Task ShouldDenyNonAdministrator()
     {
-        await RunAsDefaultUserAsync();
+        await Testing.RunAsDefaultUserAsync();
 
         var command = new PurgeTodoListsCommand();
 

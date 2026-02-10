@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-using static Testing;
+using static FB_App.Application.FunctionalTests.Testing;
 
 namespace FB_App.Application.FunctionalTests;
 

@@ -2,7 +2,7 @@
 using FB_App.Domain.Entities;
 using FB_App.Domain.ValueObjects;
 
-using static Testing;
+using static FB_App.Application.FunctionalTests.Testing;
 
 namespace FB_App.Application.FunctionalTests.TodoLists.Queries;
 

@@ -1,5 +1,5 @@
 ﻿
-using static Testing;
+using static FB_App.Application.FunctionalTests.Testing;
 
 namespace FB_App.Application.FunctionalTests;
 
