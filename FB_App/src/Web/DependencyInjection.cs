@@ -30,7 +30,10 @@ public static class DependencyInjection
 
         builder.Services.AddOpenApiDocument((configure, sp) =>
         {
+            configure.DocumentName = "v1";
             configure.Title = "FB_App API";
+            configure.Version = "v1";
+            configure.Description = "FB_App API Documentation";
 
             // Add JWT
             configure.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme

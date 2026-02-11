@@ -27,10 +27,18 @@ app.UseStaticFiles();
 app.MapDefaultEndpoints();
 app.MapEndpoints();
 
-app.UseOpenApi();
+// Enable OpenAPI JSON document generation at runtime
+// Document available at: /swagger/v1/swagger.json
+app.UseOpenApi(settings =>
+{
+    settings.DocumentName = "v1";
+    settings.Path = "/swagger/{documentName}/swagger.json";
+});
+
 app.UseSwaggerUi(settings =>
 {
     settings.Path = "/api";
+    settings.DocumentPath = "/swagger/{documentName}/swagger.json";
 });
 
 app.UseExceptionHandler(options => { });
