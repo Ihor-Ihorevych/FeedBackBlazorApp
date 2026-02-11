@@ -66,4 +66,28 @@ public sealed class MovieId : ValueObject
     /// Explicitly converts a Guid to a MovieId.
     /// </summary>
     public static explicit operator MovieId(Guid value) => new(value);
+
+    /// <summary>
+    /// Determines whether two MovieId instances are equal.
+    /// </summary>
+    public static bool operator ==(MovieId? left, MovieId? right)
+    {
+        if (left is null)
+            return right is null;
+        return left.Equals(right);
+    }
+
+    /// <summary>
+    /// Determines whether two MovieId instances are not equal.
+    /// </summary>
+    public static bool operator !=(MovieId? left, MovieId? right) => !(left == right);
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is MovieId other)
+            return Value == other.Value;
+        return false;
+    }
+
+    public override int GetHashCode() => Value.GetHashCode();
 }

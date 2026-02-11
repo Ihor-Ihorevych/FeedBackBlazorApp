@@ -1,0 +1,190 @@
+using FB_App.Application.Common.Exceptions;
+using FB_App.Application.Common.Interfaces;
+using FB_App.Application.Movies.Commands.UpdateMovie;
+using FB_App.Domain.Entities;
+using FB_App.Domain.Entities.Values;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using NUnit.Framework;
+using Shouldly;
+
+namespace FB_App.Application.UnitTests.Movies.Commands.UpdateMovie;
+
+[TestFixture]
+public class UpdateMovieCommandHandlerTests
+{
+    private Mock<IApplicationDbContext> _contextMock = null!;
+    private Mock<DbSet<Movie>> _moviesDbSetMock = null!;
+    private UpdateMovieCommandHandler _handler = null!;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _contextMock = new Mock<IApplicationDbContext>();
+        _moviesDbSetMock = new Mock<DbSet<Movie>>();
+        _contextMock.Setup(x => x.Movies).Returns(_moviesDbSetMock.Object);
+        _handler = new UpdateMovieCommandHandler(_contextMock.Object);
+    }
+
+    [Test]
+    public async Task Handle_WithExistingMovie_ShouldUpdateAllFields()
+    {
+        // Arrange
+        
+        var existingMovie = Movie.Create("Original Title", "Original Description", 2020, "Original Director", "Drama", null, 7.0);
+        existingMovie.Id
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingMovie);
+        _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        var command = new UpdateMovieCommand
+        {
+            Id = movieId,
+            Title = "Updated Title",
+            Description = "Updated Description",
+            ReleaseYear = 2024,
+            Director = "Updated Director",
+            Genre = "Action",
+            PosterUrl = "https://example.com/new.jpg",
+            Rating = 9.0
+        };
+
+        // Act
+        await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        existingMovie.Title.ShouldBe("Updated Title");
+        existingMovie.Description.ShouldBe("Updated Description");
+        existingMovie.ReleaseYear.ShouldBe(2024);
+        existingMovie.Director.ShouldBe("Updated Director");
+        existingMovie.Genre.ShouldBe("Action");
+        existingMovie.PosterUrl.ShouldBe("https://example.com/new.jpg");
+        existingMovie.Rating.ShouldBe(9.0);
+    }
+
+    [Test]
+    public async Task Handle_WithExistingMovie_ShouldSaveChanges()
+    {
+        // Arrange
+        var existingMovie = Movie.Create("Original Title", null, null, null, null, null, null);
+        
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingMovie);
+        _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        var command = new UpdateMovieCommand
+        {
+            Id = existingMovie.Id,
+            Title = "Updated Title"
+        };
+
+        // Act
+        await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        _contextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task Handle_WithNonExistentMovie_ShouldThrowNotFoundException()
+    {
+        // Arrange
+        var movieId = Guid.NewGuid();
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { (MovieId)movieId }, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Movie?)null);
+
+        var command = new UpdateMovieCommand
+        {
+            Id = movieId,
+            Title = "Updated Title"
+        };
+
+        // Act & Assert
+        await Should.ThrowAsync<NotFoundException>(async () =>
+            await _handler.Handle(command, CancellationToken.None));
+    }
+
+    [Test]
+    public async Task Handle_WithNonExistentMovie_ShouldIncludeEntityNameInException()
+    {
+        // Arrange
+        var movieId = Guid.NewGuid();
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId }, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Movie?)null);
+
+        var command = new UpdateMovieCommand
+        {
+            Id = movieId,
+            Title = "Updated Title"
+        };
+
+        // Act & Assert
+        var exception = await Should.ThrowAsync<NotFoundException>(async () =>
+            await _handler.Handle(command, CancellationToken.None));
+        
+        exception.Message.ShouldContain("Movie");
+    }
+
+    [Test]
+    public async Task Handle_WithCancellationToken_ShouldPassToFindAndSave()
+    {
+        // Arrange
+        var existingMovie = Movie.Create("Original Title", null, null, null, null, null, null);
+        using var cts = new CancellationTokenSource();
+        var token = cts.Token;
+
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, token))
+            .ReturnsAsync(existingMovie);
+        _contextMock.Setup(x => x.SaveChangesAsync(token))
+            .ReturnsAsync(1);
+
+        var command = new UpdateMovieCommand
+        {
+            Id = existingMovie.Id,
+            Title = "Updated Title"
+        };
+
+        // Act
+        await _handler.Handle(command, token);
+
+        // Assert
+        _contextMock.Verify(x => x.SaveChangesAsync(token), Times.Once);
+    }
+
+    [Test]
+    public async Task Handle_WithNullOptionalFields_ShouldUpdateToNull()
+    {
+        // Arrange
+        var existingMovie = Movie.Create("Title", "Has Description", 2020, "Director", "Genre", "url", 8.0);
+        
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingMovie);
+        _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        var command = new UpdateMovieCommand
+        {
+            Id = existingMovie.Id,
+            Title = "Updated Title",
+            Description = null,
+            ReleaseYear = null,
+            Director = null,
+            Genre = null,
+            PosterUrl = null,
+            Rating = null
+        };
+
+        // Act
+        await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        existingMovie.Description.ShouldBeNull();
+        existingMovie.ReleaseYear.ShouldBeNull();
+        existingMovie.Director.ShouldBeNull();
+        existingMovie.Genre.ShouldBeNull();
+        existingMovie.PosterUrl.ShouldBeNull();
+        existingMovie.Rating.ShouldBeNull();
+    }
+}

@@ -7,11 +7,11 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
 {
     public static Movie Create(string title, string? description = null, int? releaseYear = null, string? director = null, string? genre = null, string? posterUrl = null, double? rating = null)
     {
+
         if (string.IsNullOrWhiteSpace(title))
             throw new ArgumentException("Title cannot be null or empty.", nameof(title));
-        return new Movie
+        var movie = new Movie
         {
-            Id = MovieId.CreateNew(),
             Title = title,
             Description = description,
             ReleaseYear = releaseYear,
@@ -20,12 +20,16 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
             PosterUrl = posterUrl,
             Rating = rating
         };
+
+        movie.AddDomainEvent(new MovieCreatedEvent(movie));
+
+        return movie;
     }
 
 
     private readonly HashSet<Comment> _comments = new();
 
-    public override MovieId Id { get; set; } = MovieId.CreateNew();
+    public override MovieId Id { get; } = MovieId.CreateNew();
 
     public string Title { get; set; } = string.Empty;
     
@@ -65,6 +69,8 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
         var comment = Comment.Create(Id, userId, text);
         _comments.Add(comment);
 
+        AddDomainEvent(new CommentCreatedEvent(comment));
+
         return comment;
     }
 
@@ -80,6 +86,10 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
             return false;
 
         _comments.Remove(comment);
+
+
+
+
         return true;
     }
 

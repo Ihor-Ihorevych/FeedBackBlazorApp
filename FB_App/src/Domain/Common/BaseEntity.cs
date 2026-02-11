@@ -10,7 +10,7 @@ public abstract class BaseEntity : BaseEntity<int>;
 /// <typeparam name="TId">The type of the entity ID.</typeparam>
 public abstract class BaseEntity<TId> where TId : notnull
 {
-    public abstract TId Id { get; set; }
+    public abstract TId Id { get; }
 
     private readonly List<BaseEvent> _domainEvents = new();
 
