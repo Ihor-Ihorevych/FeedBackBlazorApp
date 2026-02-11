@@ -48,7 +48,7 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
     /// Factory method to create a new comment.
     /// This is called only by the Movie aggregate root.
     /// </summary>
-    internal static Comment Create(MovieId movieId, string userId, string text)
+    public static Comment Create(MovieId movieId, string userId, string text)
     {
         if (movieId == Guid.Empty)
             throw new ArgumentException("Movie ID must be greater than zero.", nameof(movieId));
@@ -76,7 +76,7 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
     /// <param name="reviewedBy">The identifier of the user approving the comment.</param>
     /// <exception cref="ArgumentException">Thrown when reviewedBy is null or empty.</exception>
     /// <exception cref="InvalidOperationException">Thrown when comment is not in pending status.</exception>
-    internal void Approve(string reviewedBy)
+    public void Approve(string reviewedBy)
     {
         if (string.IsNullOrWhiteSpace(reviewedBy))
             throw new ArgumentException("Reviewed by cannot be null or empty.", nameof(reviewedBy));
@@ -95,7 +95,7 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
     /// <param name="reviewedBy">The identifier of the user rejecting the comment.</param>
     /// <exception cref="ArgumentException">Thrown when reviewedBy is null or empty.</exception>
     /// <exception cref="InvalidOperationException">Thrown when comment is not in pending status.</exception>
-    internal void Reject(string reviewedBy)
+    public void Reject(string reviewedBy)
     {
         if (string.IsNullOrWhiteSpace(reviewedBy))
             throw new ArgumentException("Reviewed by cannot be null or empty.", nameof(reviewedBy));
@@ -113,7 +113,7 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
     /// Only allowed for reviewed comments.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when comment is already pending.</exception>
-    internal void ResetToPending()
+    public void ResetToPending()
     {
         if (IsPending)
             throw new InvalidOperationException("Comment is already in pending status.");

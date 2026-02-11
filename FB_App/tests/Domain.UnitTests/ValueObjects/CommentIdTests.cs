@@ -1,6 +1,5 @@
 using FB_App.Domain.Entities.Values;
 using NUnit.Framework;
-using Shouldly;
 
 namespace FB_App.Domain.UnitTests.ValueObjects;
 
@@ -17,7 +16,7 @@ public class CommentIdTests
         var commentId = CommentId.Create(value);
 
         // Assert
-        commentId.Value.ShouldBe(value);
+        Assert.That(commentId.Value, Is.EqualTo(value));
     }
 
     [Test]
@@ -27,7 +26,7 @@ public class CommentIdTests
         var value = Guid.Empty;
 
         // Act & Assert
-        Should.Throw<ArgumentException>(() => CommentId.Create(value));
+        Assert.That(() => CommentId.Create(value), Throws.TypeOf<ArgumentException>());
     }
 
     [Test]
@@ -37,7 +36,7 @@ public class CommentIdTests
         var commentId = CommentId.CreateNew();
 
         // Assert
-        commentId.Value.ShouldNotBe(Guid.Empty);
+        Assert.That(commentId.Value, Is.Not.EqualTo(Guid.Empty));
     }
 
     [Test]
@@ -49,9 +48,12 @@ public class CommentIdTests
         // Act
         var result = CommentId.TryCreate(value, out var commentId);
 
-        // Assert
-        result.ShouldBeTrue();
-        commentId!.Value.ShouldBe(value);
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result, Is.True);
+            Assert.That(commentId!.Value, Is.EqualTo(value));
+        }
     }
 
     [Test]
@@ -63,9 +65,12 @@ public class CommentIdTests
         // Act
         var result = CommentId.TryCreate(value, out var commentId);
 
-        // Assert
-        result.ShouldBeFalse();
-        commentId.ShouldBeNull();
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result, Is.False);
+            Assert.That(commentId, Is.Null);
+        }
     }
 
     [Test]
@@ -79,7 +84,7 @@ public class CommentIdTests
         Guid value = commentId;
 
         // Assert
-        value.ShouldBe(guidValue);
+        Assert.That(value, Is.EqualTo(guidValue));
     }
 
     [Test]
@@ -92,7 +97,7 @@ public class CommentIdTests
         var commentId = (CommentId)value;
 
         // Assert
-        commentId.Value.ShouldBe(value);
+        Assert.That(commentId.Value, Is.EqualTo(value));
     }
 
     [Test]
@@ -102,7 +107,7 @@ public class CommentIdTests
         var value = Guid.Empty;
 
         // Act & Assert
-        Should.Throw<ArgumentException>(() => (CommentId)value);
+        Assert.That(() => (CommentId)value, Throws.TypeOf<ArgumentException>());
     }
 
     [Test]
@@ -125,8 +130,8 @@ public class CommentIdTests
         var commentId2 = CommentId.Create(Guid.NewGuid());
 
         // Act & Assert
-        commentId1.ShouldNotBe(commentId2);
-        (commentId1 != commentId2).ShouldBeTrue();
+        Assert.That(commentId1, Is.Not.EqualTo(commentId2));
+        Assert.That(commentId1, Is.Not.EqualTo(commentId2));
     }
 
     [Test]
@@ -138,7 +143,7 @@ public class CommentIdTests
         var commentId2 = CommentId.Create(guid);
 
         // Act & Assert
-        commentId1.GetHashCode().ShouldBe(commentId2.GetHashCode());
+        Assert.That(commentId1.GetHashCode(), Is.EqualTo(commentId2.GetHashCode()));
     }
 
     [Test]
@@ -149,6 +154,6 @@ public class CommentIdTests
         var commentId2 = CommentId.Create(Guid.NewGuid());
 
         // Act & Assert
-        commentId1.GetHashCode().ShouldNotBe(commentId2.GetHashCode());
+        Assert.That(commentId1.GetHashCode(), Is.Not.EqualTo(commentId2.GetHashCode()));
     }
 }

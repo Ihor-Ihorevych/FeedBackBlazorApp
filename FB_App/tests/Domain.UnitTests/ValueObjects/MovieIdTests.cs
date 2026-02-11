@@ -1,6 +1,5 @@
 using FB_App.Domain.Entities.Values;
 using NUnit.Framework;
-using Shouldly;
 
 namespace FB_App.Domain.UnitTests.ValueObjects;
 
@@ -17,7 +16,7 @@ public class MovieIdTests
         var movieId = MovieId.Create(value);
 
         // Assert
-        movieId.Value.ShouldBe(value);
+        Assert.That(movieId.Value, Is.EqualTo(value));
     }
 
     [Test]
@@ -27,7 +26,7 @@ public class MovieIdTests
         var value = Guid.Empty;
 
         // Act & Assert
-        Should.Throw<ArgumentException>(() => MovieId.Create(value));
+        Assert.That(() => MovieId.Create(value), Throws.TypeOf<ArgumentException>());
     }
 
     [Test]
@@ -37,7 +36,7 @@ public class MovieIdTests
         var movieId = MovieId.CreateNew();
 
         // Assert
-        movieId.Value.ShouldNotBe(Guid.Empty);
+        Assert.That(movieId.Value, Is.Not.EqualTo(Guid.Empty));
     }
 
     [Test]
@@ -49,9 +48,12 @@ public class MovieIdTests
         // Act
         var result = MovieId.TryCreate(value, out var movieId);
 
-        // Assert
-        result.ShouldBeTrue();
-        movieId!.Value.ShouldBe(value);
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result, Is.True);
+            Assert.That(movieId!.Value, Is.EqualTo(value));
+        }
     }
 
     [Test]
@@ -63,9 +65,12 @@ public class MovieIdTests
         // Act
         var result = MovieId.TryCreate(value, out var movieId);
 
-        // Assert
-        result.ShouldBeFalse();
-        movieId.ShouldBeNull();
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result, Is.False);
+            Assert.That(movieId, Is.Null);
+        }
     }
 
     [Test]
@@ -79,7 +84,7 @@ public class MovieIdTests
         Guid value = movieId;
 
         // Assert
-        value.ShouldBe(guidValue);
+        Assert.That(value, Is.EqualTo(guidValue));
     }
 
     [Test]
@@ -92,7 +97,7 @@ public class MovieIdTests
         var movieId = (MovieId)value;
 
         // Assert
-        movieId.Value.ShouldBe(value);
+        Assert.That(movieId.Value, Is.EqualTo(value));
     }
 
     [Test]
@@ -102,7 +107,7 @@ public class MovieIdTests
         var value = Guid.Empty;
 
         // Act & Assert
-        Should.Throw<ArgumentException>(() => (MovieId)value);
+        Assert.That(() => (MovieId)value, Throws.TypeOf<ArgumentException>());
     }
 
     [Test]
@@ -113,6 +118,7 @@ public class MovieIdTests
         var movieId1 = MovieId.Create(guid);
         var movieId2 = MovieId.Create(guid);
 
+        // Act & Assert
         Assert.That(movieId1, Is.EqualTo(movieId2));
     }
 
@@ -124,8 +130,7 @@ public class MovieIdTests
         var movieId2 = MovieId.Create(Guid.NewGuid());
 
         // Act & Assert
-        movieId1.ShouldNotBe(movieId2);
-        (movieId1 != movieId2).ShouldBeTrue();
+        Assert.That(movieId1, Is.Not.EqualTo(movieId2));
     }
 
     [Test]
@@ -137,7 +142,7 @@ public class MovieIdTests
         var movieId2 = MovieId.Create(guid);
 
         // Act & Assert
-        movieId1.GetHashCode().ShouldBe(movieId2.GetHashCode());
+        Assert.That(movieId1.GetHashCode(), Is.EqualTo(movieId2.GetHashCode()));
     }
 
     [Test]
@@ -148,6 +153,6 @@ public class MovieIdTests
         var movieId2 = MovieId.Create(Guid.NewGuid());
 
         // Act & Assert
-        movieId1.GetHashCode().ShouldNotBe(movieId2.GetHashCode());
+        Assert.That(movieId1.GetHashCode(), Is.Not.EqualTo(movieId2.GetHashCode()));
     }
 }

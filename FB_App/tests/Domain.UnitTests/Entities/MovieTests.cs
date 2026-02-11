@@ -2,7 +2,6 @@ using FB_App.Domain.Entities;
 using FB_App.Domain.Entities.Values;
 using FB_App.Domain.Enums;
 using NUnit.Framework;
-using Shouldly;
 
 namespace FB_App.Domain.UnitTests.Entities;
 
@@ -30,12 +29,15 @@ public class MovieTests
     [Test]
     public void Create_NewMovie_ShouldHaveEmptyComments()
     {
-        // Assert
-        _movie.Comments.ShouldBeEmpty();
-        _movie.TotalCommentsCount.ShouldBe(0);
-        _movie.ApprovedCommentsCount.ShouldBe(0);
-        _movie.PendingCommentsCount.ShouldBe(0);
-        _movie.RejectedCommentsCount.ShouldBe(0);
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(_movie.Comments, Is.Empty);
+            Assert.That(_movie.TotalCommentsCount, Is.Zero);
+            Assert.That(_movie.ApprovedCommentsCount, Is.Zero);
+            Assert.That(_movie.PendingCommentsCount, Is.Zero);
+            Assert.That(_movie.RejectedCommentsCount, Is.Zero);
+        }
     }
 
     [Test]
@@ -48,42 +50,49 @@ public class MovieTests
         var comment = _movie.AddComment(UserId, commentText);
 
         // Assert
-        comment.ShouldNotBeNull();
-        comment.UserId.ShouldBe(UserId);
-        comment.Text.ShouldBe(commentText);
-        comment.Status.ShouldBe(CommentStatus.Pending);
-        comment.IsPending.ShouldBeTrue();
-        _movie.Comments.ShouldContain(comment);
-        _movie.TotalCommentsCount.ShouldBe(1);
-        _movie.PendingCommentsCount.ShouldBe(1);
+        Assert.That(comment, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(comment.UserId, Is.EqualTo(UserId));
+            Assert.That(comment.Text, Is.EqualTo(commentText));
+            Assert.That(comment.Status, Is.EqualTo(CommentStatus.Pending));
+            Assert.That(comment.IsPending, Is.True);
+            Assert.That(_movie.Comments, Does.Contain(comment));
+            Assert.That(_movie.TotalCommentsCount, Is.EqualTo(1));
+            Assert.That(_movie.PendingCommentsCount, Is.EqualTo(1));
+        }
     }
 
     [Test]
     public void AddComment_WithNullUserId_ShouldThrowArgumentException()
     {
         // Act & Assert
-        Should.Throw<ArgumentException>(() => _movie.AddComment(null!, "Great movie!"));
+        Assert.That(() => _movie.AddComment(null!, "Great movie!"),
+            Throws.TypeOf<ArgumentException>());
     }
 
     [Test]
     public void AddComment_WithEmptyUserId_ShouldThrowArgumentException()
     {
         // Act & Assert
-        Should.Throw<ArgumentException>(() => _movie.AddComment("", "Great movie!"));
+        Assert.That(() => _movie.AddComment("", "Great movie!"),
+            Throws.TypeOf<ArgumentException>());
     }
 
     [Test]
     public void AddComment_WithNullText_ShouldThrowArgumentException()
     {
         // Act & Assert
-        Should.Throw<ArgumentException>(() => _movie.AddComment(UserId, null!));
+        Assert.That(() => _movie.AddComment(UserId, null!),
+            Throws.TypeOf<ArgumentException>());
     }
 
     [Test]
     public void AddComment_WithEmptyText_ShouldThrowArgumentException()
     {
         // Act & Assert
-        Should.Throw<ArgumentException>(() => _movie.AddComment(UserId, ""));
+        Assert.That(() => _movie.AddComment(UserId, ""),
+            Throws.TypeOf<ArgumentException>());
     }
 
     [Test]
@@ -94,10 +103,13 @@ public class MovieTests
         _movie.AddComment("user-456", "Second comment");
         _movie.AddComment("user-789", "Third comment");
 
-        // Assert
-        _movie.TotalCommentsCount.ShouldBe(3);
-        _movie.PendingCommentsCount.ShouldBe(3);
-        _movie.Comments.Count.ShouldBe(3);
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(_movie.TotalCommentsCount, Is.EqualTo(3));
+            Assert.That(_movie.PendingCommentsCount, Is.EqualTo(3));
+            Assert.That(_movie.Comments, Has.Count.EqualTo(3));
+        }
     }
 
     [Test]
@@ -113,16 +125,17 @@ public class MovieTests
 
         // Assert
         var approvedComment = _movie.GetComment(commentId);
-        approvedComment.ShouldNotBeNull();
-        approvedComment.Status.ShouldBe(CommentStatus.Approved);
-        approvedComment.IsApproved.ShouldBeTrue();
-        approvedComment.ReviewedBy.ShouldBe(reviewerId);
-        approvedComment.ReviewedAt.ShouldNotBeNull();
-        _movie.ApprovedCommentsCount.ShouldBe(1);
-        _movie.PendingCommentsCount.ShouldBe(0);
+        Assert.That(approvedComment, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(approvedComment!.Status, Is.EqualTo(CommentStatus.Approved));
+            Assert.That(approvedComment.IsApproved, Is.True);
+            Assert.That(approvedComment.ReviewedBy, Is.EqualTo(reviewerId));
+            Assert.That(approvedComment.ReviewedAt, Is.Not.Null);
+            Assert.That(_movie.ApprovedCommentsCount, Is.EqualTo(1));
+            Assert.That(_movie.PendingCommentsCount, Is.Zero);
+        }
     }
-
-   
 
     [Test]
     public void ApproveComment_WithAlreadyApprovedComment_ShouldThrowInvalidOperationException()
@@ -133,7 +146,8 @@ public class MovieTests
         _movie.ApproveComment(commentId, "reviewer-123");
 
         // Act & Assert
-        Should.Throw<InvalidOperationException>(() => _movie.ApproveComment(commentId, "another-reviewer"));
+        Assert.That(() => _movie.ApproveComment(commentId, "another-reviewer"),
+            Throws.TypeOf<InvalidOperationException>());
     }
 
     [Test]
@@ -149,15 +163,16 @@ public class MovieTests
 
         // Assert
         var rejectedComment = _movie.GetComment(commentId);
-        rejectedComment.ShouldNotBeNull();
-        rejectedComment.Status.ShouldBe(CommentStatus.Rejected);
-        rejectedComment.ReviewedBy.ShouldBe(reviewerId);
-        rejectedComment.ReviewedAt.ShouldNotBeNull();
-        _movie.RejectedCommentsCount.ShouldBe(1);
-        _movie.PendingCommentsCount.ShouldBe(0);
+        Assert.That(rejectedComment, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(rejectedComment!.Status, Is.EqualTo(CommentStatus.Rejected));
+            Assert.That(rejectedComment.ReviewedBy, Is.EqualTo(reviewerId));
+            Assert.That(rejectedComment.ReviewedAt, Is.Not.Null);
+            Assert.That(_movie.RejectedCommentsCount, Is.EqualTo(1));
+            Assert.That(_movie.PendingCommentsCount, Is.Zero);
+        }
     }
-
-    
 
     [Test]
     public void RejectComment_WithAlreadyApprovedComment_ShouldThrowInvalidOperationException()
@@ -168,7 +183,8 @@ public class MovieTests
         _movie.ApproveComment(commentId, "reviewer-123");
 
         // Act & Assert
-        Should.Throw<InvalidOperationException>(() => _movie.RejectComment(commentId, "another-reviewer"));
+        Assert.That(() => _movie.RejectComment(commentId, "another-reviewer"),
+            Throws.TypeOf<InvalidOperationException>());
     }
 
     [Test]
@@ -181,11 +197,14 @@ public class MovieTests
         // Act
         var result = _movie.RemoveComment(commentId);
 
-        // Assert
-        result.ShouldBeTrue();
-        _movie.Comments.ShouldNotContain(comment);
-        _movie.TotalCommentsCount.ShouldBe(0);
-        _movie.GetComment(commentId).ShouldBeNull();
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result, Is.True);
+            Assert.That(_movie.Comments, Does.Not.Contain(comment));
+            Assert.That(_movie.TotalCommentsCount, Is.Zero);
+            Assert.That(_movie.GetComment(commentId), Is.Null);
+        }
     }
 
     [Test]
@@ -195,7 +214,7 @@ public class MovieTests
         var result = _movie.RemoveComment(CommentId.CreateNew());
 
         // Assert
-        result.ShouldBeFalse();
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -209,9 +228,12 @@ public class MovieTests
         var retrievedComment = _movie.GetComment(commentId);
 
         // Assert
-        retrievedComment.ShouldNotBeNull();
-        retrievedComment!.UserId.ShouldBe(UserId);
-        retrievedComment.Text.ShouldBe("Great movie!");
+        Assert.That(retrievedComment, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(retrievedComment!.UserId, Is.EqualTo(UserId));
+            Assert.That(retrievedComment.Text, Is.EqualTo("Great movie!"));
+        }
     }
 
     [Test]
@@ -221,7 +243,7 @@ public class MovieTests
         var result = _movie.GetComment(CommentId.CreateNew());
 
         // Assert
-        result.ShouldBeNull();
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -240,10 +262,10 @@ public class MovieTests
         var approvedComments = _movie.GetApprovedComments();
 
         // Assert
-        approvedComments.Count.ShouldBe(2);
-        approvedComments.ShouldContain(comment1);
-        approvedComments.ShouldContain(comment2);
-        approvedComments.ShouldNotContain(comment3);
+        Assert.That(approvedComments, Has.Count.EqualTo(2));
+        Assert.That(approvedComments, Does.Contain(comment1));
+        Assert.That(approvedComments, Does.Contain(comment2));
+        Assert.That(approvedComments, Does.Not.Contain(comment3));
     }
 
     [Test]
@@ -260,10 +282,10 @@ public class MovieTests
         var pendingComments = _movie.GetPendingComments();
 
         // Assert
-        pendingComments.Count.ShouldBe(2);
-        pendingComments.ShouldContain(comment1);
-        pendingComments.ShouldContain(comment2);
-        pendingComments.ShouldNotContain(comment3);
+        Assert.That(pendingComments, Has.Count.EqualTo(2));
+        Assert.That(pendingComments, Does.Contain(comment1));
+        Assert.That(pendingComments, Does.Contain(comment2));
+        Assert.That(pendingComments, Does.Not.Contain(comment3));
     }
 
     [Test]
@@ -276,7 +298,7 @@ public class MovieTests
         var result = _movie.HasPendingComments;
 
         // Assert
-        result.ShouldBeTrue();
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -290,7 +312,7 @@ public class MovieTests
         var result = _movie.HasPendingComments;
 
         // Assert
-        result.ShouldBeFalse();
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -300,7 +322,7 @@ public class MovieTests
         var movieId = _movie.Id;
 
         // Assert
-        movieId.Value.ShouldBe(_movie.Id);
+        Assert.That(movieId, Is.EqualTo((MovieId)_movie.Id.Value));
     }
 
     [Test]
@@ -315,13 +337,16 @@ public class MovieTests
         _movie.RejectComment(comment2.Id, "reviewer-123");
         _movie.RemoveComment(comment3.Id);
 
-        // Assert
-        _movie.TotalCommentsCount.ShouldBe(2);
-        _movie.ApprovedCommentsCount.ShouldBe(1);
-        _movie.RejectedCommentsCount.ShouldBe(1);
-        _movie.PendingCommentsCount.ShouldBe(0);
-        _movie.GetComment(comment1.Id).ShouldNotBeNull();
-        _movie.GetComment(comment2.Id).ShouldNotBeNull();
-        _movie.GetComment(comment3.Id).ShouldBeNull();
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(_movie.TotalCommentsCount, Is.EqualTo(2));
+            Assert.That(_movie.ApprovedCommentsCount, Is.EqualTo(1));
+            Assert.That(_movie.RejectedCommentsCount, Is.EqualTo(1));
+            Assert.That(_movie.PendingCommentsCount, Is.Zero);
+            Assert.That(_movie.GetComment(comment1.Id), Is.Not.Null);
+            Assert.That(_movie.GetComment(comment2.Id), Is.Not.Null);
+            Assert.That(_movie.GetComment(comment3.Id), Is.Null);
+        }
     }
 }
