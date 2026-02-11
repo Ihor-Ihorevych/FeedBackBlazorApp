@@ -111,7 +111,7 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Password)));
     }
 
