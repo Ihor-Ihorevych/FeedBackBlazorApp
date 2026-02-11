@@ -13,7 +13,7 @@ public static class ILoggerExtensions
         {
             if (logger.IsEnabled(logLevel))
             {
-                logger.Log(logLevel, message, args);
+                logger.Log(logLevel: logLevel, message: message, args: args);
             }
         }
     }

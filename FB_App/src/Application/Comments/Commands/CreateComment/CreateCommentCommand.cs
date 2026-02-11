@@ -1,20 +1,19 @@
+using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
 using FB_App.Domain.Entities;
 
-using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException;
-
 namespace FB_App.Application.Comments.Commands.CreateComment;
 
 [Authorize(Roles = Roles.User)]
-public record CreateCommentCommand : IRequest<Guid>
+public record CreateCommentCommand : IRequest<Result<Guid>>
 {
     public Guid MovieId { get; init; }
     public string Text { get; init; } = string.Empty;
 }
 
-public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand, Guid>
+public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand, Result<Guid>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IUser _user;
@@ -25,23 +24,26 @@ public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand,
         _user = user;
     }
 
-    public async Task<Guid> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
     {
         var movie = await _context.Movies
             .FirstOrDefaultAsync(m => m.Id == request.MovieId, cancellationToken);
 
         if (movie == null)
         {
-            throw new NotFoundException(nameof(Movie), request.MovieId.ToString());
+            return Result<Guid>.NotFound($"{nameof(Movie)} ({request.MovieId}) was not found.");
         }
 
-        var comment = movie.AddComment(
-            _user.Id ?? throw new UnauthorizedAccessException("User ID not found"),
-            request.Text
-        );
+        var userId = _user.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Result<Guid>.Unauthorized();
+        }
+
+        var comment = movie.AddComment(userId, request.Text);
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return comment.Id;
+        return Result<Guid>.Success(comment.Id);
     }
 }

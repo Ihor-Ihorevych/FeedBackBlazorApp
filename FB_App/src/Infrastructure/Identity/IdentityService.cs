@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Models;
 using FB_App.Domain.Constants;
@@ -43,7 +44,7 @@ public class IdentityService : IIdentityService
         return user?.UserName;
     }
 
-    public async Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password, string role = nameof(Roles.User))
+    public async Task<Result<string>> CreateUserAsync(string userName, string password, string role = nameof(Roles.User))
     {
         var user = new ApplicationUser
         {
@@ -52,9 +53,15 @@ public class IdentityService : IIdentityService
         };
 
         var result = await _userManager.CreateAsync(user, password);
+
+        if (!result.Succeeded)
+        {
+            return Result<string>.Error(string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
         await _userManager.AddToRoleAsync(user, role);
 
-        return (result.ToApplicationResult(), user.Id);
+        return Result<string>.Success(user.Id);
     }
 
     public async Task<bool> IsInRoleAsync(string userId, string role)
@@ -91,16 +98,18 @@ public class IdentityService : IIdentityService
     {
         var result = await _userManager.DeleteAsync(user);
 
-        return result.ToApplicationResult();
+        return result.Succeeded 
+            ? Result.Success() 
+            : Result.Error(new ErrorList(result.Errors.Select(e => e.Description).ToArray()));
     }
 
-    public async Task<(Result Result, AppAccessTokenResponse? Token)> LoginUserAsync(string email, string password)
+    public async Task<Result<AppAccessTokenResponse>> LoginUserAsync(string email, string password)
     {
         var user = await _userManager.FindByEmailAsync(email);
 
         if (user == null)
         {
-            return (Result.Failure(["Invalid email or password."]), null);
+            return Result<AppAccessTokenResponse>.Error("Invalid email or password.");
         }
 
         var signInResult = await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
@@ -109,18 +118,18 @@ public class IdentityService : IIdentityService
         {
             if (signInResult.IsLockedOut)
             {
-                return (Result.Failure(["Account is locked out. Please try again later."]), null);
+                return Result<AppAccessTokenResponse>.Error("Account is locked out. Please try again later.");
             }
 
-            return (Result.Failure(["Invalid email or password."]), null);
+            return Result<AppAccessTokenResponse>.Error("Invalid email or password.");
         }
 
         var token = await GenerateTokenAsync(user);
 
-        return (Result.Success(), token);
+        return Result<AppAccessTokenResponse>.Success(token);
     }
 
-    public async Task<(Result Result, AppAccessTokenResponse? Token)> RefreshTokenAsync(string refreshToken)
+    public async Task<Result<AppAccessTokenResponse>> RefreshTokenAsync(string refreshToken)
     {
         var options = _bearerTokenOptions.Get(IdentityConstants.BearerScheme);
         var refreshTokenProtector = options.RefreshTokenProtector;
@@ -130,12 +139,12 @@ public class IdentityService : IIdentityService
             _timeProvider.GetUtcNow() >= expiresUtc ||
             await _signInManager.ValidateSecurityStampAsync(refreshTicket.Principal) is not { } user)
         {
-            return (Result.Failure(["Invalid or expired refresh token."]), null);
+            return Result<AppAccessTokenResponse>.Error("Invalid or expired refresh token.");
         }
 
         var token = await GenerateTokenAsync(user);
 
-        return (Result.Success(), token);
+        return Result<AppAccessTokenResponse>.Success(token);
     }
 
     private async Task<AppAccessTokenResponse> GenerateTokenAsync(ApplicationUser user)

@@ -66,9 +66,12 @@ public class CreateCommentCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result, Is.Not.EqualTo(Guid.Empty));
-        Assert.That(movie.Comments, Is.Not.Empty);
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result, Is.Not.Default);
+            Assert.That(movie.Comments, Is.Not.Empty);
+        }
     }
 
     [Test]

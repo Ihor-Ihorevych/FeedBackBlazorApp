@@ -17,13 +17,19 @@ public class Comments : EndpointGroupBase
         groupBuilder.MapPut(RejectComment, "/movie/{movieId}/{id}/reject").RequireAuthorization();
     }
 
-    public async Task<Created<Guid>> CreateComment(ISender sender, CreateCommentCommand command)
+    public static async Task<Results<Created<Guid>, NotFound>> CreateComment(ISender sender, CreateCommentCommand command)
     {
-        var id = await sender.Send(command);
-        return TypedResults.Created($"/api/comments/{id}", id);
+        var result = await sender.Send(command);
+
+        if (!result.IsSuccess)
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.Created($"/api/comments/{result.Value}", result.Value);
     }
 
-    public async Task<Ok<List<CommentDetailDto>>> GetCommentsByMovie(
+    public static async Task<Ok<List<CommentDetailDto>>> GetCommentsByMovie(
         ISender sender,
         Guid movieId,
         CommentStatus? status = null)
@@ -33,34 +39,32 @@ public class Comments : EndpointGroupBase
             MovieId = movieId,
             Status = status
         };
-        
+
         var comments = await sender.Send(query);
         return TypedResults.Ok(comments);
     }
 
-    public async Task<Results<NoContent, NotFound>> ApproveComment(ISender sender, Guid movieId, Guid id)
+    public static async Task<Results<NoContent, NotFound>> ApproveComment(ISender sender, Guid movieId, Guid id)
     {
-        try
-        {
-            await sender.Send(new ApproveCommentCommand(movieId, id));
-            return TypedResults.NoContent();
-        }
-        catch (NotFoundException)
+        var result = await sender.Send(new ApproveCommentCommand(movieId, id));
+
+        if (!result.IsSuccess)
         {
             return TypedResults.NotFound();
         }
+
+        return TypedResults.NoContent();
     }
 
-    public async Task<Results<NoContent, NotFound>> RejectComment(ISender sender, Guid movieId, Guid id)
+    public static async Task<Results<NoContent, NotFound>> RejectComment(ISender sender, Guid movieId, Guid id)
     {
-        try
-        {
-            await sender.Send(new RejectCommentCommand(movieId, id));
-            return TypedResults.NoContent();
-        }
-        catch (NotFoundException)
+        var result = await sender.Send(new RejectCommentCommand(movieId, id));
+
+        if (!result.IsSuccess)
         {
             return TypedResults.NotFound();
         }
+
+        return TypedResults.NoContent();
     }
 }

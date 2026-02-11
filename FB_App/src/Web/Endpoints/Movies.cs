@@ -12,17 +12,15 @@ public class Movies : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
-        // Public endpoints - no authorization required (Guest access)
         groupBuilder.MapGet(GetMovies, "/");
         groupBuilder.MapGet(GetMovieById, "/{id}");
-        
-        // Admin-only endpoints - CRUD operations
+
         groupBuilder.MapPost(CreateMovie, "/").RequireAuthorization();
         groupBuilder.MapPut(UpdateMovie, "/{id}").RequireAuthorization();
         groupBuilder.MapDelete(DeleteMovie, "/{id}").RequireAuthorization();
     }
 
-    public async Task<Ok<PaginatedList<MovieDto>>> GetMovies(
+    public static async Task<Ok<PaginatedList<MovieDto>>> GetMovies(
         ISender sender, 
         [AsParameters] GetMoviesQuery query)
     {
@@ -30,28 +28,27 @@ public class Movies : EndpointGroupBase
         return TypedResults.Ok(result);
     }
 
-    public async Task<Results<Ok<MovieDetailDto>, NotFound>> GetMovieById(
+    public static async Task<Results<Ok<MovieDetailDto>, NotFound>> GetMovieById(
         ISender sender, 
         Guid id)
     {
-        try
-        {
-            var movie = await sender.Send(new GetMovieByIdQuery(id));
-            return TypedResults.Ok(movie);
-        }
-        catch (NotFoundException)
+        var result = await sender.Send(new GetMovieByIdQuery(id));
+
+        if (!result.IsSuccess)
         {
             return TypedResults.NotFound();
         }
+
+        return TypedResults.Ok(result.Value);
     }
 
-    public async Task<Created<Guid>> CreateMovie(ISender sender, CreateMovieCommand command)
+    public static async Task<Created<Guid>> CreateMovie(ISender sender, CreateMovieCommand command)
     {
         var id = await sender.Send(command);
         return TypedResults.Created($"/api/movies/{id}", id);
     }
 
-    public async Task<Results<NoContent, BadRequest, NotFound>> UpdateMovie(
+    public static async Task<Results<NoContent, BadRequest, NotFound>> UpdateMovie(
         ISender sender, 
         Guid id, 
         UpdateMovieCommand command)
@@ -59,27 +56,25 @@ public class Movies : EndpointGroupBase
         if (id != command.Id) 
             return TypedResults.BadRequest();
 
-        try
-        {
-            await sender.Send(command);
-            return TypedResults.NoContent();
-        }
-        catch (NotFoundException)
+        var result = await sender.Send(command);
+
+        if (!result.IsSuccess)
         {
             return TypedResults.NotFound();
         }
+
+        return TypedResults.NoContent();
     }
 
-    public async Task<Results<NoContent, NotFound>> DeleteMovie(ISender sender, Guid id)
+    public static async Task<Results<NoContent, NotFound>> DeleteMovie(ISender sender, Guid id)
     {
-        try
-        {
-            await sender.Send(new DeleteMovieCommand(id));
-            return TypedResults.NoContent();
-        }
-        catch (NotFoundException)
+        var result = await sender.Send(new DeleteMovieCommand(id));
+
+        if (!result.IsSuccess)
         {
             return TypedResults.NotFound();
         }
+
+        return TypedResults.NoContent();
     }
 }

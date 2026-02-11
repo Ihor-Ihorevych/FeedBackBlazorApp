@@ -1,5 +1,5 @@
+using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
-using FB_App.Application.Common.Models;
 using FB_App.Application.Users.Commands.CreateUser;
 using Moq;
 using NUnit.Framework;
@@ -32,7 +32,7 @@ public class CreateUserCommandHandlerTests
         var expectedUserId = Guid.NewGuid().ToString();
         _identityServiceMock
             .Setup(x => x.CreateUserAsync(command.Email, command.Password, "User"))
-            .ReturnsAsync((Result.Success(), expectedUserId));
+            .ReturnsAsync(Result<string>.Success(expectedUserId));
 
         // Act
         await _handler.Handle(command, CancellationToken.None);
@@ -57,14 +57,14 @@ public class CreateUserCommandHandlerTests
         var expectedUserId = Guid.NewGuid().ToString();
         _identityServiceMock
             .Setup(x => x.CreateUserAsync(command.Email, command.Password, "User"))
-            .ReturnsAsync((Result.Success(), expectedUserId));
+            .ReturnsAsync(Result<string>.Success(expectedUserId));
 
         // Act
-        var (result, userId) = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.That(result.Succeeded, Is.True);
-        Assert.That(userId, Is.EqualTo(expectedUserId));
+        Assert.That(result.IsSuccess, Is.True);
+        Assert.That(result.Value, Is.EqualTo(expectedUserId));
     }
 
     [Test]
@@ -77,18 +77,16 @@ public class CreateUserCommandHandlerTests
             Password = "ValidPass1!"
         };
 
-        var errors = new[] { "Email already exists." };
         _identityServiceMock
             .Setup(x => x.CreateUserAsync(command.Email, command.Password, "User"))
-            .ReturnsAsync((Result.Failure(errors), string.Empty));
+            .ReturnsAsync(Result<string>.Error("Email already exists."));
 
         // Act
-        var (result, userId) = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.That(result.Succeeded, Is.False);
-        Assert.That(result.Errors, Does.Contain("Email already exists."));
-        Assert.That(userId, Is.Empty);
+        Assert.That(result.IsSuccess, Is.False);
+        Assert.That(result.Errors.Select(e => e.ToString()), Does.Contain("Email already exists."));
     }
 
     [Test]
@@ -103,7 +101,7 @@ public class CreateUserCommandHandlerTests
 
         _identityServiceMock
             .Setup(x => x.CreateUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync((Result.Success(), "user-id"));
+            .ReturnsAsync(Result<string>.Success("user-id"));
 
         // Act
         await _handler.Handle(command, CancellationToken.None);
@@ -128,12 +126,12 @@ public class CreateUserCommandHandlerTests
         using var cts = new CancellationTokenSource();
         _identityServiceMock
             .Setup(x => x.CreateUserAsync(command.Email, command.Password, "User"))
-            .ReturnsAsync((Result.Success(), "user-id"));
+            .ReturnsAsync(Result<string>.Success("user-id"));
 
         // Act
-        var (result, _) = await _handler.Handle(command, cts.Token);
+        var result = await _handler.Handle(command, cts.Token);
 
         // Assert
-        Assert.That(result.Succeeded, Is.True);
+        Assert.That(result.IsSuccess, Is.True);
     }
 }

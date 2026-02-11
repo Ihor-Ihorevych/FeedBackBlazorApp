@@ -1,15 +1,13 @@
-using FB_App.Application.Common.Exceptions;
+using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
 using FB_App.Domain.Entities;
 
-using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException;
-
 namespace FB_App.Application.Movies.Commands.UpdateMovie;
 
 [Authorize(Roles = Roles.Administrator)]
-public record UpdateMovieCommand : IRequest
+public record UpdateMovieCommand : IRequest<Result>
 {
     public Guid Id { get; init; }
     public string Title { get; init; } = string.Empty;
@@ -21,7 +19,7 @@ public record UpdateMovieCommand : IRequest
     public double? Rating { get; init; }
 }
 
-public class UpdateMovieCommandHandler : IRequestHandler<UpdateMovieCommand>
+public class UpdateMovieCommandHandler : IRequestHandler<UpdateMovieCommand, Result>
 {
     private readonly IApplicationDbContext _context;
 
@@ -30,14 +28,14 @@ public class UpdateMovieCommandHandler : IRequestHandler<UpdateMovieCommand>
         _context = context;
     }
 
-    public async Task Handle(UpdateMovieCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateMovieCommand request, CancellationToken cancellationToken)
     {
         var movie = await _context.Movies
             .FindAsync(new object[] { request.Id }, cancellationToken);
 
         if (movie == null)
         {
-            throw new NotFoundException(nameof(Movie), request.Id.ToString());
+            return Result.NotFound($"{nameof(Movie)} ({request.Id}) was not found.");
         }
 
         movie.Title = request.Title;
@@ -49,5 +47,7 @@ public class UpdateMovieCommandHandler : IRequestHandler<UpdateMovieCommand>
         movie.Rating = request.Rating;
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
     }
 }

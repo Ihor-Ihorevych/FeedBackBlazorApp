@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Models;
 using FB_App.Application.Users.Commands.RefreshToken;
@@ -36,18 +37,18 @@ public class RefreshTokenCommandHandlerTests
 
         _identityServiceMock
             .Setup(x => x.RefreshTokenAsync(command.RefreshToken))
-            .ReturnsAsync((Result.Success(), expectedToken));
+            .ReturnsAsync(Result<AccessTokenResponse>.Success(expectedToken));
 
         // Act
-        var (result, token) = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.That(result.Succeeded, Is.True);
-        Assert.That(token, Is.Not.Null);
-        Assert.That(token.AccessToken, Is.EqualTo("new-access-token"));
-        Assert.That(token.RefreshToken, Is.EqualTo("new-refresh-token"));
-        Assert.That(token.TokenType, Is.EqualTo("Bearer"));
-        Assert.That(token.ExpiresIn, Is.EqualTo(3600));
+        Assert.That(result.IsSuccess, Is.True);
+        Assert.That(result.Value, Is.Not.Null);
+        Assert.That(result.Value.AccessToken, Is.EqualTo("new-access-token"));
+        Assert.That(result.Value.RefreshToken, Is.EqualTo("new-refresh-token"));
+        Assert.That(result.Value.TokenType, Is.EqualTo("Bearer"));
+        Assert.That(result.Value.ExpiresIn, Is.EqualTo(3600));
     }
 
     [Test]
@@ -61,15 +62,14 @@ public class RefreshTokenCommandHandlerTests
 
         _identityServiceMock
             .Setup(x => x.RefreshTokenAsync(command.RefreshToken))
-            .ReturnsAsync((Result.Failure(["Invalid or expired refresh token."]), (AccessTokenResponse?)null));
+            .ReturnsAsync(Result<AccessTokenResponse>.Error("Invalid or expired refresh token."));
 
         // Act
-        var (result, token) = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.That(result.Succeeded, Is.False);
-        Assert.That(result.Errors, Does.Contain("Invalid or expired refresh token."));
-        Assert.That(token, Is.Null);
+        Assert.That(result.IsSuccess, Is.False);
+        Assert.That(result.Errors.Select(e => e.ToString()), Does.Contain("Invalid or expired refresh token."));
     }
 
     [Test]
@@ -83,14 +83,13 @@ public class RefreshTokenCommandHandlerTests
 
         _identityServiceMock
             .Setup(x => x.RefreshTokenAsync(command.RefreshToken))
-            .ReturnsAsync((Result.Failure(["Invalid or expired refresh token."]), (AccessTokenResponse?)null));
+            .ReturnsAsync(Result<AccessTokenResponse>.Error("Invalid or expired refresh token."));
 
         // Act
-        var (result, token) = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.That(result.Succeeded, Is.False);
-        Assert.That(token, Is.Null);
+        Assert.That(result.IsSuccess, Is.False);
     }
 
     [Test]
@@ -104,7 +103,7 @@ public class RefreshTokenCommandHandlerTests
 
         _identityServiceMock
             .Setup(x => x.RefreshTokenAsync(It.IsAny<string>()))
-            .ReturnsAsync((Result.Success(), new AccessTokenResponse("Bearer", "token", 3600, "refresh")));
+            .ReturnsAsync(Result<AccessTokenResponse>.Success(new AccessTokenResponse("Bearer", "token", 3600, "refresh")));
 
         // Act
         await _handler.Handle(command, CancellationToken.None);
@@ -130,15 +129,15 @@ public class RefreshTokenCommandHandlerTests
 
         _identityServiceMock
             .Setup(x => x.RefreshTokenAsync(command.RefreshToken))
-            .ReturnsAsync((Result.Success(), newToken));
+            .ReturnsAsync(Result<AccessTokenResponse>.Success(newToken));
 
         // Act
-        var (result, token) = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.That(result.Succeeded, Is.True);
-        Assert.That(token, Is.Not.Null);
-        Assert.That(token.AccessToken, Is.EqualTo("completely-new-access-token"));
-        Assert.That(token.ExpiresIn, Is.EqualTo(7200));
+        Assert.That(result.IsSuccess, Is.True);
+        Assert.That(result.Value, Is.Not.Null);
+        Assert.That(result.Value.AccessToken, Is.EqualTo("completely-new-access-token"));
+        Assert.That(result.Value.ExpiresIn, Is.EqualTo(7200));
     }
 }

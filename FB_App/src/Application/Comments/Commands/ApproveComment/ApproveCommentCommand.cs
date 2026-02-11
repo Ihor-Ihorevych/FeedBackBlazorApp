@@ -1,17 +1,16 @@
-using FB_App.Application.Common.Exceptions;
+using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
 using FB_App.Domain.Entities;
 using FB_App.Domain.Entities.Values;
-using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException;
 
 namespace FB_App.Application.Comments.Commands.ApproveComment;
 
 [Authorize(Roles = Roles.Administrator)]
-public record ApproveCommentCommand(Guid MovieId, Guid CommentId) : IRequest;
+public record ApproveCommentCommand(Guid MovieId, Guid CommentId) : IRequest<Result>;
 
-public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentCommand>
+public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentCommand, Result>
 {
     private readonly IApplicationDbContext _context;
     private readonly IUser _user;
@@ -22,7 +21,7 @@ public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentComman
         _user = user;
     }
 
-    public async Task Handle(ApproveCommentCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(ApproveCommentCommand request, CancellationToken cancellationToken)
     {
         var movie = await _context.Movies
             .Include(m => m.Comments.Where(c => c.MovieId == m.Id))
@@ -30,19 +29,25 @@ public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentComman
 
         if (movie == null)
         {
-            throw new NotFoundException(nameof(Movie), request.MovieId.ToString());
+            return Result.NotFound($"{nameof(Movie)} ({request.MovieId}) was not found.");
         }
 
         var comment = movie.GetComment((CommentId)request.CommentId);
         if (comment == null)
         {
-            throw new NotFoundException(nameof(Comment), request.CommentId.ToString());
+            return Result.NotFound($"{nameof(Comment)} ({request.CommentId}) was not found.");
         }
 
+        var userId = _user.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Result.Unauthorized();
+        }
 
-        var userId = _user.Id ?? throw new UnauthorizedAccessException("User ID not found");
         movie.ApproveComment((CommentId)request.CommentId, userId);
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
     }
 }

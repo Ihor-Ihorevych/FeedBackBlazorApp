@@ -1,8 +1,10 @@
-﻿using FB_App.Application.Common.Models;
+﻿using Ardalis.Result.AspNetCore;
+using FB_App.Application.Common.Models;
 using FB_App.Application.Users.Commands.CreateUser;
 using FB_App.Application.Users.Commands.LoginUser;
 using FB_App.Application.Users.Commands.RefreshToken;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Build.Framework;
 
 namespace FB_App.Web.Endpoints;
 
@@ -24,45 +26,44 @@ public class Users : EndpointGroupBase
         ISender sender,
         CreateUserCommand command)
     {
-        var (result, userId) = await sender.Send(command);
+        var result = await sender.Send(command);
 
-        if (!result.Succeeded)
+        if (!result.IsSuccess)
         {
             return TypedResults.ValidationProblem(
                 new Dictionary<string, string[]>
                 {
-                    { "Errors", result.Errors }
+                    { "Errors", result.Errors.Select(e => e.ToString()).ToArray() }
                 });
         }
 
-        return TypedResults.Ok(userId);
+        return TypedResults.Ok(result.Value);
     }
 
     private static async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult>> Login(
         ISender sender,
         LoginUserCommand command)
     {
-        var (result, token) = await sender.Send(command);
-
-        if (!result.Succeeded || token is null)
+        var result = await sender.Send(command);
+        if (!result.IsSuccess)
         {
             return TypedResults.Unauthorized();
         }
 
-        return TypedResults.Ok(token);
+        return TypedResults.Ok(result.Value);
     }
 
     private static async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult>> Refresh(
         ISender sender,
         RefreshTokenCommand command)
     {
-        var (result, token) = await sender.Send(command);
+        var result = await sender.Send(command);
 
-        if (!result.Succeeded || token is null)
+        if (!result.IsSuccess)
         {
             return TypedResults.Unauthorized();
         }
 
-        return TypedResults.Ok(token);
+        return TypedResults.Ok(result.Value);
     }
 }
