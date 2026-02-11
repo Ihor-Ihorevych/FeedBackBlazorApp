@@ -30,17 +30,12 @@ public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, Gui
 
     public async Task<Guid> Handle(CreateMovieCommand request, CancellationToken cancellationToken)
     {
-        var movie = new Movie
-        {
-            Id = MovieId.CreateNew(),
-            Title = request.Title,
-            Description = request.Description,
-            ReleaseYear = request.ReleaseYear,
-            Director = request.Director,
-            Genre = request.Genre,
-            PosterUrl = request.PosterUrl,
-            Rating = request.Rating
-        };
+        var movie = Movie.Create(request.Title, request.Description,
+            request.ReleaseYear,
+            request.Director,
+            request.Genre,
+            request.PosterUrl,
+            request.Rating);
 
         movie.AddDomainEvent(new MovieCreatedEvent(movie));
 

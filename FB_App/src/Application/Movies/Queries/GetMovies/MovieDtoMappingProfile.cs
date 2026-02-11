@@ -9,6 +9,7 @@ public class MovieDtoMappingProfile : Profile
     public MovieDtoMappingProfile()
     {
         CreateMap<Movie, MovieDto>()
+            .ForMember(d => d.Id, opt => opt.MapFrom(s => (Guid)s.Id))
             .ForMember(d => d.ApprovedCommentsCount, opt => 
                 opt.MapFrom(s => s.Comments.Count(c => c.Status == CommentStatus.Approved)));
     }

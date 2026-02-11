@@ -7,6 +7,7 @@ public class CommentDtoMappingProfile : Profile
 {
     public CommentDtoMappingProfile()
     {
-        CreateMap<Comment, CommentDto>();
+        CreateMap<Comment, CommentDto>()
+            .ForMember(d => d.Id, opt => opt.MapFrom(s => (Guid)s.Id));
     }
 }

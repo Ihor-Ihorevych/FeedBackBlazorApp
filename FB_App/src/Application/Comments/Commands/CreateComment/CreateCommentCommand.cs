@@ -1,4 +1,3 @@
-using FB_App.Application.Common.Exceptions;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;

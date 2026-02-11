@@ -7,7 +7,7 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
 {
     public override CommentId Id { get; set; } = CommentId.CreateNew();
 
-    public required MovieId MovieId { get; set; }
+    public MovieId MovieId { get; private set; } = null!;
     public Movie Movie { get; internal set; } = null!;
     
     public string UserId { get; internal set; } = string.Empty;

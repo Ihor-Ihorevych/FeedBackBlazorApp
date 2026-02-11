@@ -2,6 +2,4 @@
 
 namespace FB_App.Infrastructure.Identity;
 
-public class ApplicationUser : IdentityUser
-{
-}
+public class ApplicationUser : IdentityUser;

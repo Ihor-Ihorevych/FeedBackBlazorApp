@@ -29,17 +29,18 @@ public class GetMoviesQueryHandler : IRequestHandler<GetMoviesQuery, PaginatedLi
     public async Task<PaginatedList<MovieDto>> Handle(GetMoviesQuery request, CancellationToken cancellationToken)
     {
         var query = _context.Movies.AsQueryable();
-
+        
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
+            var searchToLower = request.SearchTerm.ToLower();
             query = query.Where(m => 
-                m.Title.Contains(request.SearchTerm) || 
-                (m.Description != null && m.Description.Contains(request.SearchTerm)));
+                m.Title.ToLower().Contains(searchToLower) || 
+                (m.Description != null && m.Description.ToLower().Contains(searchToLower)));
         }
 
         if (!string.IsNullOrWhiteSpace(request.Genre))
         {
-            query = query.Where(m => m.Genre == request.Genre);
+            query = query.Where(m => m.Genre != null && m.Genre.ToLower().Contains(request.Genre.ToLower()));
         }
 
         return await query

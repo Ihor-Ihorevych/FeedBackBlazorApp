@@ -4,6 +4,7 @@ using FB_App.Domain.Entities;
 using FB_App.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FB_App.Infrastructure.Data;
 
@@ -14,6 +15,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<Movie> Movies => Set<Movie>();
 
     public DbSet<Comment> Comments => Set<Comment>();
+
+    public IDbContextTransaction BeginTransaction()
+    {
+        return Database.BeginTransaction();
+    }
+
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        return Database.BeginTransactionAsync(cancellationToken);
+    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

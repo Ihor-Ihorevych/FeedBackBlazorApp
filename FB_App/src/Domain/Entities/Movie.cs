@@ -5,7 +5,6 @@ using FB_App.Domain.Enums;
 
 public sealed class Movie : BaseAuditableEntity<MovieId>
 {
-
     public static Movie Create(string title, string? description = null, int? releaseYear = null, string? director = null, string? genre = null, string? posterUrl = null, double? rating = null)
     {
         if (string.IsNullOrWhiteSpace(title))

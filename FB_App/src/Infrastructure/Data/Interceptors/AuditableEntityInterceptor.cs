@@ -36,20 +36,22 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
     public void UpdateEntities(DbContext? context)
     {
         if (context == null) return;
-
-        foreach (var entry in context.ChangeTracker.Entries<BaseAuditableEntity>())
+        Func<EntityEntry, bool> isAuditable = (e) => e.State is (EntityState.Added or EntityState.Modified) || e.HasChangedOwnedEntities();
+        foreach (var entry in context.ChangeTracker.Entries<IBaseAuditableEntity>())
         {
-            if (entry.State is EntityState.Added or EntityState.Modified || entry.HasChangedOwnedEntities())
+            if (!isAuditable(entry))
             {
-                var utcNow = _dateTime.GetUtcNow();
-                if (entry.State == EntityState.Added)
-                {
-                    entry.Entity.CreatedBy = _user.Id;
-                    entry.Entity.Created = utcNow;
-                }
-                entry.Entity.LastModifiedBy = _user.Id;
-                entry.Entity.LastModified = utcNow;
+                continue;
             }
+
+            var utcNow = _dateTime.GetUtcNow();
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedBy = _user.Id;
+                entry.Entity.Created = utcNow;
+            }
+            entry.Entity.LastModifiedBy = _user.Id;
+            entry.Entity.LastModified = utcNow;
         }
     }
 }

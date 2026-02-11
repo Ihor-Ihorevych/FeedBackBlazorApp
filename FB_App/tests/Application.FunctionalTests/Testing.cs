@@ -74,7 +74,7 @@ public partial class Testing
 
         var result = await userManager.CreateAsync(user, password);
 
-        if (roles.Any())
+        if (roles.Length != 0)
         {
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 

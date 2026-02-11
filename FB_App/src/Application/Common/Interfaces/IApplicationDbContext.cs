@@ -1,4 +1,7 @@
-﻿using FB_App.Domain.Entities;
+﻿using System.Data;
+using FB_App.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FB_App.Application.Common.Interfaces;
 
@@ -9,4 +12,7 @@ public interface IApplicationDbContext
     DbSet<Comment> Comments { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+
+    IDbContextTransaction BeginTransaction();
+    Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
 }
