@@ -30,10 +30,10 @@ public class DeleteMovieCommandHandlerTests
     public async Task Handle_WithExistingMovie_ShouldRemoveFromContext()
     {
         // Arrange
-        var movieId = Guid.NewGuid();
+        
         var existingMovie = Movie.Create("Test Movie", null, null, null, null, null, null);
-
-        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId }, It.IsAny<CancellationToken>()))
+        var movieId = existingMovie.Id;
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId.Value }, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
@@ -51,10 +51,9 @@ public class DeleteMovieCommandHandlerTests
     public async Task Handle_WithExistingMovie_ShouldSaveChanges()
     {
         // Arrange
-        var movieId = Guid.NewGuid();
         var existingMovie = Movie.Create("Test Movie", null, null, null, null, null, null);
-
-        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId }, It.IsAny<CancellationToken>()))
+        var movieId = existingMovie.Id;
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId.Value }, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
@@ -104,15 +103,14 @@ public class DeleteMovieCommandHandlerTests
     public async Task Handle_WithExistingMovie_ShouldAddDeletedDomainEvent()
     {
         // Arrange
-        var movieId = Guid.NewGuid();
         var existingMovie = Movie.Create("Test Movie", null, null, null, null, null, null);
 
-        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId }, It.IsAny<CancellationToken>()))
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
 
-        var command = new DeleteMovieCommand(movieId);
+        var command = new DeleteMovieCommand(existingMovie.Id);
 
         // Act
         await _handler.Handle(command, CancellationToken.None);

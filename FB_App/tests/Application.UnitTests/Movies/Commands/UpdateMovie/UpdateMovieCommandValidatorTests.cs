@@ -20,26 +20,34 @@ public class UpdateMovieCommandValidatorTests
     [Test]
     public void Validate_WithValidId_ShouldNotHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
-            Title = "Test Movie" 
+            Title = "Test Movie"
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldNotHaveValidationErrorFor(x => x.Id);
+
+        Assert.That(result.IsValid, Is.True);
+        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Id)));
     }
 
     [Test]
     public void Validate_WithEmptyId_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.Empty,
-            Title = "Test Movie" 
+            Title = "Test Movie"
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Id)
-            .WithErrorMessage("Movie ID is required.");
+
+        Assert.That(result.IsValid, Is.False);
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Id) &&
+                 f.ErrorMessage == "Movie ID is required."));
     }
 
     #endregion
@@ -49,39 +57,48 @@ public class UpdateMovieCommandValidatorTests
     [Test]
     public void Validate_WithValidTitle_ShouldNotHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
-            Title = "The Matrix" 
+            Title = "The Matrix"
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldNotHaveValidationErrorFor(x => x.Title);
+
+        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Title)));
     }
 
     [Test]
     public void Validate_WithEmptyTitle_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
-            Title = "" 
+            Title = ""
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Title)
-            .WithErrorMessage("Title is required.");
+
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Title) &&
+                 f.ErrorMessage == "Title is required."));
     }
 
     [Test]
     public void Validate_WithTitleExceeding200Characters_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
-            Title = new string('A', 201) 
+            Title = new string('A', 201)
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Title)
-            .WithErrorMessage("Title must not exceed 200 characters.");
+
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Title) &&
+                 f.ErrorMessage == "Title must not exceed 200 characters."));
     }
 
     #endregion
@@ -91,15 +108,18 @@ public class UpdateMovieCommandValidatorTests
     [Test]
     public void Validate_WithDescriptionExceeding2000Characters_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
             Title = "Test Movie",
-            Description = new string('A', 2001) 
+            Description = new string('A', 2001)
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Description)
-            .WithErrorMessage("Description must not exceed 2000 characters.");
+
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Description) &&
+                 f.ErrorMessage == "Description must not exceed 2000 characters."));
     }
 
     #endregion
@@ -109,42 +129,51 @@ public class UpdateMovieCommandValidatorTests
     [Test]
     public void Validate_WithValidReleaseYear_ShouldNotHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
             Title = "Test Movie",
-            ReleaseYear = 2024 
+            ReleaseYear = 2024
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldNotHaveValidationErrorFor(x => x.ReleaseYear);
+
+        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.ReleaseYear)));
     }
 
     [Test]
     public void Validate_WithReleaseYearBefore1800_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
             Title = "Test Movie",
-            ReleaseYear = 1799 
+            ReleaseYear = 1799
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.ReleaseYear)
-            .WithErrorMessage("Release year must be after 1800.");
+
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.ReleaseYear) &&
+                 f.ErrorMessage == "Release year must be after 1800."));
     }
 
     [Test]
     public void Validate_WithReleaseYearTooFarInFuture_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
             Title = "Test Movie",
-            ReleaseYear = DateTime.Now.Year + 10 
+            ReleaseYear = DateTime.Now.Year + 10
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.ReleaseYear)
-            .WithErrorMessage("Release year cannot be too far in the future.");
+
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.ReleaseYear) &&
+                 f.ErrorMessage.Contains("future")));
     }
 
     #endregion
@@ -154,15 +183,18 @@ public class UpdateMovieCommandValidatorTests
     [Test]
     public void Validate_WithDirectorExceeding100Characters_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
             Title = "Test Movie",
-            Director = new string('A', 101) 
+            Director = new string('A', 101)
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Director)
-            .WithErrorMessage("Director name must not exceed 100 characters.");
+
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Director) &&
+                 f.ErrorMessage == "Director name must not exceed 100 characters."));
     }
 
     #endregion
@@ -172,15 +204,18 @@ public class UpdateMovieCommandValidatorTests
     [Test]
     public void Validate_WithGenreExceeding50Characters_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
             Title = "Test Movie",
-            Genre = new string('A', 51) 
+            Genre = new string('A', 51)
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Genre)
-            .WithErrorMessage("Genre must not exceed 50 characters.");
+
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Genre) &&
+                 f.ErrorMessage == "Genre must not exceed 50 characters."));
     }
 
     #endregion
@@ -190,15 +225,18 @@ public class UpdateMovieCommandValidatorTests
     [Test]
     public void Validate_WithPosterUrlExceeding500Characters_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
             Title = "Test Movie",
-            PosterUrl = new string('A', 501) 
+            PosterUrl = new string('A', 501)
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.PosterUrl)
-            .WithErrorMessage("Poster URL must not exceed 500 characters.");
+
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.PosterUrl) &&
+                 f.ErrorMessage == "Poster URL must not exceed 500 characters."));
     }
 
     #endregion
@@ -208,42 +246,51 @@ public class UpdateMovieCommandValidatorTests
     [Test]
     public void Validate_WithRatingBelowZero_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
             Title = "Test Movie",
-            Rating = -1 
+            Rating = -1
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Rating)
-            .WithErrorMessage("Rating must be at least 0.");
+
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Rating) &&
+                 f.ErrorMessage == "Rating must be at least 0."));
     }
 
     [Test]
     public void Validate_WithRatingAboveTen_ShouldHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
             Title = "Test Movie",
-            Rating = 10.5 
+            Rating = 10.5D,
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Rating)
-            .WithErrorMessage("Rating must not exceed 10.");
+
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Rating) &&
+                 f.ErrorMessage == "Rating must not exceed 10."));
     }
 
     [Test]
     public void Validate_WithValidRating_ShouldNotHaveError()
     {
-        var command = new UpdateMovieCommand 
-        { 
+        var command = new UpdateMovieCommand
+        {
             Id = Guid.NewGuid(),
             Title = "Test Movie",
-            Rating = 8.5 
+            Rating = 8.5D,
         };
+
         var result = _validator.TestValidate(command);
-        result.ShouldNotHaveValidationErrorFor(x => x.Rating);
+
+        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Rating)));
     }
 
     #endregion
@@ -262,11 +309,13 @@ public class UpdateMovieCommandValidatorTests
             Director = "Christopher Nolan",
             Genre = "Sci-Fi",
             PosterUrl = "https://example.com/inception.jpg",
-            Rating = 8.8
+            Rating = 8.8D,
         };
 
         var result = _validator.TestValidate(command);
-        result.ShouldNotHaveAnyValidationErrors();
+
+        Assert.That(result.IsValid, Is.True);
+        Assert.That(result.Errors, Is.Empty);
     }
 
     [Test]
@@ -280,9 +329,14 @@ public class UpdateMovieCommandValidatorTests
         };
 
         var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.Id);
-        result.ShouldHaveValidationErrorFor(x => x.Title);
-        result.ShouldHaveValidationErrorFor(x => x.Rating);
+
+        Assert.That(result.Errors, Has.Count.EqualTo(3));
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Id)));
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Title)));
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Rating)));
     }
 
     #endregion

@@ -25,7 +25,9 @@ public class RefreshTokenCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldNotHaveValidationErrorFor(x => x.RefreshToken);
+        Assert.That(result.IsValid, Is.True);
+        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.RefreshToken)));
     }
 
     [Test]
@@ -38,8 +40,10 @@ public class RefreshTokenCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.RefreshToken)
-            .WithErrorMessage("Refresh token is required.");
+        Assert.That(result.IsValid, Is.False);
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.RefreshToken) &&
+                 f.ErrorMessage == "Refresh token is required."));
     }
 
     [Test]
@@ -52,7 +56,9 @@ public class RefreshTokenCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.RefreshToken);
+        Assert.That(result.IsValid, Is.False);
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.RefreshToken)));
     }
 
     [Test]
@@ -65,6 +71,7 @@ public class RefreshTokenCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldNotHaveAnyValidationErrors();
+        Assert.That(result.IsValid, Is.True);
+        Assert.That(result.Errors, Is.Empty);
     }
 }

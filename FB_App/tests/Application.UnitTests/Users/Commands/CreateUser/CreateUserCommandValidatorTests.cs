@@ -28,7 +28,8 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldNotHaveValidationErrorFor(x => x.Email);
+        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Email)));
     }
 
     [Test]
@@ -42,8 +43,9 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.Email)
-            .WithErrorMessage("Email is required.");
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Email) &&
+                 f.ErrorMessage == "Email is required."));
     }
 
     [Test]
@@ -57,8 +59,9 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.Email)
-            .WithErrorMessage("Email must be a valid email address.");
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Email) &&
+                 f.ErrorMessage == "Email must be a valid email address."));
     }
 
     [TestCase("test@")]
@@ -74,7 +77,8 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.Email);
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Email)));
     }
 
     #endregion
@@ -92,7 +96,8 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldNotHaveValidationErrorFor(x => x.Password);
+        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Password)));
     }
 
     [Test]
@@ -106,7 +111,8 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.Password);
+        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Password)));
     }
 
     [Test]
@@ -120,7 +126,8 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.Password);
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Password)));
     }
 
     [Test]
@@ -134,7 +141,8 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.Password);
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Password)));
     }
 
     [Test]
@@ -148,7 +156,8 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.Password);
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Password)));
     }
 
     [Test]
@@ -162,7 +171,8 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.Password);
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Password)));
     }
 
     [TestCase("Password1!")]
@@ -179,7 +189,8 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldNotHaveValidationErrorFor(x => x.Password);
+        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Password)));
     }
 
     #endregion
@@ -197,7 +208,8 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldNotHaveAnyValidationErrors();
+        Assert.That(result.IsValid, Is.True);
+        Assert.That(result.Errors, Is.Empty);
     }
 
     [Test]
@@ -211,8 +223,11 @@ public class CreateUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        result.ShouldHaveValidationErrorFor(x => x.Email);
-        result.ShouldHaveValidationErrorFor(x => x.Password);
+        Assert.That(result.Errors, Has.Count.GreaterThanOrEqualTo(2));
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Email)));
+        Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
+            f => f.PropertyName == nameof(command.Password)));
     }
 
     #endregion

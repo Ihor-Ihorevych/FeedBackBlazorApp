@@ -6,7 +6,9 @@ using FB_App.Domain.Entities.Values;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
-using Shouldly;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FB_App.Application.UnitTests.Movies.Commands.UpdateMovie;
 
@@ -30,9 +32,8 @@ public class UpdateMovieCommandHandlerTests
     public async Task Handle_WithExistingMovie_ShouldUpdateAllFields()
     {
         // Arrange
-        
         var existingMovie = Movie.Create("Original Title", "Original Description", 2020, "Original Director", "Drama", null, 7.0);
-        existingMovie.Id
+
         _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
@@ -40,7 +41,7 @@ public class UpdateMovieCommandHandlerTests
 
         var command = new UpdateMovieCommand
         {
-            Id = movieId,
+            Id = existingMovie.Id,
             Title = "Updated Title",
             Description = "Updated Description",
             ReleaseYear = 2024,
@@ -54,13 +55,13 @@ public class UpdateMovieCommandHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        existingMovie.Title.ShouldBe("Updated Title");
-        existingMovie.Description.ShouldBe("Updated Description");
-        existingMovie.ReleaseYear.ShouldBe(2024);
-        existingMovie.Director.ShouldBe("Updated Director");
-        existingMovie.Genre.ShouldBe("Action");
-        existingMovie.PosterUrl.ShouldBe("https://example.com/new.jpg");
-        existingMovie.Rating.ShouldBe(9.0);
+        Assert.That(existingMovie.Title, Is.EqualTo("Updated Title"));
+        Assert.That(existingMovie.Description, Is.EqualTo("Updated Description"));
+        Assert.That(existingMovie.ReleaseYear, Is.EqualTo(2024));
+        Assert.That(existingMovie.Director, Is.EqualTo("Updated Director"));
+        Assert.That(existingMovie.Genre, Is.EqualTo("Action"));
+        Assert.That(existingMovie.PosterUrl, Is.EqualTo("https://example.com/new.jpg"));
+        Assert.That(existingMovie.Rating, Is.EqualTo(9.0));
     }
 
     [Test]
@@ -68,7 +69,7 @@ public class UpdateMovieCommandHandlerTests
     {
         // Arrange
         var existingMovie = Movie.Create("Original Title", null, null, null, null, null, null);
-        
+
         _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
@@ -102,8 +103,8 @@ public class UpdateMovieCommandHandlerTests
         };
 
         // Act & Assert
-        await Should.ThrowAsync<NotFoundException>(async () =>
-            await _handler.Handle(command, CancellationToken.None));
+        await Assert.ThatAsync(async () => await _handler.Handle(command, CancellationToken.None),
+            Throws.TypeOf<NotFoundException>());
     }
 
     [Test]
@@ -120,11 +121,12 @@ public class UpdateMovieCommandHandlerTests
             Title = "Updated Title"
         };
 
-        // Act & Assert
-        var exception = await Should.ThrowAsync<NotFoundException>(async () =>
+        // Act
+        var ex = Assert.ThrowsAsync<NotFoundException>(async () =>
             await _handler.Handle(command, CancellationToken.None));
-        
-        exception.Message.ShouldContain("Movie");
+
+        // Assert
+        Assert.That(ex.Message, Does.Contain("Movie"));
     }
 
     [Test]
@@ -158,7 +160,7 @@ public class UpdateMovieCommandHandlerTests
     {
         // Arrange
         var existingMovie = Movie.Create("Title", "Has Description", 2020, "Director", "Genre", "url", 8.0);
-        
+
         _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
@@ -180,11 +182,11 @@ public class UpdateMovieCommandHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        existingMovie.Description.ShouldBeNull();
-        existingMovie.ReleaseYear.ShouldBeNull();
-        existingMovie.Director.ShouldBeNull();
-        existingMovie.Genre.ShouldBeNull();
-        existingMovie.PosterUrl.ShouldBeNull();
-        existingMovie.Rating.ShouldBeNull();
+        Assert.That(existingMovie.Description, Is.Null);
+        Assert.That(existingMovie.ReleaseYear, Is.Null);
+        Assert.That(existingMovie.Director, Is.Null);
+        Assert.That(existingMovie.Genre, Is.Null);
+        Assert.That(existingMovie.PosterUrl, Is.Null);
+        Assert.That(existingMovie.Rating, Is.Null);
     }
 }

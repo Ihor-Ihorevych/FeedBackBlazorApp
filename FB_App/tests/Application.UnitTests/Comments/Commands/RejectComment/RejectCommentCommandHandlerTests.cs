@@ -1,13 +1,11 @@
 using FB_App.Application.Comments.Commands.RejectComment;
 using FB_App.Application.Common.Exceptions;
 using FB_App.Application.Common.Interfaces;
+using FB_App.Application.UnitTests.Common.Testing;
 using FB_App.Domain.Entities;
-using FB_App.Domain.Entities.Values;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using NUnit.Framework;
-using Shouldly;
 
 namespace FB_App.Application.UnitTests.Comments.Commands.RejectComment;
 
@@ -66,8 +64,8 @@ public class RejectCommentCommandHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        comment.IsApproved.ShouldBeFalse();
-        comment.ReviewedBy.ShouldNotBeNull();
+        Assert.That(comment.IsApproved, Is.False);
+        Assert.That(comment.ReviewedBy, Is.Not.Null);
     }
 
     [Test]
@@ -95,10 +93,11 @@ public class RejectCommentCommandHandlerTests
         var command = new RejectCommentCommand(Guid.NewGuid(), Guid.NewGuid());
 
         // Act & Assert
-        var exception = await Should.ThrowAsync<NotFoundException>(async () =>
+        var exception = Assert.ThrowsAsync<NotFoundException>(async () =>
             await _handler.Handle(command, CancellationToken.None));
-        
-        exception.Message.ShouldContain("Movie");
+
+        Assert.That(exception, Is.Not.Null);
+        Assert.That(exception!.Message, Does.Contain("Movie"));
     }
 
     [Test]
@@ -111,10 +110,11 @@ public class RejectCommentCommandHandlerTests
         var command = new RejectCommentCommand(movie.Id, Guid.NewGuid());
 
         // Act & Assert
-        var exception = await Should.ThrowAsync<NotFoundException>(async () =>
+        var exception = Assert.ThrowsAsync<NotFoundException>(async () =>
             await _handler.Handle(command, CancellationToken.None));
-        
-        exception.Message.ShouldContain("Comment");
+
+        Assert.That(exception, Is.Not.Null);
+        Assert.That(exception!.Message, Does.Contain("Comment"));
     }
 
     [Test]
@@ -130,8 +130,8 @@ public class RejectCommentCommandHandlerTests
         var command = new RejectCommentCommand(movie.Id, comment.Id);
 
         // Act & Assert
-        await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
-            await _handler.Handle(command, CancellationToken.None));
+        await Assert.ThatAsync(async () => await _handler.Handle(command, CancellationToken.None),
+            Throws.TypeOf<UnauthorizedAccessException>());
     }
 
     [Test]
@@ -150,7 +150,7 @@ public class RejectCommentCommandHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        comment.ReviewedBy.ShouldBe("reviewer-admin-id");
+        Assert.That(comment.ReviewedBy, Is.EqualTo("reviewer-admin-id"));
     }
 
     [Test]
@@ -171,93 +171,5 @@ public class RejectCommentCommandHandlerTests
 
         // Assert
         _contextMock.Verify(x => x.SaveChangesAsync(token), Times.Once);
-    }
-}
-
-// Helper classes for async DbSet mocking
-internal class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
-{
-    private readonly IQueryProvider _inner;
-
-    internal TestAsyncQueryProvider(IQueryProvider inner)
-    {
-        _inner = inner;
-    }
-
-    public IQueryable CreateQuery(System.Linq.Expressions.Expression expression)
-    {
-        return new TestAsyncEnumerable<TEntity>(expression);
-    }
-
-    public IQueryable<TElement> CreateQuery<TElement>(System.Linq.Expressions.Expression expression)
-    {
-        return new TestAsyncEnumerable<TElement>(expression);
-    }
-
-    public object? Execute(System.Linq.Expressions.Expression expression)
-    {
-        return _inner.Execute(expression);
-    }
-
-    public TResult Execute<TResult>(System.Linq.Expressions.Expression expression)
-    {
-        return _inner.Execute<TResult>(expression);
-    }
-
-    public TResult ExecuteAsync<TResult>(System.Linq.Expressions.Expression expression, CancellationToken cancellationToken = default)
-    {
-        var resultType = typeof(TResult).GetGenericArguments()[0];
-        var executionResult = typeof(IQueryProvider)
-            .GetMethod(
-                name: nameof(IQueryProvider.Execute),
-                genericParameterCount: 1,
-                types: new[] { typeof(System.Linq.Expressions.Expression) })!
-            .MakeGenericMethod(resultType)
-            .Invoke(this, new[] { expression });
-
-        return (TResult)typeof(Task).GetMethod(nameof(Task.FromResult))!
-            .MakeGenericMethod(resultType)
-            .Invoke(null, new[] { executionResult })!;
-    }
-}
-
-internal class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
-{
-    public TestAsyncEnumerable(IEnumerable<T> enumerable)
-        : base(enumerable)
-    { }
-
-    public TestAsyncEnumerable(System.Linq.Expressions.Expression expression)
-        : base(expression)
-    { }
-
-    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
-    {
-        return new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
-    }
-
-    IQueryProvider IQueryable.Provider => new TestAsyncQueryProvider<T>(this);
-}
-
-internal class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
-{
-    private readonly IEnumerator<T> _inner;
-
-    public TestAsyncEnumerator(IEnumerator<T> inner)
-    {
-        _inner = inner;
-    }
-
-    public T Current => _inner.Current;
-
-    public ValueTask<bool> MoveNextAsync()
-    {
-        return ValueTask.FromResult(_inner.MoveNext());
-    }
-
-    public ValueTask DisposeAsync()
-    {
-        _inner.Dispose();
-        return ValueTask.CompletedTask;
     }
 }

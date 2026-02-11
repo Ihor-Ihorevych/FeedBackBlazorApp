@@ -4,7 +4,9 @@ using FB_App.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
-using Shouldly;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FB_App.Application.UnitTests.Movies.Commands.CreateMovie;
 
@@ -45,7 +47,7 @@ public class CreateMovieCommandHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        _moviesDbSetMock.Verify(x => x.Add(It.Is<Movie>(m => 
+        _moviesDbSetMock.Verify(x => x.Add(It.Is<Movie>(m =>
             m.Title == command.Title &&
             m.Description == command.Description &&
             m.ReleaseYear == command.ReleaseYear &&
@@ -83,7 +85,7 @@ public class CreateMovieCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.ShouldNotBe(Guid.Empty);
+        Assert.That(result, Is.Not.EqualTo(Guid.Empty));
     }
 
     [Test]
@@ -102,8 +104,8 @@ public class CreateMovieCommandHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        addedMovie.ShouldNotBeNull();
-        addedMovie.Title.ShouldBe("Inception");
+        Assert.That(addedMovie, Is.Not.Null);
+        Assert.That(addedMovie!.Title, Is.EqualTo("Inception"));
     }
 
     [Test]
@@ -122,11 +124,11 @@ public class CreateMovieCommandHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        addedMovie.ShouldNotBeNull();
-        addedMovie.Title.ShouldBe("Minimal Movie");
-        addedMovie.Description.ShouldBeNull();
-        addedMovie.Director.ShouldBeNull();
-        addedMovie.Genre.ShouldBeNull();
+        Assert.That(addedMovie, Is.Not.Null);
+        Assert.That(addedMovie!.Title, Is.EqualTo("Minimal Movie"));
+        Assert.That(addedMovie.Description, Is.Null);
+        Assert.That(addedMovie.Director, Is.Null);
+        Assert.That(addedMovie.Genre, Is.Null);
     }
 
     [Test]
@@ -157,7 +159,7 @@ public class CreateMovieCommandHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        addedMovie.ShouldNotBeNull();
-        addedMovie.DomainEvents.ShouldNotBeEmpty();
+        Assert.That(addedMovie, Is.Not.Null);
+        Assert.That(addedMovie!.DomainEvents, Is.Not.Empty);
     }
 }

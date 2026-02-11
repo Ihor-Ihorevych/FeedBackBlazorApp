@@ -5,7 +5,7 @@ using FB_App.Domain.Enums;
 
 public sealed class Comment : BaseAuditableEntity<CommentId>
 {
-    public override CommentId Id { get; set; } = CommentId.CreateNew();
+    public override CommentId Id { get; } = CommentId.CreateNew();
 
     public MovieId MovieId { get; private set; } = null!;
     public Movie Movie { get; internal set; } = null!;

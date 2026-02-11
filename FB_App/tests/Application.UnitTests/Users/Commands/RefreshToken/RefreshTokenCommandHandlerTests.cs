@@ -3,7 +3,6 @@ using FB_App.Application.Common.Models;
 using FB_App.Application.Users.Commands.RefreshToken;
 using Moq;
 using NUnit.Framework;
-using Shouldly;
 
 namespace FB_App.Application.UnitTests.Users.Commands.RefreshToken;
 
@@ -43,12 +42,12 @@ public class RefreshTokenCommandHandlerTests
         var (result, token) = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Succeeded.ShouldBeTrue();
-        token.ShouldNotBeNull();
-        token.AccessToken.ShouldBe("new-access-token");
-        token.RefreshToken.ShouldBe("new-refresh-token");
-        token.TokenType.ShouldBe("Bearer");
-        token.ExpiresIn.ShouldBe(3600);
+        Assert.That(result.Succeeded, Is.True);
+        Assert.That(token, Is.Not.Null);
+        Assert.That(token.AccessToken, Is.EqualTo("new-access-token"));
+        Assert.That(token.RefreshToken, Is.EqualTo("new-refresh-token"));
+        Assert.That(token.TokenType, Is.EqualTo("Bearer"));
+        Assert.That(token.ExpiresIn, Is.EqualTo(3600));
     }
 
     [Test]
@@ -68,9 +67,9 @@ public class RefreshTokenCommandHandlerTests
         var (result, token) = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Succeeded.ShouldBeFalse();
-        result.Errors.ShouldContain("Invalid or expired refresh token.");
-        token.ShouldBeNull();
+        Assert.That(result.Succeeded, Is.False);
+        Assert.That(result.Errors, Does.Contain("Invalid or expired refresh token."));
+        Assert.That(token, Is.Null);
     }
 
     [Test]
@@ -90,8 +89,8 @@ public class RefreshTokenCommandHandlerTests
         var (result, token) = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Succeeded.ShouldBeFalse();
-        token.ShouldBeNull();
+        Assert.That(result.Succeeded, Is.False);
+        Assert.That(token, Is.Null);
     }
 
     [Test]
@@ -137,9 +136,9 @@ public class RefreshTokenCommandHandlerTests
         var (result, token) = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Succeeded.ShouldBeTrue();
-        token.ShouldNotBeNull();
-        token.AccessToken.ShouldBe("completely-new-access-token");
-        token.ExpiresIn.ShouldBe(7200);
+        Assert.That(result.Succeeded, Is.True);
+        Assert.That(token, Is.Not.Null);
+        Assert.That(token.AccessToken, Is.EqualTo("completely-new-access-token"));
+        Assert.That(token.ExpiresIn, Is.EqualTo(7200));
     }
 }

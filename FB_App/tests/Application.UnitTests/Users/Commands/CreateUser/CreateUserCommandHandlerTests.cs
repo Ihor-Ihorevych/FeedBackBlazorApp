@@ -3,7 +3,6 @@ using FB_App.Application.Common.Models;
 using FB_App.Application.Users.Commands.CreateUser;
 using Moq;
 using NUnit.Framework;
-using Shouldly;
 
 namespace FB_App.Application.UnitTests.Users.Commands.CreateUser;
 
@@ -64,8 +63,8 @@ public class CreateUserCommandHandlerTests
         var (result, userId) = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Succeeded.ShouldBeTrue();
-        userId.ShouldBe(expectedUserId);
+        Assert.That(result.Succeeded, Is.True);
+        Assert.That(userId, Is.EqualTo(expectedUserId));
     }
 
     [Test]
@@ -87,9 +86,9 @@ public class CreateUserCommandHandlerTests
         var (result, userId) = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Succeeded.ShouldBeFalse();
-        result.Errors.ShouldContain("Email already exists.");
-        userId.ShouldBeEmpty();
+        Assert.That(result.Succeeded, Is.False);
+        Assert.That(result.Errors, Does.Contain("Email already exists."));
+        Assert.That(userId, Is.Empty);
     }
 
     [Test]
@@ -135,6 +134,6 @@ public class CreateUserCommandHandlerTests
         var (result, _) = await _handler.Handle(command, cts.Token);
 
         // Assert
-        result.Succeeded.ShouldBeTrue();
+        Assert.That(result.Succeeded, Is.True);
     }
 }
