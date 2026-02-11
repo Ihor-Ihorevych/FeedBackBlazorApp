@@ -2,7 +2,6 @@ using FB_App.Application.Comments.Commands.ApproveComment;
 using FB_App.Application.Comments.Commands.CreateComment;
 using FB_App.Application.Comments.Commands.RejectComment;
 using FB_App.Application.Comments.Queries.GetCommentsByMovie;
-using FB_App.Domain.Entities.Values;
 using FB_App.Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -18,15 +17,15 @@ public class Comments : EndpointGroupBase
         groupBuilder.MapPut(RejectComment, "/movie/{movieId}/{id}/reject").RequireAuthorization();
     }
 
-    public async Task<Created<int>> CreateComment(ISender sender, CreateCommentCommand command)
+    public async Task<Created<Guid>> CreateComment(ISender sender, CreateCommentCommand command)
     {
         var id = await sender.Send(command);
         return TypedResults.Created($"/api/comments/{id}", id);
     }
 
     public async Task<Ok<List<CommentDetailDto>>> GetCommentsByMovie(
-        ISender sender, 
-        int movieId,
+        ISender sender,
+        Guid movieId,
         CommentStatus? status = null)
     {
         var query = new GetCommentsByMovieQuery 
@@ -39,7 +38,7 @@ public class Comments : EndpointGroupBase
         return TypedResults.Ok(comments);
     }
 
-    public async Task<Results<NoContent, NotFound>> ApproveComment(ISender sender, int movieId, int id)
+    public async Task<Results<NoContent, NotFound>> ApproveComment(ISender sender, Guid movieId, Guid id)
     {
         try
         {
@@ -52,7 +51,7 @@ public class Comments : EndpointGroupBase
         }
     }
 
-    public async Task<Results<NoContent, NotFound>> RejectComment(ISender sender, int movieId, int id)
+    public async Task<Results<NoContent, NotFound>> RejectComment(ISender sender, Guid movieId, Guid id)
     {
         try
         {

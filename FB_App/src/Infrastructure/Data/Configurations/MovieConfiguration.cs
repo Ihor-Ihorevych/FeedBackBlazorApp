@@ -1,4 +1,5 @@
 using FB_App.Domain.Entities;
+using FB_App.Domain.Entities.Values;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,10 +9,14 @@ public class MovieConfiguration : IEntityTypeConfiguration<Movie>
 {
     public void Configure(EntityTypeBuilder<Movie> builder)
     {
-        // Key configuration
         builder.HasKey(m => m.Id);
 
-        // Property configurations
+        builder.Property(m => m.Id)
+            .ValueGeneratedNever()
+            .HasConversion(
+                id => id.Value,
+                value => MovieId.Create(value));
+
         builder.Property(m => m.Title)
             .HasMaxLength(200)
             .IsRequired();

@@ -6,16 +6,16 @@ namespace FB_App.Domain.Entities.Values;
 /// </summary>
 public sealed class MovieId : ValueObject
 {
-    public int Value { get; }
+    public Guid Value { get; }
 
     private MovieId()
     {
     }
 
-    private MovieId(int value)
+    private MovieId(Guid value)
     {
-        if (value <= 0)
-            throw new ArgumentException("MovieId must be greater than zero.", nameof(value));
+        if (value == Guid.Empty)
+            throw new ArgumentException("MovieId cannot be empty.", nameof(value));
         
         Value = value;
     }
@@ -25,8 +25,14 @@ public sealed class MovieId : ValueObject
     /// </summary>
     /// <param name="value">The identifier value.</param>
     /// <returns>A new MovieId instance.</returns>
-    /// <exception cref="ArgumentException">Thrown when value is less than or equal to zero.</exception>
-    public static MovieId Create(int value) => new(value);
+    /// <exception cref="ArgumentException">Thrown when value is empty.</exception>
+    public static MovieId Create(Guid value) => new(value);
+
+    /// <summary>
+    /// Creates a new MovieId with a newly generated GUID value.
+    /// </summary>
+    /// <returns>A new MovieId instance with a generated GUID.</returns>
+    public static MovieId CreateNew() => new(Guid.CreateVersion7());
 
     /// <summary>
     /// Attempts to create a MovieId with the specified value.
@@ -34,10 +40,10 @@ public sealed class MovieId : ValueObject
     /// <param name="value">The identifier value.</param>
     /// <param name="movieId">The created MovieId instance if successful; null otherwise.</param>
     /// <returns>True if the MovieId was created successfully; otherwise false.</returns>
-    public static bool TryCreate(int value, out MovieId? movieId)
+    public static bool TryCreate(Guid value, out MovieId? movieId)
     {
         movieId = null;
-        if (value <= 0)
+        if (value == Guid.Empty)
             return false;
 
         movieId = new MovieId(value);
@@ -52,12 +58,12 @@ public sealed class MovieId : ValueObject
     public override string ToString() => Value.ToString();
 
     /// <summary>
-    /// Implicitly converts a MovieId to its int value.
+    /// Implicitly converts a MovieId to its Guid value.
     /// </summary>
-    public static implicit operator int(MovieId movieId) => movieId.Value;
+    public static implicit operator Guid(MovieId movieId) => movieId.Value;
 
     /// <summary>
-    /// Explicitly converts an int to a MovieId.
+    /// Explicitly converts a Guid to a MovieId.
     /// </summary>
-    public static explicit operator MovieId(int value) => Create(value);
+    public static explicit operator MovieId(Guid value) => new(value);
 }

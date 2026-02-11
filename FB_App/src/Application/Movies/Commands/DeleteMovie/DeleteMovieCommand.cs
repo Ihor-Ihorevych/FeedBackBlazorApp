@@ -10,7 +10,7 @@ using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException
 namespace FB_App.Application.Movies.Commands.DeleteMovie;
 
 [Authorize(Roles = Roles.Administrator)]
-public record DeleteMovieCommand(int Id) : IRequest;
+public record DeleteMovieCommand(Guid Id) : IRequest;
 
 public class DeleteMovieCommandHandler : IRequestHandler<DeleteMovieCommand>
 {

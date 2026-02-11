@@ -9,13 +9,13 @@ using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException
 namespace FB_App.Application.Comments.Commands.CreateComment;
 
 [Authorize(Roles = Roles.User)]
-public record CreateCommentCommand : IRequest<int>
+public record CreateCommentCommand : IRequest<Guid>
 {
-    public int MovieId { get; init; }
+    public Guid MovieId { get; init; }
     public string Text { get; init; } = string.Empty;
 }
 
-public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand, int>
+public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand, Guid>
 {
     private readonly IApplicationDbContext _context;
     private readonly IUser _user;
@@ -26,7 +26,7 @@ public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand,
         _user = user;
     }
 
-    public async Task<int> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
     {
         var movie = await _context.Movies
             .FirstOrDefaultAsync(m => m.Id == request.MovieId, cancellationToken);

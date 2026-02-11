@@ -32,7 +32,7 @@ public class Movies : EndpointGroupBase
 
     public async Task<Results<Ok<MovieDetailDto>, NotFound>> GetMovieById(
         ISender sender, 
-        int id)
+        Guid id)
     {
         try
         {
@@ -45,7 +45,7 @@ public class Movies : EndpointGroupBase
         }
     }
 
-    public async Task<Created<int>> CreateMovie(ISender sender, CreateMovieCommand command)
+    public async Task<Created<Guid>> CreateMovie(ISender sender, CreateMovieCommand command)
     {
         var id = await sender.Send(command);
         return TypedResults.Created($"/api/movies/{id}", id);
@@ -53,7 +53,7 @@ public class Movies : EndpointGroupBase
 
     public async Task<Results<NoContent, BadRequest, NotFound>> UpdateMovie(
         ISender sender, 
-        int id, 
+        Guid id, 
         UpdateMovieCommand command)
     {
         if (id != command.Id) 
@@ -70,7 +70,7 @@ public class Movies : EndpointGroupBase
         }
     }
 
-    public async Task<Results<NoContent, NotFound>> DeleteMovie(ISender sender, int id)
+    public async Task<Results<NoContent, NotFound>> DeleteMovie(ISender sender, Guid id)
     {
         try
         {

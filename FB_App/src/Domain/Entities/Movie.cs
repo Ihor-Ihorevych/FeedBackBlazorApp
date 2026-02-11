@@ -3,13 +3,30 @@ namespace FB_App.Domain.Entities;
 using FB_App.Domain.Entities.Values;
 using FB_App.Domain.Enums;
 
-/// <summary>
-/// Movie aggregate root.
-/// Manages the lifecycle and invariants of movie and its associated comments.
-/// </summary>
-public sealed class Movie : BaseAuditableEntity<int>
+public sealed class Movie : BaseAuditableEntity<MovieId>
 {
-    private readonly List<Comment> _comments = new();
+
+    public static Movie Create(string title, string? description = null, int? releaseYear = null, string? director = null, string? genre = null, string? posterUrl = null, double? rating = null)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Title cannot be null or empty.", nameof(title));
+        return new Movie
+        {
+            Id = MovieId.CreateNew(),
+            Title = title,
+            Description = description,
+            ReleaseYear = releaseYear,
+            Director = director,
+            Genre = genre,
+            PosterUrl = posterUrl,
+            Rating = rating
+        };
+    }
+
+
+    private readonly HashSet<Comment> _comments = new();
+
+    public override MovieId Id { get; set; } = MovieId.CreateNew();
 
     public string Title { get; set; } = string.Empty;
     
@@ -25,32 +42,10 @@ public sealed class Movie : BaseAuditableEntity<int>
     
     public double? Rating { get; set; }
     
-    /// <summary>
-    /// Gets the read-only collection of comments for this movie.
-    /// Comments should only be modified through aggregate methods.
-    /// </summary>
     public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
 
-    /// <summary>
-    /// Gets the strongly-typed identifier for this movie.
-    /// </summary>
-    public MovieId MovieId => MovieId.Create(Id);
-
-    #region Comment Management
-
-    /// <summary>
-    /// Gets the count of approved comments for this movie.
-    /// </summary>
     public int ApprovedCommentsCount => _comments.Count(c => c.IsApproved);
-
-    /// <summary>
-    /// Gets the count of pending comments awaiting moderation.
-    /// </summary>
     public int PendingCommentsCount => _comments.Count(c => c.IsPending);
-
-    /// <summary>
-    /// Gets the count of rejected comments.
-    /// </summary>
     public int RejectedCommentsCount => _comments.Count(c => c.Status == CommentStatus.Rejected);
 
     /// <summary>
@@ -68,7 +63,7 @@ public sealed class Movie : BaseAuditableEntity<int>
         if (string.IsNullOrWhiteSpace(text))
             throw new ArgumentException("Comment text cannot be null or empty.", nameof(text));
 
-        var comment = Comment.Create(this.Id, userId, text);
+        var comment = Comment.Create(Id, userId, text);
         _comments.Add(comment);
 
         return comment;
@@ -79,7 +74,7 @@ public sealed class Movie : BaseAuditableEntity<int>
     /// </summary>
     /// <param name="commentId">The ID of the comment to remove.</param>
     /// <returns>True if the comment was removed; otherwise false.</returns>
-    public bool RemoveComment(int commentId)
+    public bool RemoveComment(CommentId commentId)
     {
         var comment = _comments.FirstOrDefault(c => c.Id == commentId);
         if (comment == null)
@@ -96,7 +91,7 @@ public sealed class Movie : BaseAuditableEntity<int>
     /// <param name="reviewedBy">The identifier of the user approving the comment.</param>
     /// <exception cref="InvalidOperationException">Thrown when comment is not found.</exception>
     /// <exception cref="ArgumentException">Thrown when reviewedBy is null or empty.</exception>
-    public void ApproveComment(int commentId, string reviewedBy)
+    public void ApproveComment(CommentId commentId, string reviewedBy)
     {
         var comment = GetCommentOrThrow(commentId);
         comment.Approve(reviewedBy);
@@ -109,7 +104,7 @@ public sealed class Movie : BaseAuditableEntity<int>
     /// <param name="reviewedBy">The identifier of the user rejecting the comment.</param>
     /// <exception cref="InvalidOperationException">Thrown when comment is not found.</exception>
     /// <exception cref="ArgumentException">Thrown when reviewedBy is null or empty.</exception>
-    public void RejectComment(int commentId, string reviewedBy)
+    public void RejectComment(CommentId commentId, string reviewedBy)
     {
         var comment = GetCommentOrThrow(commentId);
         comment.Reject(reviewedBy);
@@ -120,7 +115,7 @@ public sealed class Movie : BaseAuditableEntity<int>
     /// </summary>
     /// <param name="commentId">The ID of the comment.</param>
     /// <returns>The comment if found; otherwise null.</returns>
-    public Comment? GetComment(int commentId) => _comments.FirstOrDefault(c => c.Id == commentId);
+    public Comment? GetComment(CommentId commentId) => _comments.FirstOrDefault(c => c.Id == commentId);
 
     /// <summary>
     /// Gets all approved comments for this movie.
@@ -134,23 +129,23 @@ public sealed class Movie : BaseAuditableEntity<int>
     public IReadOnlyCollection<Comment> GetPendingComments() =>
         _comments.Where(c => c.IsPending).ToList().AsReadOnly();
 
-    /// <summary>
-    /// Checks if the movie has any pending comments.
-    /// </summary>
-    public bool HasPendingComments() => PendingCommentsCount > 0;
-
-    /// <summary>
-    /// Gets the total number of comments for this movie.
-    /// </summary>
+    public bool HasPendingComments => PendingCommentsCount > 0;
     public int TotalCommentsCount => _comments.Count;
 
-    private Comment GetCommentOrThrow(int commentId)
+    /// <summary>
+    ///  Retrieves the comment associated with the specified comment ID, or throws an exception if the comment does not
+    /// exist.
+    /// </summary>
+    /// <param name="commentId">The identifier of the comment to retrieve. Cannot be null.</param>
+    /// <returns>The comment associated with the specified comment ID.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if a comment with the specified ID is not found in the movie aggregate.</exception>
+    private Comment GetCommentOrThrow(CommentId commentId)
     {
         var comment = GetComment(commentId);
-        if (comment == null)
-            throw new InvalidOperationException($"Comment with ID '{commentId}' not found in this movie aggregate.");
-        return comment;
+        return comment switch
+        {
+            null => throw new InvalidOperationException($"Comment with ID '{commentId}' not found in this movie aggregate."),
+            _ => comment
+        };
     }
-
-    #endregion
 }

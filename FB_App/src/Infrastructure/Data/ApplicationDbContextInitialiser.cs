@@ -167,18 +167,19 @@ public class ApplicationDbContextInitialiser
             {
                 // Add comments through the Movie aggregate root
                 var comment1 = movies[0].AddComment(regularUser.Id, "One of the best movies ever made! A masterpiece.");
-                movies[0].ApproveComment(comment1.Id, administrator.Id);
-
                 var comment2 = movies[0].AddComment(regularUser.Id, "The friendship between Andy and Red is so touching.");
-                movies[0].ApproveComment(comment2.Id, administrator.Id);
-
                 var comment3 = movies[1].AddComment(regularUser.Id, "A timeless classic. Marlon Brando's performance is legendary.");
-                movies[1].ApproveComment(comment3.Id, administrator.Id);
-
                 var comment4 = movies[2].AddComment(regularUser.Id, "Heath Ledger's Joker is unforgettable!");
-                // This comment remains pending
-
                 var comment5 = movies[3].AddComment(regularUser.Id, "Mind-bending and visually stunning.");
+
+                // Save all comments first to generate IDs
+                await _context.SaveChangesAsync();
+
+                // Now approve comments with their generated IDs
+                movies[0].ApproveComment(comment1.Id, administrator.Id);
+                movies[0].ApproveComment(comment2.Id, administrator.Id);
+                movies[1].ApproveComment(comment3.Id, administrator.Id);
+                movies[2].ApproveComment(comment4.Id, administrator.Id);
                 movies[3].ApproveComment(comment5.Id, administrator.Id);
 
                 await _context.SaveChangesAsync();

@@ -35,7 +35,7 @@ public abstract class BaseEntity
 /// <typeparam name="TId">The type of the entity ID.</typeparam>
 public abstract class BaseEntity<TId> where TId : notnull
 {
-    public TId Id { get; set; } = default!;
+    public abstract TId Id { get; set; }
 
     private readonly List<BaseEvent> _domainEvents = new();
 

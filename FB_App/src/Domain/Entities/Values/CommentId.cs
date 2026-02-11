@@ -6,16 +6,16 @@ namespace FB_App.Domain.Entities.Values;
 /// </summary>
 public sealed class CommentId : ValueObject
 {
-    public int Value { get; }
+    public Guid Value { get; }
 
     private CommentId()
     {
     }
 
-    private CommentId(int value)
+    private CommentId(Guid value)
     {
-        if (value <= 0)
-            throw new ArgumentException("CommentId must be greater than zero.", nameof(value));
+        if (value == Guid.Empty)
+            throw new ArgumentException("CommentId cannot be empty.", nameof(value));
         
         Value = value;
     }
@@ -25,8 +25,14 @@ public sealed class CommentId : ValueObject
     /// </summary>
     /// <param name="value">The identifier value.</param>
     /// <returns>A new CommentId instance.</returns>
-    /// <exception cref="ArgumentException">Thrown when value is less than or equal to zero.</exception>
-    public static CommentId Create(int value) => new(value);
+    /// <exception cref="ArgumentException">Thrown when value is empty.</exception>
+    public static CommentId Create(Guid value) => new(value);
+
+    /// <summary>
+    /// Creates a new CommentId with a newly generated GUID value.
+    /// </summary>
+    /// <returns>A new CommentId instance with a generated GUID.</returns>
+    public static CommentId CreateNew() => new(Guid.CreateVersion7());
 
     /// <summary>
     /// Attempts to create a CommentId with the specified value.
@@ -34,10 +40,10 @@ public sealed class CommentId : ValueObject
     /// <param name="value">The identifier value.</param>
     /// <param name="commentId">The created CommentId instance if successful; null otherwise.</param>
     /// <returns>True if the CommentId was created successfully; otherwise false.</returns>
-    public static bool TryCreate(int value, out CommentId? commentId)
+    public static bool TryCreate(Guid value, out CommentId? commentId)
     {
         commentId = null;
-        if (value <= 0)
+        if (value == Guid.Empty)
             return false;
 
         commentId = new CommentId(value);
@@ -52,12 +58,12 @@ public sealed class CommentId : ValueObject
     public override string ToString() => Value.ToString();
 
     /// <summary>
-    /// Implicitly converts a CommentId to its int value.
+    /// Implicitly converts a CommentId to its Guid value.
     /// </summary>
-    public static implicit operator int(CommentId commentId) => commentId.Value;
+    public static implicit operator Guid(CommentId commentId) => commentId.Value;
 
     /// <summary>
-    /// Explicitly converts an int to a CommentId.
+    /// Explicitly converts a Guid to a CommentId.
     /// </summary>
-    public static explicit operator CommentId(int value) => Create(value);
+    public static explicit operator CommentId(Guid value) => new(value);
 }

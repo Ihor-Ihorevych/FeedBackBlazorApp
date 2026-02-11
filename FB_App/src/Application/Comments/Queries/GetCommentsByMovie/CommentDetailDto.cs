@@ -4,8 +4,8 @@ namespace FB_App.Application.Comments.Queries.GetCommentsByMovie;
 
 public class CommentDetailDto
 {
-    public int Id { get; init; }
-    public int MovieId { get; init; }
+    public Guid Id { get; init; }
+    public Guid MovieId { get; init; }
     public string Text { get; init; } = string.Empty;
     public string UserId { get; init; } = string.Empty;
     public CommentStatus Status { get; init; }

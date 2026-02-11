@@ -8,7 +8,7 @@ using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException
 
 namespace FB_App.Application.Movies.Queries.GetMovieById;
 
-public record GetMovieByIdQuery(int Id) : IRequest<MovieDetailDto>;
+public record GetMovieByIdQuery(Guid Id) : IRequest<MovieDetailDto>;
 
 public class GetMovieByIdQueryHandler : IRequestHandler<GetMovieByIdQuery, MovieDetailDto>
 {

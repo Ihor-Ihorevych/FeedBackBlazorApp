@@ -11,7 +11,7 @@ namespace FB_App.Application.Movies.Commands.UpdateMovie;
 [Authorize(Roles = Roles.Administrator)]
 public record UpdateMovieCommand : IRequest
 {
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public string Title { get; init; } = string.Empty;
     public string? Description { get; init; }
     public int? ReleaseYear { get; init; }

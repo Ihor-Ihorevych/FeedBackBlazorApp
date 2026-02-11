@@ -31,7 +31,8 @@ public class MappingTests
     [Test]
     public void ShouldHaveValidConfiguration()
     {
-        _configuration!.AssertConfigurationIsValid();
+        Assert.That(() => _configuration!.AssertConfigurationIsValid(), 
+            Throws.Nothing);
     }
 
     [Test]
@@ -41,7 +42,10 @@ public class MappingTests
     {
         var instance = GetInstanceOf(source);
 
-        _mapper!.Map(instance, source, destination);
+        var result = _mapper!.Map(instance, source, destination);
+        
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.GetType(), Is.EqualTo(destination));
     }
 
     private static object GetInstanceOf(Type type)

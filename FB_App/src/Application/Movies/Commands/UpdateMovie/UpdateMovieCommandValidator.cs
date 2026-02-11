@@ -5,7 +5,8 @@ public class UpdateMovieCommandValidator : AbstractValidator<UpdateMovieCommand>
     public UpdateMovieCommandValidator()
     {
         RuleFor(v => v.Id)
-            .GreaterThan(0).WithMessage("Id must be greater than 0.");
+            .NotEmpty()
+            .WithMessage("Movie ID is required.");
 
         RuleFor(v => v.Title)
             .NotEmpty().WithMessage("Title is required.")

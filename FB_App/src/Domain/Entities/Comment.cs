@@ -3,13 +3,11 @@ namespace FB_App.Domain.Entities;
 using FB_App.Domain.Entities.Values;
 using FB_App.Domain.Enums;
 
-/// <summary>
-/// Comment owned entity - part of the Movie aggregate root.
-/// Comments cannot exist independently and should only be accessed through the Movie aggregate.
-/// </summary>
-public sealed class Comment : BaseAuditableEntity<int>
+public sealed class Comment : BaseAuditableEntity<CommentId>
 {
-    public int MovieId { get; internal set; }
+    public override CommentId Id { get; set; } = CommentId.CreateNew();
+
+    public required MovieId MovieId { get; set; }
     public Movie Movie { get; internal set; } = null!;
     
     public string UserId { get; internal set; } = string.Empty;
@@ -31,11 +29,6 @@ public sealed class Comment : BaseAuditableEntity<int>
     }
 
     /// <summary>
-    /// Gets the strongly-typed identifier for this comment.
-    /// </summary>
-    public CommentId CommentId => CommentId.Create(Id);
-
-    /// <summary>
     /// Gets a value indicating whether the comment is approved.
     /// </summary>
     public bool IsApproved => Status == CommentStatus.Approved;
@@ -50,13 +43,14 @@ public sealed class Comment : BaseAuditableEntity<int>
     /// </summary>
     public bool IsReviewed => ReviewedAt.HasValue && !string.IsNullOrEmpty(ReviewedBy);
 
+
     /// <summary>
     /// Factory method to create a new comment.
     /// This is called only by the Movie aggregate root.
     /// </summary>
-    internal static Comment Create(int movieId, string userId, string text)
+    internal static Comment Create(MovieId movieId, string userId, string text)
     {
-        if (movieId <= 0)
+        if (movieId == Guid.Empty)
             throw new ArgumentException("Movie ID must be greater than zero.", nameof(movieId));
         
         if (string.IsNullOrWhiteSpace(userId))
