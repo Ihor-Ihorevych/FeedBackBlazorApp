@@ -10,6 +10,7 @@ namespace FB_App.Application.Comments.Commands.ApproveComment;
 [Authorize(Roles = Roles.Administrator)]
 public record ApproveCommentCommand(Guid MovieId, Guid CommentId) : IRequest<Result>;
 
+
 public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentCommand, Result>
 {
     private readonly IApplicationDbContext _context;
@@ -23,6 +24,12 @@ public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentComman
 
     public async Task<Result> Handle(ApproveCommentCommand request, CancellationToken cancellationToken)
     {
+        var userId = _user.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Result.Unauthorized();
+        }
+
         var movie = await _context.Movies
                     .Include(m => m.Comments)
                     .FirstOrDefaultAsync(m => m.Id == request.MovieId, cancellationToken);
@@ -37,12 +44,7 @@ public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentComman
         {
             return Result.NotFound($"{nameof(Comment)} ({request.CommentId}) was not found.");
         }
-
-        var userId = _user.Id;
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Result.Unauthorized();
-        }
+        
 
         movie.ApproveComment((CommentId)request.CommentId, userId);
 

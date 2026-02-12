@@ -5,9 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FB_App.Application.Comments.EventHandlers;
 
-/// <summary>
-/// Handles the CommentCreatedEvent by notifying administrators about new comments pending moderation.
-/// </summary>
+
 public class CommentCreatedEventHandler : INotificationHandler<CommentCreatedEvent>
 {
     private readonly ILogger<CommentCreatedEventHandler> _logger;
@@ -33,13 +31,11 @@ public class CommentCreatedEventHandler : INotificationHandler<CommentCreatedEve
             notification.Comment.MovieId,
             notification.Comment.UserId);
 
-        // Get movie title for notification
         var movie = await _context.Movies
             .FirstOrDefaultAsync(m => m.Id == notification.Comment.MovieId, cancellationToken);
 
         var movieTitle = movie?.Title ?? "Unknown Movie";
 
-        // Notify administrators about the new comment
         await _adminNotificationService.NotifyNewCommentAsync(
             notification.Comment.MovieId,
             movieTitle,

@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace FB_App.Web.Services;
 
-/// <summary>
-/// SignalR-based implementation of administrator notification service.
-/// </summary>
+
 public class AdminNotificationService : IAdminNotificationService
 {
     private readonly IHubContext<AdminNotificationHub> _hubContext;

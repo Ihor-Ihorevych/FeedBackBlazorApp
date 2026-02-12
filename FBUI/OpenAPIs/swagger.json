@@ -512,7 +512,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CurrentUserResponse"
+                  "$ref": "#/components/schemas/CurrentUserDto"
                 }
               }
             }
@@ -914,7 +914,7 @@
           }
         }
       },
-      "CurrentUserResponse": {
+      "CurrentUserDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

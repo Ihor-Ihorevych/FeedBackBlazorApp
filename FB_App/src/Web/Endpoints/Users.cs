@@ -69,7 +69,7 @@ public class Users : EndpointGroupBase
         return TypedResults.Ok(result.Value);
     }
 
-    private static async Task<Results<Ok<CurrentUserResponse>, UnauthorizedHttpResult>> GetCurrentUser(
+    private static async Task<Results<Ok<CurrentUserDto>, UnauthorizedHttpResult>> GetCurrentUser(
         ISender sender)
     {
         var result = await sender.Send(new GetCurrentUserQuery());
