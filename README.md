@@ -6,23 +6,6 @@ A full-stack movie feedback application built with **.NET 10**, **Blazor WebAsse
 
 This solution follows **Clean Architecture** with clear separation of concerns:
 
-```
-FB_App/
-├── src/
-│   ├── Domain/           # Entities, Value Objects, Domain Events
-│   ├── Application/      # Use Cases, CQRS Commands/Queries, Interfaces
-│   ├── Infrastructure/   # Data Access, Identity, External Services
-│   ├── Web/              # ASP.NET Core Web API
-│   ├── AppHost/          # .NET Aspire Orchestration
-│   └── ServiceDefaults/  # Shared Service Configuration
-├── tests/
-│   ├── Domain.UnitTests/
-│   ├── Application.UnitTests/
-│   ├── Application.FunctionalTests/
-│   └── Infrastructure.IntegrationTests/
-└── FBUI/                 # Blazor WebAssembly Client
-```
-
 ## ✨ Features
 
 ### Core Functionality
@@ -67,7 +50,6 @@ FB_App/
 
 ### Prerequisites
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
-- [Visual Studio 2022/2026](https://visualstudio.microsoft.com/) or [VS Code](https://code.visualstudio.com/)
 
 ### Running the Application
 
@@ -83,30 +65,6 @@ FB_App/
    dotnet run
    ```
    This will start both the Web API and Blazor WASM client with proper orchestration.
-
-3. **Or run projects individually**
-   ```bash
-   # Terminal 1 - Start the API
-   cd FB_App/src/Web
-   dotnet run
-
-   # Terminal 2 - Start the Blazor client
-   cd FBUI
-   dotnet run
-   ```
-
-### Running Tests
-
-```bash
-# Run all tests
-dotnet test
-
-# Run specific test projects
-dotnet test FB_App/tests/Application.UnitTests
-dotnet test FB_App/tests/Domain.UnitTests
-dotnet test FB_App/tests/Infrastructure.IntegrationTests
-```
-
 ## 📁 Project Structure
 
 ### Domain Layer
@@ -156,20 +114,3 @@ When running the Web API, Swagger UI is available at:
 ```
 https://localhost:{port}/swagger
 ```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 👤 Author
-
-**Ihor Voloshyn**
-- GitHub: [@Ihor-Ihorevych](https://github.com/Ihor-Ihorevych)
