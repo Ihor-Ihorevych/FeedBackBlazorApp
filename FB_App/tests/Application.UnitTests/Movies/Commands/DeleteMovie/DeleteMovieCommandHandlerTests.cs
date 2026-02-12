@@ -33,7 +33,7 @@ public class DeleteMovieCommandHandlerTests
         
         var existingMovie = Movie.Create("Test Movie", null, null, null, null, null, null);
         var movieId = existingMovie.Id;
-        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId.Value }, It.IsAny<CancellationToken>()))
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId }, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
@@ -53,7 +53,7 @@ public class DeleteMovieCommandHandlerTests
         // Arrange
         var existingMovie = Movie.Create("Test Movie", null, null, null, null, null, null);
         var movieId = existingMovie.Id;
-        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId.Value }, It.IsAny<CancellationToken>()))
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId }, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
@@ -130,7 +130,7 @@ public class DeleteMovieCommandHandlerTests
         using var cts = new CancellationTokenSource();
         var token = cts.Token;
 
-        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId.Value }, token))
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId }, token))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(token))
             .ReturnsAsync(1);

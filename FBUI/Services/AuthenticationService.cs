@@ -19,7 +19,7 @@ public class AuthenticationService : IAuthenticationService
 {
     private readonly IFBApiClient _apiClient;
     private readonly ILocalStorageService _localStorage;
-    private readonly AuthenticationStateProvider _authStateProvider;
+    private readonly IAuthStateProvider _authStateProvider;
     private readonly ITokenStorageService _tokenStorage;
 
     private const string AccessTokenKey = "accessToken";
@@ -28,7 +28,7 @@ public class AuthenticationService : IAuthenticationService
     public AuthenticationService(
         IFBApiClient apiClient,
         ILocalStorageService localStorage,
-        AuthenticationStateProvider authStateProvider,
+        IAuthStateProvider authStateProvider,
         ITokenStorageService tokenStorage)
     {
         _apiClient = apiClient;
@@ -79,7 +79,7 @@ public class AuthenticationService : IAuthenticationService
                 await _localStorage.SetItemAsync(RefreshTokenKey, response.RefreshToken);
                 _tokenStorage.SetTokens(response.AccessToken, response.RefreshToken);
 
-                ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(response.AccessToken);
+                _authStateProvider.NotifyUserAuthentication();
                 return Result<AccessTokenResponse>.Success(response);
             }
 
@@ -100,7 +100,7 @@ public class AuthenticationService : IAuthenticationService
         await _localStorage.RemoveItemAsync(AccessTokenKey);
         await _localStorage.RemoveItemAsync(RefreshTokenKey);
         _tokenStorage.ClearTokens();
-        ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
+        _authStateProvider.NotifyUserLogout();
     }
 
     public async Task<string?> GetAccessTokenAsync()
@@ -128,8 +128,7 @@ public class AuthenticationService : IAuthenticationService
                 await _localStorage.SetItemAsync(AccessTokenKey, response.AccessToken);
                 await _localStorage.SetItemAsync(RefreshTokenKey, response.RefreshToken);
                 _tokenStorage.SetTokens(response.AccessToken, response.RefreshToken);
-
-                ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(response.AccessToken);
+                _authStateProvider.NotifyUserAuthentication();
                 return Result.Success();
             }
 

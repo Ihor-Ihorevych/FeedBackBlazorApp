@@ -5,7 +5,14 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace FBUI.Services;
 
-public class AuthStateProvider : AuthenticationStateProvider
+public interface IAuthStateProvider
+{
+    Task<AuthenticationState> GetAuthenticationStateAsync();
+    void NotifyUserAuthentication();
+    void NotifyUserLogout();
+}
+
+public class AuthStateProvider : AuthenticationStateProvider, IAuthStateProvider
 {
     private const string AccessTokenKey_ = "accessToken";
     private const string RefreshTokenKey_ = "refreshToken";
@@ -13,7 +20,6 @@ public class AuthStateProvider : AuthenticationStateProvider
     private readonly ITokenStorageService _tokenStorage;
     private readonly IFBApiClient _apiClient;
     private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
-    private bool _initialized;
 
     public AuthStateProvider(ILocalStorageService localStorage, ITokenStorageService tokenStorage, IFBApiClient apiClient)
     {
@@ -27,11 +33,10 @@ public class AuthStateProvider : AuthenticationStateProvider
         try
         {
             var token = await _localStorage.GetItemAsync<string>("accessToken");
-            if (!_initialized)
+            if (string.IsNullOrEmpty(_tokenStorage.AccessToken))
             {
                 var refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
                 _tokenStorage.SetTokens(token, refreshToken);
-                _initialized = true;
             }
 
             if (string.IsNullOrEmpty(token))
@@ -88,18 +93,15 @@ public class AuthStateProvider : AuthenticationStateProvider
         await _localStorage.RemoveItemAsync(AccessTokenKey_);
         await _localStorage.RemoveItemAsync(RefreshTokenKey_);
         _tokenStorage.ClearTokens();
-        _initialized = false;
     }
 
-    public void NotifyUserAuthentication(string token)
+    public void NotifyUserAuthentication()
     {
-        _ = token;
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
     public void NotifyUserLogout()
     {
-        _initialized = false;
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_anonymous)));
     }
 }

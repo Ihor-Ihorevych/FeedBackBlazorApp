@@ -35,7 +35,7 @@ public class UpdateMovieCommandHandlerTests
         // Arrange
         var existingMovie = Movie.Create("Original Title", "Original Description", 2020, "Original Director", "Drama", null, 7.0);
 
-        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, It.IsAny<CancellationToken>()))
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id}, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
@@ -71,7 +71,7 @@ public class UpdateMovieCommandHandlerTests
         // Arrange
         var existingMovie = Movie.Create("Original Title", null, null, null, null, null, null);
 
-        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, It.IsAny<CancellationToken>()))
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id }, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
@@ -139,7 +139,7 @@ public class UpdateMovieCommandHandlerTests
         using var cts = new CancellationTokenSource();
         var token = cts.Token;
 
-        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, token))
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id }, token))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(token))
             .ReturnsAsync(1);
@@ -163,7 +163,7 @@ public class UpdateMovieCommandHandlerTests
         // Arrange
         var existingMovie = Movie.Create("Title", "Has Description", 2020, "Director", "Genre", "url", 8.0);
 
-        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id.Value }, It.IsAny<CancellationToken>()))
+        _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { existingMovie.Id }, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingMovie);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);

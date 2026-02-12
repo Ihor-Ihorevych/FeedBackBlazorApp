@@ -1,7 +1,7 @@
 @using FBUI.Services
 @inject IAdminNotificationService NotificationService
+@inject INotificationTextHelper NotificationTextHelper
 @inject NavigationManager Navigation
-@inject IFBApiClient ApiClient
 @implements IDisposable
 
 <AuthorizeView Roles="Administrator">
@@ -14,21 +14,31 @@
                     <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-4 shadow-xl animate-slide-in">
                         <div class="flex items-start gap-3">
                             <div class="flex-shrink-0">
-                                @if (notification.Type == "NewComment")
+                                @switch (NotificationTextHelper.GetIconType(notification))
                                 {
-                                    <FluentIcon Value="@(new Icons.Regular.Size20.CommentAdd())" Color="Color.Success" />
-                                }
-                                else
-                                {
-                                    <FluentIcon Value="@(new Icons.Regular.Size20.Info())" Color="Color.Accent" />
+                                    case NotificationIconType.Comment:
+                                        <FluentIcon Value="@(new Icons.Regular.Size20.CommentAdd())" Color="Color.Success" />
+                                        break;
+                                    case NotificationIconType.Success:
+                                        <FluentIcon Value="@(new Icons.Regular.Size20.CheckmarkCircle())" Color="Color.Success" />
+                                        break;
+                                    case NotificationIconType.Warning:
+                                        <FluentIcon Value="@(new Icons.Regular.Size20.Warning())" Color="Color.Warning" />
+                                        break;
+                                    case NotificationIconType.Error:
+                                        <FluentIcon Value="@(new Icons.Regular.Size20.ErrorCircle())" Color="Color.Error" />
+                                        break;
+                                    default:
+                                        <FluentIcon Value="@(new Icons.Regular.Size20.Info())" Color="Color.Accent" />
+                                        break;
                                 }
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-white">
-                                    @GetNotificationTitle(notification)
+                                    @NotificationTextHelper.GetTitle(notification)
                                 </p>
                                 <p class="text-xs text-neutral-400 mt-1 truncate">
-                                    @GetNotificationMessage(notification)
+                                    @NotificationTextHelper.GetMessage(notification)
                                 </p>
                                 @if (notification.MovieId.HasValue)
                                 {
@@ -62,7 +72,7 @@
     private readonly List<AdminNotification> _notifications = new();
     private string _connectionState = "Waiting for auth...";
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         NotificationService.OnNotificationReceived += HandleNotification;
         NotificationService.OnConnectionStateChanged += HandleConnectionStateChanged;
@@ -85,7 +95,7 @@
     {
         _notifications.Add(notification);
         InvokeAsync(StateHasChanged);
-        _ = Task.Delay(3000).ContinueWith(_ =>
+        _ = Task.Delay(5000).ContinueWith(_ =>
         {
             _notifications.Remove(notification);
             InvokeAsync(StateHasChanged);
@@ -108,25 +118,11 @@
         Navigation.NavigateTo($"/movies/{movieId}");
     }
 
-    private static string GetNotificationTitle(AdminNotification notification) => notification.Type switch
-    {
-        "NewComment" => "New Comment Pending",
-        "CommentStatusChanged" => "Comment Status Updated",
-        _ => "Notification"
-    };
-
-    private static string GetNotificationMessage(AdminNotification notification) => notification.Type switch
-    {
-        "NewComment" => $"On \"{notification.MovieTitle}\": {notification.CommentPreview}",
-        "CommentStatusChanged" => $"Comment marked as {notification.NewStatus} by {notification.ReviewedBy}",
-        _ => "New notification received"
-    };
-
     private string GetConnectionColor() => _connectionState switch
     {
-        "Connected" => "bg-green-500",
-        "Reconnecting" => "bg-yellow-500 animate-pulse",
-        "Disconnected" or "Failed" => "bg-red-500",
+        ConnectionStates.Connected => "bg-green-500",
+        ConnectionStates.Reconnecting => "bg-yellow-500 animate-pulse",
+        ConnectionStates.Disconnected or ConnectionStates.Failed => "bg-red-500",
         _ => "bg-neutral-500 animate-pulse"
     };
 
