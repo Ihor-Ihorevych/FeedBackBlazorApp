@@ -1,6 +1,7 @@
 @using FBUI.Services
 @inject AdminNotificationService NotificationService
 @inject NavigationManager Navigation
+@inject IFBApiClient ApiClient
 @implements IDisposable
 
 <AuthorizeView Roles="Administrator">
@@ -72,13 +73,9 @@
     {
         if (firstRender)
         {
-            // Wait a bit for auth state to be fully initialized
             await Task.Delay(500);
-
-            // Only connect if we have a token
             if (!string.IsNullOrEmpty(NotificationService.GetCurrentToken()))
             {
-                _isAdmin = true;
                 await NotificationService.StartAsync();
                 await InvokeAsync(StateHasChanged);
             }

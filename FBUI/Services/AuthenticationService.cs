@@ -119,8 +119,6 @@ public class AuthenticationService
             {
                 await _localStorage.SetItemAsync(AccessTokenKey, response.AccessToken);
                 await _localStorage.SetItemAsync(RefreshTokenKey, response.RefreshToken);
-
-                // Update in-memory token storage for HTTP handlers
                 _tokenStorage.SetTokens(response.AccessToken, response.RefreshToken);
 
                 ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(response.AccessToken);

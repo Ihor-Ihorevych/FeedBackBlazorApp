@@ -38,6 +38,7 @@ public class AuthStateProvider : AuthenticationStateProvider
             var userInfo = await _apiClient.GetApiUsersMeAsync();
             if (userInfo is null)
             {
+                await ClearTokensAsync();
                 return new AuthenticationState(_anonymous);
             }
 
@@ -72,10 +73,23 @@ public class AuthStateProvider : AuthenticationStateProvider
             var user = new ClaimsPrincipal(identity);
             return new AuthenticationState(user);
         }
+        catch (ApiException ex) when (ex.StatusCode == 401)
+        {
+            await ClearTokensAsync();
+            return new AuthenticationState(_anonymous);
+        }
         catch
         {
             return new AuthenticationState(_anonymous);
         }
+    }
+
+    private async Task ClearTokensAsync()
+    {
+        await _localStorage.RemoveItemAsync("accessToken");
+        await _localStorage.RemoveItemAsync("refreshToken");
+        _tokenStorage.ClearTokens();
+        _initialized = false;
     }
 
     public void NotifyUserAuthentication(string token)
@@ -86,6 +100,7 @@ public class AuthStateProvider : AuthenticationStateProvider
 
     public void NotifyUserLogout()
     {
+        _initialized = false;
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_anonymous)));
     }
 }

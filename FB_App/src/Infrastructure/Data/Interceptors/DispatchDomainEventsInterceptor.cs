@@ -33,7 +33,6 @@ public class DispatchDomainEventsInterceptor : SaveChangesInterceptor
     {
         if (context == null) return;
 
-        // Use IHasDomainEvents interface to find all entities with domain events
         var entities = context.ChangeTracker
             .Entries<IHasDomainEvents>()
             .Where(e => e.Entity.DomainEvents.Any())

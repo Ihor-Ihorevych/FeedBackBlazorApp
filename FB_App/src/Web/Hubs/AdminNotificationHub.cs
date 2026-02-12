@@ -25,7 +25,6 @@ public class AdminNotificationHub : Hub
             Context.UserIdentifier,
             Context.ConnectionId);
 
-        // Add the admin to a group for easier broadcasting
         await Groups.AddToGroupAsync(Context.ConnectionId, "Administrators");
         
         await base.OnConnectedAsync();
