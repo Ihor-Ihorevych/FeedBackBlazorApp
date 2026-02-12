@@ -1,10 +1,9 @@
-﻿using Ardalis.Result.AspNetCore;
-using FB_App.Application.Common.Models;
+﻿using FB_App.Application.Common.Models;
 using FB_App.Application.Users.Commands.CreateUser;
 using FB_App.Application.Users.Commands.LoginUser;
 using FB_App.Application.Users.Commands.RefreshToken;
+using FB_App.Application.Users.Queries.GetCurrentUser;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Build.Framework;
 
 namespace FB_App.Web.Endpoints;
 
@@ -20,6 +19,9 @@ public class Users : EndpointGroupBase
 
         groupBuilder.MapPost("/refresh", Refresh)
             .AllowAnonymous();
+
+        groupBuilder.MapGet("/me", GetCurrentUser)
+            .RequireAuthorization();
     }
 
     private static async Task<Results<Ok<string>, ValidationProblem>> Register(
@@ -58,6 +60,19 @@ public class Users : EndpointGroupBase
         RefreshTokenCommand command)
     {
         var result = await sender.Send(command);
+
+        if (!result.IsSuccess)
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        return TypedResults.Ok(result.Value);
+    }
+
+    private static async Task<Results<Ok<CurrentUserResponse>, UnauthorizedHttpResult>> GetCurrentUser(
+        ISender sender)
+    {
+        var result = await sender.Send(new GetCurrentUserQuery());
 
         if (!result.IsSuccess)
         {

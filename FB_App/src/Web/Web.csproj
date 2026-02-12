@@ -47,13 +47,6 @@
       <Output TaskParameter="ExitCode" PropertyName="NSwagExitCode" />
       <Output TaskParameter="ConsoleOutput" PropertyName="NSwagOutput" />
     </Exec>
-
-
-    <!-- Generate C# client code from OpenAPI spec to FBUI project -->
-    <Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net100) openapi2csharp /input:..\..\..\FBUI\OpenAPIs\swagger.json /classname:ApiClient /namespace:FB_App.FBUI.Generated /output:..\..\..\FBUI\Generated\ApiClient.cs /useBaseUrl:false /generateClientInterfaces:true" />
-
-    <Message Text="$(NSwagOutput)" Condition="'$(NSwagExitCode)' == '0'" Importance="low" />
-    <Error Text="$(NSwagOutput)" Condition="'$(NSwagExitCode)' != '0'" />
   </Target>
 </Project>
 

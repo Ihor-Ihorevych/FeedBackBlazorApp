@@ -1,6 +1,7 @@
 @page "/movies/create"
+@using FBUI.Client
 @attribute [Authorize(Roles = "Administrator")]
-@inject IFBApiClient ApiClient
+@inject FbApiClient ApiClient
 @inject NavigationManager Navigation
 @inject IToastService ToastService
 

@@ -1,5 +1,6 @@
 @page "/movies/{Id:guid}"
-@inject IFBApiClient ApiClient
+@using FBUI.Client
+@inject FbApiClient ApiClient
 @inject NavigationManager Navigation
 @inject IToastService ToastService
 @inject IDialogService DialogService

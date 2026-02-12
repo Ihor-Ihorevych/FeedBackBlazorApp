@@ -1,5 +1,5 @@
 using Blazored.LocalStorage;
-using FBUI.ApiClient;
+using FBUI.Client;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace FBUI.Services;
@@ -7,7 +7,7 @@ namespace FBUI.Services;
 
 public class AuthenticationService
 {
-    private readonly IFBApiClient _apiClient;
+    private readonly FbApiClient _apiClient;
     private readonly ILocalStorageService _localStorage;
     private readonly AuthenticationStateProvider _authStateProvider;
     private readonly TokenStorageService _tokenStorage;
@@ -16,7 +16,7 @@ public class AuthenticationService
     private const string RefreshTokenKey = "refreshToken";
 
     public AuthenticationService(
-        IFBApiClient apiClient,
+        FbApiClient apiClient,
         ILocalStorageService localStorage,
         AuthenticationStateProvider authStateProvider,
         TokenStorageService tokenStorage)
@@ -61,7 +61,7 @@ public class AuthenticationService
                 Email = email,
                 Password = password
             };
-
+            
             var response = await _apiClient.PostApiUsersLoginAsync(command);
 
             if (response?.AccessToken is not null)

@@ -6,8 +6,9 @@
 	<WasmEnableStreamingResponse>false</WasmEnableStreamingResponse>
     <ImplicitUsings>enable</ImplicitUsings>
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+	  
   </PropertyGroup>
-
+    
   <ItemGroup>
     <Content Include="config.nswag" />
   </ItemGroup>
@@ -37,8 +38,17 @@
     <Folder Include="OpenAPIs\" />
   </ItemGroup>
 
+	<ItemGroup>
+		<OpenApiReference Include="OpenAPIs\swagger.json" CodeGenerator="NSwagCSharp"
+						  Namespace="FBUI.ApiClient"
+						  ClassName="FBApiClient"
+                          OutputPath="ApiClients.cs">
+			<Options>/GenerateClientInterfaces:true</Options>
+		</OpenApiReference>
+	</ItemGroup>
+
   <PropertyGroup>
     <OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
   </PropertyGroup>
-
+	
 </Project>

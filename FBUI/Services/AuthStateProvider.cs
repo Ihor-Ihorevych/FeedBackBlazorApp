@@ -17,6 +17,7 @@ public class AuthStateProvider : AuthenticationStateProvider
     {
         _localStorage = localStorage;
         _tokenStorage = tokenStorage;
+        
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()

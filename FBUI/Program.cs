@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.FluentUI.AspNetCore.Components;
 using Blazored.LocalStorage;
 using FBUI;
+using FBUI.Client;
 using FBUI.Services;
-using FBUI.ApiClient;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.FluentUI.AspNetCore.Components;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -25,11 +25,11 @@ builder.Services.AddHttpClient("FBApi", client =>
 })
 .AddHttpMessageHandler<AuthorizationMessageHandler>();
 
-builder.Services.AddScoped<IFBApiClient>(sp =>
+builder.Services.AddScoped<FbApiClient>(sp =>
 {
     var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
     var httpClient = httpClientFactory.CreateClient("FBApi");
-    return new FBApiClient(apiBaseAddress, httpClient);
+    return new FbApiClient(apiBaseAddress, httpClient);
 });
 
 builder.Services.AddFluentUIComponents();
