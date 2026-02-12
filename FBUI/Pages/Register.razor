@@ -1,5 +1,5 @@
 @page "/register"
-@inject AuthenticationService AuthService
+@inject IAuthenticationService AuthService
 @inject NavigationManager Navigation
 @inject IToastService ToastService
 
@@ -104,19 +104,19 @@
 
         try
         {
-            var (success, error) = await AuthService.RegisterAsync(
+            var result = await AuthService.RegisterAsync(
                 _model.UserName, 
                 _model.Email, 
                 _model.Password);
 
-            if (success)
+            if (result.IsSuccess)
             {
                 ToastService.ShowSuccess("Account created successfully! Please login.");
                 Navigation.NavigateTo("/login");
             }
             else
             {
-                _errorMessage = error ?? "Registration failed. Please try again.";
+                _errorMessage = string.Join(", ", result.Errors);
             }
         }
         catch (Exception ex)

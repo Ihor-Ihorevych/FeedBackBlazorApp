@@ -1,16 +1,26 @@
+using Ardalis.Result;
 using Blazored.LocalStorage;
 using FBUI.ApiClient;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace FBUI.Services;
 
+public interface IAuthenticationService
+{
+    Task<string?> GetAccessTokenAsync();
+    Task InitializeAsync();
+    Task<Result<AccessTokenResponse>> LoginAsync(string email, string password);
+    Task LogoutAsync();
+    Task<Result> RegisterAsync(string userName, string email, string password);
+    Task<Result> TryRefreshTokenAsync();
+}
 
-public class AuthenticationService
+public class AuthenticationService : IAuthenticationService
 {
     private readonly IFBApiClient _apiClient;
     private readonly ILocalStorageService _localStorage;
     private readonly AuthenticationStateProvider _authStateProvider;
-    private readonly TokenStorageService _tokenStorage;
+    private readonly ITokenStorageService _tokenStorage;
 
     private const string AccessTokenKey = "accessToken";
     private const string RefreshTokenKey = "refreshToken";
@@ -19,7 +29,7 @@ public class AuthenticationService
         IFBApiClient apiClient,
         ILocalStorageService localStorage,
         AuthenticationStateProvider authStateProvider,
-        TokenStorageService tokenStorage)
+        ITokenStorageService tokenStorage)
     {
         _apiClient = apiClient;
         _localStorage = localStorage;
@@ -27,7 +37,7 @@ public class AuthenticationService
         _tokenStorage = tokenStorage;
     }
 
-    public async Task<(bool Success, string? Error)> RegisterAsync(string userName, string email, string password)
+    public async Task<Result> RegisterAsync(string userName, string email, string password)
     {
         try
         {
@@ -39,20 +49,19 @@ public class AuthenticationService
             };
 
             await _apiClient.PostApiUsersRegisterAsync(command);
-            return (true, null);
+            return Result.Success();
         }
         catch (ApiException<Exception> ex)
         {
-            var errors = ex.Result.Message;
-            return (false, string.Join(", ", errors));
+            return Result.Error(ex.Result.Message ?? "Registration failed");
         }
         catch (Exception ex)
         {
-            return (false, ex.Message);
+            return Result.Error(ex.Message);
         }
     }
 
-    public async Task<(bool Success, string? Error)> LoginAsync(string email, string password)
+    public async Task<Result<AccessTokenResponse>> LoginAsync(string email, string password)
     {
         try
         {
@@ -61,7 +70,7 @@ public class AuthenticationService
                 Email = email,
                 Password = password
             };
-            
+
             var response = await _apiClient.PostApiUsersLoginAsync(command);
 
             if (response?.AccessToken is not null)
@@ -71,18 +80,18 @@ public class AuthenticationService
                 _tokenStorage.SetTokens(response.AccessToken, response.RefreshToken);
 
                 ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(response.AccessToken);
-                return (true, null);
+                return Result<AccessTokenResponse>.Success(response);
             }
 
-            return (false, "Login failed");
+            return Result<AccessTokenResponse>.Error("Login failed");
         }
         catch (ApiException ex) when (ex.StatusCode == 401)
         {
-            return (false, "Invalid email or password");
+            return Result<AccessTokenResponse>.Unauthorized();
         }
         catch (Exception ex)
         {
-            return (false, ex.Message);
+            return Result<AccessTokenResponse>.Error(ex.Message);
         }
     }
 
@@ -91,7 +100,6 @@ public class AuthenticationService
         await _localStorage.RemoveItemAsync(AccessTokenKey);
         await _localStorage.RemoveItemAsync(RefreshTokenKey);
         _tokenStorage.ClearTokens();
-
         ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
     }
 
@@ -100,13 +108,13 @@ public class AuthenticationService
         return await _localStorage.GetItemAsync<string>(AccessTokenKey);
     }
 
-    public async Task<bool> TryRefreshTokenAsync()
+    public async Task<Result> TryRefreshTokenAsync()
     {
         try
         {
             var refreshToken = await _localStorage.GetItemAsync<string>(RefreshTokenKey);
             if (string.IsNullOrEmpty(refreshToken))
-                return false;
+                return Result.Error("No refresh token available");
 
             var command = new RefreshTokenCommand
             {
@@ -122,15 +130,15 @@ public class AuthenticationService
                 _tokenStorage.SetTokens(response.AccessToken, response.RefreshToken);
 
                 ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(response.AccessToken);
-                return true;
+                return Result.Success();
             }
 
-            return false;
+            return Result.Error("Token refresh failed");
         }
         catch
         {
             await LogoutAsync();
-            return false;
+            return Result.Error("Token refresh failed");
         }
     }
 

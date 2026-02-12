@@ -7,13 +7,15 @@ namespace FBUI.Services;
 
 public class AuthStateProvider : AuthenticationStateProvider
 {
+    private const string AccessTokenKey_ = "accessToken";
+    private const string RefreshTokenKey_ = "refreshToken";
     private readonly ILocalStorageService _localStorage;
-    private readonly TokenStorageService _tokenStorage;
+    private readonly ITokenStorageService _tokenStorage;
     private readonly IFBApiClient _apiClient;
     private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
     private bool _initialized;
 
-    public AuthStateProvider(ILocalStorageService localStorage, TokenStorageService tokenStorage, IFBApiClient apiClient)
+    public AuthStateProvider(ILocalStorageService localStorage, ITokenStorageService tokenStorage, IFBApiClient apiClient)
     {
         _localStorage = localStorage;
         _tokenStorage = tokenStorage;
@@ -60,12 +62,9 @@ public class AuthStateProvider : AuthenticationStateProvider
 
             if (userInfo.Roles is not null)
             {
-                foreach (var role in userInfo.Roles)
+                foreach (var role in userInfo.Roles.Where(r => !string.IsNullOrEmpty(r)))
                 {
-                    if (!string.IsNullOrWhiteSpace(role))
-                    {
-                        claims.Add(new Claim(ClaimTypes.Role, role));
-                    }
+                    claims.Add(new Claim(ClaimTypes.Role, role));
                 }
             }
 
@@ -86,8 +85,8 @@ public class AuthStateProvider : AuthenticationStateProvider
 
     private async Task ClearTokensAsync()
     {
-        await _localStorage.RemoveItemAsync("accessToken");
-        await _localStorage.RemoveItemAsync("refreshToken");
+        await _localStorage.RemoveItemAsync(AccessTokenKey_);
+        await _localStorage.RemoveItemAsync(RefreshTokenKey_);
         _tokenStorage.ClearTokens();
         _initialized = false;
     }

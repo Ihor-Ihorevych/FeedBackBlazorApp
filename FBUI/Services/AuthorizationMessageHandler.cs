@@ -2,9 +2,9 @@ namespace FBUI.Services;
 
 public class AuthorizationMessageHandler : DelegatingHandler
 {
-    private readonly TokenStorageService _tokenStorage;
+    private readonly ITokenStorageService _tokenStorage;
 
-    public AuthorizationMessageHandler(TokenStorageService tokenStorage)
+    public AuthorizationMessageHandler(ITokenStorageService tokenStorage)
     {
         _tokenStorage = tokenStorage;
     }

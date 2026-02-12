@@ -14,11 +14,11 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 var apiBaseAddress = builder.Configuration["ApiBaseAddress"] ?? "https://localhost:5001";
 
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddSingleton<TokenStorageService>();
+builder.Services.AddSingleton<ITokenStorageService,TokenStorageService>();
 builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<AuthenticationService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
-builder.Services.AddScoped<AdminNotificationService>();
+builder.Services.AddScoped<IAdminNotificationService,AdminNotificationService>();
 builder.Services.AddTransient<AuthorizationMessageHandler>();
 builder.Services.AddHttpClient("FBApi", client =>
 {

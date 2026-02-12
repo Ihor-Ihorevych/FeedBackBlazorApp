@@ -1,14 +1,24 @@
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace FBUI.Services;
 
-/// <summary>
-/// Service for managing SignalR connection to receive admin notifications.
-/// </summary>
-public class AdminNotificationService : IAsyncDisposable
+public interface IAdminNotificationService : IAsyncDisposable
 {
-    private readonly TokenStorageService _tokenStorage;
+    string ConnectionState { get; }
+    bool IsConnected { get; }
+
+    event Action<string>? OnConnectionStateChanged;
+    event Action<AdminNotification>? OnNotificationReceived;
+
+    ValueTask DisposeAsync();
+    string? GetCurrentToken();
+    Task StartAsync();
+    Task StopAsync();
+}
+
+public class AdminNotificationService : IAdminNotificationService
+{
+    private readonly ITokenStorageService _tokenStorage;
     private readonly string _hubUrl;
     private HubConnection? _hubConnection;
 
@@ -18,7 +28,7 @@ public class AdminNotificationService : IAsyncDisposable
     public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
     public string ConnectionState => _hubConnection?.State.ToString() ?? "Disconnected";
 
-    public AdminNotificationService(TokenStorageService tokenStorage, IConfiguration configuration)
+    public AdminNotificationService(ITokenStorageService tokenStorage, IConfiguration configuration)
     {
         _tokenStorage = tokenStorage;
         var apiBaseAddress = configuration["ApiBaseAddress"] ?? "https://localhost:5001";
@@ -93,6 +103,8 @@ public class AdminNotificationService : IAsyncDisposable
             _hubConnection = null;
         }
     }
+
+
 }
 
 public record AdminNotification(
