@@ -3,7 +3,9 @@
   <PropertyGroup>
     <RootNamespace>FB_App.Web</RootNamespace>
     <AssemblyName>FB_App.Web</AssemblyName>
+    <!--<ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>-->
   </PropertyGroup>
+  <Import Condition="Exists('$(MSBuildProjectDirectory)\obj\$(MSBuildProjectFile).EntityFrameworkCore.targets')" Project="$(MSBuildProjectDirectory)\obj\$(MSBuildProjectFile).EntityFrameworkCore.targets" />
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
@@ -23,14 +25,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NSwag.AspNetCore" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" />
     <PackageReference Include="NSwag.MSBuild">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
-
-  <!-- Auto-generated Open API specification and Angular TypeScript clients -->
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
@@ -39,16 +40,20 @@
     Disabled: Using runtime OpenAPI generation via app.UseOpenApi() instead.
     To manually generate OpenAPI spec, run: dotnet build -p:GenerateOpenApi=True
   -->
-  <!--
+  
   <Target Name="NSwag" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' And '$(SkipNSwag)' != 'True' ">
-    <Exec ConsoleToMSBuild="true" ContinueOnError="true" WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net100) run config.nswag /variables:Configuration=$(Configuration)">
+    <!-- Generate OpenAPI JSON specification -->
+    <Exec ConsoleToMSBuild="true" ContinueOnError="false" WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net100) aspnetcore2openapi /project:Web.csproj /documentName:v1 /configuration:$(Configuration) /targetFramework:$(TargetFramework) /noBuild:true /aspNetCoreEnvironment:Development /output:..\..\..\FBUI\OpenAPIs\swagger.json">
       <Output TaskParameter="ExitCode" PropertyName="NSwagExitCode" />
       <Output TaskParameter="ConsoleOutput" PropertyName="NSwagOutput" />
     </Exec>
 
+
+    <!-- Generate C# client code from OpenAPI spec to FBUI project -->
+    <Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net100) openapi2csharp /input:..\..\..\FBUI\OpenAPIs\swagger.json /classname:ApiClient /namespace:FB_App.FBUI.Generated /output:..\..\..\FBUI\Generated\ApiClient.cs /useBaseUrl:false /generateClientInterfaces:true" />
+
     <Message Text="$(NSwagOutput)" Condition="'$(NSwagExitCode)' == '0'" Importance="low" />
     <Error Text="$(NSwagOutput)" Condition="'$(NSwagExitCode)' != '0'" />
   </Target>
-  -->
-
 </Project>
+

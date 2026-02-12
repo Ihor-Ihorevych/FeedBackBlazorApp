@@ -1,3 +1,77 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject AuthenticationService AuthService
 
-@Body
+<FluentLayout>
+    <FluentHeader Class="bg-neutral-950 border-b border-neutral-800">
+        <div class="w-full max-w-7xl mx-auto px-6">
+            <div class="flex flex-wrap items-center justify-between gap-6 py-4">
+                <div class="flex items-center gap-8">
+                    <span class="text-xl font-semibold tracking-tight text-white">FB</span>
+                    <nav class="flex items-center gap-6">
+                        <FluentAnchor Href="/"
+                                      Appearance="Appearance.Stealth"
+                                      Class="text-sm text-neutral-300 hover:text-white transition-colors">
+                            Home
+                        </FluentAnchor>
+                        <FluentAnchor Href="/movies"
+                                      Appearance="Appearance.Stealth"
+                                      Class="text-sm text-neutral-300 hover:text-white transition-colors">
+                            Movies
+                        </FluentAnchor>
+                    </nav>
+                </div>
+
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm text-neutral-300 hidden sm:inline">@context.User.Identity?.Name</span>
+                            <FluentButton Appearance="Appearance.Outline"
+                                          OnClick="LogoutAsync"
+                                          Class="text-sm !text-white border-neutral-600 hover:border-neutral-400 hover:text-white px-4 py-1.5">
+                                Sign out
+                            </FluentButton>
+                        </div>
+                    </Authorized>
+
+                    <NotAuthorized>
+                        <div class="flex items-center gap-3">
+                            <FluentAnchor Href="/login"
+                                          Appearance="Appearance.Stealth"
+                                          Class="text-sm text-neutral-300 hover:text-white transition-colors">
+                                Sign in
+                            </FluentAnchor>
+
+                            <FluentButton Appearance="Appearance.Outline"
+                                          OnClick="@(() => Navigation.NavigateTo("/register"))"
+                                          Class="text-sm !text-white border-neutral-600 hover:border-neutral-400 hover:text-white px-4 py-1.5">
+                                Get started
+                            </FluentButton>
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </FluentHeader>
+
+    <FluentBodyContent Class="flex-1 px-8 py-10 bg-neutral-950">
+        <div class="max-w-6xl mx-auto">
+            <FluentMessageBarProvider Section="@MessagesTop" />
+            @Body
+        </div>
+    </FluentBodyContent>
+
+    <FluentFooter Class="bg-neutral-950 border-t border-neutral-800 py-6 text-center">
+        <p class="text-xs text-neutral-500">© @DateTime.Now.Year FB App</p>
+    </FluentFooter>
+</FluentLayout>
+
+@code {
+    private const string MessagesTop = "messages-top";
+
+    private async Task LogoutAsync()
+    {
+        await AuthService.LogoutAsync();
+        Navigation.NavigateTo("/");
+    }
+}

@@ -1,6 +1,9 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.Web>("web");
-builder.AddProject<Projects.FBUI>("wasm");
+var webApi = builder.AddProject<Projects.Web>("web");
 
-builder.Build().Run();
+builder.AddProject<Projects.FBUI>("wasm")
+    .WithReference(webApi)
+    .WithEnvironment("ApiBaseAddress", webApi.GetEndpoint("https"));
+
+await builder.Build().RunAsync();

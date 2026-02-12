@@ -9,6 +9,7 @@ public class CommentDetailDtoMappingProfile : Profile
     {
         CreateMap<Comment, CommentDetailDto>()
             .ForMember(d => d.Id, opt => opt.MapFrom(s => (Guid)s.Id))
-            .ForMember(d => d.MovieId, opt => opt.MapFrom(s => (Guid)s.MovieId));
+            .ForMember(d => d.MovieId, opt => opt.MapFrom(s => (Guid)s.MovieId))
+            .ForMember(d => d.UserName, opt => opt.Ignore());
     }
 }

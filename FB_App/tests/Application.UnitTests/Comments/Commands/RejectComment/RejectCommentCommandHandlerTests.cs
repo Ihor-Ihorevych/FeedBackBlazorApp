@@ -1,5 +1,5 @@
+using Ardalis.Result;
 using FB_App.Application.Comments.Commands.RejectComment;
-using FB_App.Application.Common.Exceptions;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.UnitTests.Common.Testing;
 using FB_App.Domain.Entities;
@@ -87,21 +87,21 @@ public class RejectCommentCommandHandlerTests
     }
 
     [Test]
-    public async Task Handle_WithNonExistentMovie_ShouldThrowNotFoundException()
+    public async Task Handle_WithNonExistentMovie_ShouldReturnNotFoundResult()
     {
         // Arrange
         var command = new RejectCommentCommand(Guid.NewGuid(), Guid.NewGuid());
 
-        // Act & Assert
-        var exception = Assert.ThrowsAsync<NotFoundException>(async () =>
-            await _handler.Handle(command, CancellationToken.None));
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
 
-        Assert.That(exception, Is.Not.Null);
-        Assert.That(exception!.Message, Does.Contain("Movie"));
+        // Assert
+        Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
+        Assert.That(result.Errors.Single(), Does.Contain("Movie"));
     }
 
     [Test]
-    public async Task Handle_WithNonExistentComment_ShouldThrowNotFoundException()
+    public async Task Handle_WithNonExistentComment_ShouldReturnNotFoundResult()
     {
         // Arrange
         var movie = Movie.Create("Test Movie", null, null, null, null, null, null);
@@ -109,16 +109,16 @@ public class RejectCommentCommandHandlerTests
 
         var command = new RejectCommentCommand(movie.Id, Guid.NewGuid());
 
-        // Act & Assert
-        var exception = Assert.ThrowsAsync<NotFoundException>(async () =>
-            await _handler.Handle(command, CancellationToken.None));
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
 
-        Assert.That(exception, Is.Not.Null);
-        Assert.That(exception!.Message, Does.Contain("Comment"));
+        // Assert
+        Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
+        Assert.That(result.Errors.Single(), Does.Contain("Comment"));
     }
 
     [Test]
-    public async Task Handle_WithNullUserId_ShouldThrowUnauthorizedAccessException()
+    public async Task Handle_WithNullUserId_ShouldReturnUnauthorizedResult()
     {
         // Arrange
         var movie = Movie.Create("Test Movie", null, null, null, null, null, null);
@@ -129,9 +129,11 @@ public class RejectCommentCommandHandlerTests
 
         var command = new RejectCommentCommand(movie.Id, comment.Id);
 
-        // Act & Assert
-        await Assert.ThatAsync(async () => await _handler.Handle(command, CancellationToken.None),
-            Throws.TypeOf<UnauthorizedAccessException>());
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.That(result.Status, Is.EqualTo(ResultStatus.Unauthorized));
     }
 
     [Test]

@@ -1,6 +1,5 @@
 using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
-using FB_App.Application.Common.Models;
 using FB_App.Domain.Constants;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.BearerToken;
@@ -44,12 +43,15 @@ public class IdentityService : IIdentityService
         return user?.UserName;
     }
 
-    public async Task<Result<string>> CreateUserAsync(string userName, string password, string role = nameof(Roles.User))
+    public async Task<Result<string>> CreateUserAsync(string email,
+                                                      string password,
+                                                      string role = nameof(Roles.User),
+                                                      string userName = "")
     {
         var user = new ApplicationUser
         {
             UserName = userName,
-            Email = userName,
+            Email = email,
         };
 
         var result = await _userManager.CreateAsync(user, password);

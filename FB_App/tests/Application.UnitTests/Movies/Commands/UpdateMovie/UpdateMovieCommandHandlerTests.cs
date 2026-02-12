@@ -1,4 +1,4 @@
-using FB_App.Application.Common.Exceptions;
+using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Movies.Commands.UpdateMovie;
 using FB_App.Domain.Entities;
@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -89,7 +90,7 @@ public class UpdateMovieCommandHandlerTests
     }
 
     [Test]
-    public async Task Handle_WithNonExistentMovie_ShouldThrowNotFoundException()
+    public async Task Handle_WithNonExistentMovie_ShouldReturnNotFoundResult()
     {
         // Arrange
         var movieId = Guid.NewGuid();
@@ -102,13 +103,15 @@ public class UpdateMovieCommandHandlerTests
             Title = "Updated Title"
         };
 
-        // Act & Assert
-        await Assert.ThatAsync(async () => await _handler.Handle(command, CancellationToken.None),
-            Throws.TypeOf<NotFoundException>());
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
     }
 
     [Test]
-    public async Task Handle_WithNonExistentMovie_ShouldIncludeEntityNameInException()
+    public async Task Handle_WithNonExistentMovie_ShouldIncludeEntityNameInErrors()
     {
         // Arrange
         var movieId = Guid.NewGuid();
@@ -122,11 +125,10 @@ public class UpdateMovieCommandHandlerTests
         };
 
         // Act
-        var ex = Assert.ThrowsAsync<NotFoundException>(async () =>
-            await _handler.Handle(command, CancellationToken.None));
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.That(ex.Message, Does.Contain("Movie"));
+        Assert.That(result.Errors.Single(), Does.Contain("Movie"));
     }
 
     [Test]

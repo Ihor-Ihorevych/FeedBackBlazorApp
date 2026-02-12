@@ -1,0 +1,141 @@
+@page "/movies/create"
+@attribute [Authorize(Roles = "Administrator")]
+@inject IFBApiClient ApiClient
+@inject NavigationManager Navigation
+@inject IToastService ToastService
+
+<PageTitle>Add Movie - FB App</PageTitle>
+
+<div class="max-w-2xl mx-auto">
+    <div class="mb-6">
+        <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => Navigation.NavigateTo("/movies"))">
+            <FluentIcon Value="@(new Icons.Regular.Size20.ArrowLeft())" Slot="start" />
+            Back to Movies
+        </FluentButton>
+    </div>
+
+    <FluentCard Class="p-8">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">Add New Movie</h1>
+            <p class="text-neutral-600 dark:text-neutral-400 mt-1">Fill in the details to add a new movie</p>
+        </div>
+
+        <EditForm Model="@_model" OnValidSubmit="HandleSubmitAsync" FormName="CreateMovieForm">
+            <DataAnnotationsValidator />
+
+            <div class="space-y-5">
+                <div>
+                    <FluentTextField 
+                        @bind-Value="_model.Title" 
+                        Label="Title" 
+                        Placeholder="Enter movie title"
+                        Style="width: 100%;"
+                        Required="true" />
+                    <ValidationMessage For="@(() => _model.Title)" class="text-red-500 text-sm mt-1" />
+                </div>
+
+                <div>
+                    <FluentTextArea 
+                        @bind-Value="_model.Description" 
+                        Label="Description" 
+                        Placeholder="Enter movie description"
+                        Rows="4"
+                        Style="width: 100%;" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <FluentTextField 
+                            @bind-Value="_model.Director" 
+                            Label="Director" 
+                            Placeholder="Director name"
+                            Style="width: 100%;" />
+                    </div>
+                    <div>
+                        <FluentTextField 
+                            @bind-Value="_model.Genre" 
+                            Label="Genre" 
+                            Placeholder="e.g., Action, Drama"
+                            Style="width: 100%;" />
+                    </div>
+                </div>
+
+                <div>
+                    <FluentTextField 
+                        @bind-Value="_model.ReleaseYear"
+                        Label="Release Year"
+                        TextFieldType="TextFieldType.Number"
+                        Placeholder="e.g., 2024"
+                        Style="width: 100%;" />
+                </div>
+
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <FluentMessageBar Intent="MessageIntent.Error">
+                        @_errorMessage
+                    </FluentMessageBar>
+                }
+
+                <div class="flex gap-4 pt-4">
+                    <FluentButton 
+                        Type="ButtonType.Submit" 
+                        Appearance="Appearance.Accent" 
+                        Loading="@_isLoading">
+                        <FluentIcon Value="@(new Icons.Regular.Size20.Save())" Slot="start" />
+                        Save Movie
+                    </FluentButton>
+                    <FluentButton 
+                        Appearance="Appearance.Outline" 
+                        OnClick="@(() => Navigation.NavigateTo("/movies"))">
+                        Cancel
+                    </FluentButton>
+                </div>
+            </div>
+        </EditForm>
+    </FluentCard>
+</div>
+
+@code {
+    private readonly CreateMovieModel _model = new();
+    private bool _isLoading;
+    private string? _errorMessage;
+
+    private async Task HandleSubmitAsync()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+
+        try
+        {
+            var command = new CreateMovieCommand
+            {
+                Title = _model.Title,
+                Description = _model.Description,
+                Director = _model.Director,
+                Genre = _model.Genre,
+                ReleaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : null
+            };
+
+            var movieId = await ApiClient.CreateMovieAsync(command);
+            ToastService.ShowSuccess("Movie created successfully!");
+            Navigation.NavigateTo($"/movies/{movieId}");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to create movie: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private class CreateMovieModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public string? Director { get; set; }
+        public string? Genre { get; set; }
+        public string? ReleaseYear { get; set; }
+    }
+}

@@ -1,6 +1,7 @@
 using FB_App.Domain.Entities;
 using FB_App.Domain.Entities.Values;
 using FB_App.Domain.Enums;
+using FB_App.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -25,8 +26,13 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
             .IsRequired();
 
         builder.Property(c => c.UserId)
-            .HasMaxLength(32)
+            .HasMaxLength(450)
             .IsRequired();
+
+        builder.HasOne<ApplicationUser>()
+            .WithMany(user => user.Comments)
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(c => c.Status)
             .HasConversion<int>()

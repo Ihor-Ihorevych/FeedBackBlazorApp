@@ -16,11 +16,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
     public DbSet<Comment> Comments => Set<Comment>();
 
-    public IDbContextTransaction BeginTransaction()
-    {
-        return Database.BeginTransaction();
-    }
-
     public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         return Database.BeginTransactionAsync(cancellationToken);

@@ -1,21 +1,11 @@
 {
   "runtime": "Net100",
   "defaultVariables": null,
-  "documentGenerator": {
-    "aspNetCoreToOpenApi": {
-      "project": "Web.csproj",
-      "documentName": "v1",
-      "msBuildProjectExtensionsPath": null,
-      "configuration": "${Configuration}",
-      "runtime": null,
-      "targetFramework": "net10.0",
-      "noBuild": true,
-      "msBuildOutputPath": null,
-      "verbose": true,
-      "workingDirectory": null,
-      "aspNetCoreEnvironment": null,
-      "output": "../../../FBUI/OpenAPIs/swagger.json",
-      "newLineBehavior": "Auto"
+  "documentGenerator": null,
+  "documentGenerators": {
+    "openApi": {
+      "fromDocument": false,
+      "input": "OpenAPIs/swagger.json"
     }
   },
   "codeGenerators": {
@@ -91,7 +81,7 @@
       "requiredPropertiesMustBeDefined": true,
       "openApiNullableReferenceTypes": false,
       "generateNullableReferenceTypes": false,
-      "output": "../../../FBUI/OpenAPIs/ApiClient.cs",
+      "output": "ApiClient.cs",
       "newLineBehavior": "Auto"
     }
   }

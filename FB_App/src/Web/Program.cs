@@ -22,6 +22,10 @@ else
 }
 
 app.UseHttpsRedirection();
+
+// Enable CORS for Blazor WebAssembly client
+app.UseCors("BlazorClientPolicy");
+
 app.UseStaticFiles();
 
 app.MapDefaultEndpoints();

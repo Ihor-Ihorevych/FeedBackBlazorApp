@@ -1,4 +1,4 @@
-using FB_App.Application.Common.Exceptions;
+using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Movies.Commands.DeleteMovie;
 using FB_App.Domain.Entities;
@@ -68,7 +68,7 @@ public class DeleteMovieCommandHandlerTests
     }
 
     [Test]
-    public async Task Handle_WithNonExistentMovie_ShouldThrowNotFoundException()
+    public async Task Handle_WithNonExistentMovie_ShouldReturnNotFoundResult()
     {
         // Arrange
         var movieId = Guid.NewGuid();
@@ -77,13 +77,15 @@ public class DeleteMovieCommandHandlerTests
 
         var command = new DeleteMovieCommand(movieId);
 
-        // Act & Assert
-        await Should.ThrowAsync<NotFoundException>(async () =>
-            await _handler.Handle(command, CancellationToken.None));
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
     }
 
     [Test]
-    public async Task Handle_WithNonExistentMovie_ShouldIncludeMovieInExceptionMessage()
+    public async Task Handle_WithNonExistentMovie_ShouldIncludeMovieInErrors()
     {
         // Arrange
         var movieId = Guid.NewGuid();
@@ -92,11 +94,11 @@ public class DeleteMovieCommandHandlerTests
 
         var command = new DeleteMovieCommand(movieId);
 
-        // Act & Assert
-        var exception = await Should.ThrowAsync<NotFoundException>(async () =>
-            await _handler.Handle(command, CancellationToken.None));
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
 
-        exception.Message.ShouldContain("Movie");
+        // Assert
+        result.Errors.Single().ShouldContain("Movie");
     }
 
     [Test]

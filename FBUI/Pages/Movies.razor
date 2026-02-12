@@ -1,0 +1,138 @@
+@page "/movies"
+@inject IFBApiClient ApiClient
+@inject NavigationManager Navigation
+@inject IToastService ToastService
+@inject IDialogService DialogService
+
+<PageTitle>Movies - FB App</PageTitle>
+
+<div class="py-8">
+    <div class="flex justify-between items-end mb-12">
+        <div>
+            <h1 class="text-3xl font-light tracking-tight text-neutral-100">Movies</h1>
+            <p class="text-neutral-500 mt-2 text-sm">Browse and discover</p>
+        </div>
+        <AuthorizeView Roles="Administrator">
+            <Authorized>
+                <FluentButton Appearance="Appearance.Outline" OnClick="@(() => Navigation.NavigateTo("/movies/create"))" Class="border-neutral-700 text-neutral-300">
+                    Add Movie
+                </FluentButton>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+
+    @if (_isLoading)
+    {
+        <div class="flex justify-center py-20">
+            <FluentProgressRing />
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(_error))
+    {
+        <div class="py-20 text-center">
+            <p class="text-neutral-400 mb-4">Failed to load movies</p>
+            <p class="text-sm text-neutral-500 mb-6">@_error</p>
+            <FluentButton Appearance="Appearance.Outline" OnClick="LoadMoviesAsync" Class="border-neutral-700 text-neutral-300">
+                Try Again
+            </FluentButton>
+        </div>
+    }
+    else if (_movies?.Items is null || !_movies.Items.Any())
+    {
+        <div class="py-20 text-center">
+            <p class="text-neutral-400">No movies yet</p>
+            <p class="text-sm text-neutral-500 mt-2">Be the first to add one.</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @foreach (var movie in _movies.Items)
+            {
+                <div class="group cursor-pointer border border-neutral-800 rounded-lg p-5 hover:border-neutral-600 transition-colors bg-neutral-900"
+                     @onclick="@(() => Navigation.NavigateTo($"/movies/{movie.Id}"))">
+                    <h3 class="font-medium text-neutral-100 mb-2 group-hover:text-neutral-300">
+                        @movie.Title
+                    </h3>
+                    @if (!string.IsNullOrEmpty(movie.Description))
+                    {
+                        <p class="text-sm text-neutral-400 line-clamp-2 mb-4">
+                            @movie.Description
+                        </p>
+                    }
+                    <div class="flex items-center justify-between text-xs text-neutral-500">
+                        @if (movie.ReleaseYear.HasValue)
+                        {
+                            <span>@movie.ReleaseYear.Value</span>
+                        }
+                        @if (movie.Rating.HasValue)
+                        {
+                            <span class="text-amber-500">★ @movie.Rating.Value.ToString("F1")</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (_movies.TotalPages > 1)
+        {
+            <div class="flex justify-center mt-12">
+                <FluentPaginator State="@_paginationState" CurrentPage="@(_currentPage - 1)"
+                                 TotalItemCount="@_movies.TotalCount" ItemsPerPage="@_pageSize"
+                                 OnPageChange="OnPageChangeAsync" />
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private PaginatedListOfMovieDto? _movies;
+    private bool _isLoading = true;
+    private string? _error;
+    private int _currentPage = 1;
+    private const int _pageSize = 12;
+    private readonly PaginationState _paginationState = new() { ItemsPerPage = _pageSize };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMoviesAsync();
+    }
+
+    private async Task LoadMoviesAsync()
+    {
+        _isLoading = true;
+        _error = null;
+
+        try
+        {
+            _movies = await ApiClient.GetMoviesAsync(_currentPage, _pageSize, string.Empty, string.Empty);
+        }
+        catch (ApiException ex)
+        {
+            _error = $"API Error ({ex.StatusCode}): {ex.Message}";
+            Console.WriteLine($"API Exception: {ex.StatusCode} - {ex.Message}");
+            Console.WriteLine($"Response: {ex.Response}");
+        }
+        catch (HttpRequestException ex)
+        {
+            _error = $"Network Error: {ex.Message}";
+            Console.WriteLine($"HTTP Exception: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error: {ex.Message}";
+            Console.WriteLine($"Exception: {ex.GetType().Name} - {ex.Message}");
+            Console.WriteLine($"Stack: {ex.StackTrace}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task OnPageChangeAsync(int pageNumber)
+    {
+        _currentPage = pageNumber + 1;
+        await LoadMoviesAsync();
+    }
+}

@@ -6,7 +6,6 @@ using FB_App.Domain.Enums;
 namespace FB_App.Application.Comments.Queries.GetCommentsByMovie;
 
 
-[Authorize(Roles = Roles.Administrator)]
 public record GetCommentsByMovieQuery : IRequest<List<CommentDetailDto>>
 {
     public Guid MovieId { get; init; }
@@ -17,11 +16,13 @@ public class GetCommentsByMovieQueryHandler : IRequestHandler<GetCommentsByMovie
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IIdentityService _identityService;
 
-    public GetCommentsByMovieQueryHandler(IApplicationDbContext context, IMapper mapper)
+    public GetCommentsByMovieQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService)
     {
         _context = context;
         _mapper = mapper;
+        _identityService = identityService;
     }
 
     public async Task<List<CommentDetailDto>> Handle(GetCommentsByMovieQuery request, CancellationToken cancellationToken)
@@ -35,9 +36,20 @@ public class GetCommentsByMovieQueryHandler : IRequestHandler<GetCommentsByMovie
             query = query.Where(c => c.Status == request.Status.Value);
         }
 
-        return await query
+        var comments = await query
             .OrderByDescending(c => c.Id)
-            .ProjectTo<CommentDetailDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
+
+        var result = _mapper.Map<List<CommentDetailDto>>(comments);
+
+        var userNameTasks = result.Where(c => !string.IsNullOrWhiteSpace(c.UserId))
+                .Select(async comment =>
+                {
+                    comment.UserName = await _identityService.GetUserNameAsync(comment.UserId) ?? string.Empty;
+                });
+        
+        await Task.WhenAll(userNameTasks);
+
+        return result;
     }
 }

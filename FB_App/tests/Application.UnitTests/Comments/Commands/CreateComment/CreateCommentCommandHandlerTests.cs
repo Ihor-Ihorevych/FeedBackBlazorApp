@@ -1,5 +1,4 @@
 using FB_App.Application.Comments.Commands.CreateComment;
-using FB_App.Application.Common.Exceptions;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.UnitTests.Common.Testing;
 using FB_App.Domain.Entities;
@@ -7,6 +6,7 @@ using FB_App.Domain.Entities.Values;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
+using Ardalis.Result;
 
 namespace FB_App.Application.UnitTests.Comments.Commands.CreateComment;
 
@@ -95,7 +95,7 @@ public class CreateCommentCommandHandlerTests
     }
 
     [Test]
-    public void Handle_WithNonExistentMovie_ShouldThrowNotFoundException()
+    public async Task Handle_WithNonExistentMovie_ShouldReturnNotFoundResult()
     {
         // Arrange
         var command = new CreateCommentCommand
@@ -104,13 +104,16 @@ public class CreateCommentCommandHandlerTests
             Text = "Great movie!"
         };
 
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
         // Assert
-        Assert.That(async () => await _handler.Handle(command, CancellationToken.None),
-            Throws.TypeOf<NotFoundException>());
+        Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
+        Assert.That(result.Errors.Single(), Does.Contain("Movie"));
     }
 
     [Test]
-    public void Handle_WithNullUserId_ShouldThrowUnauthorizedAccessException()
+    public async Task Handle_WithNullUserId_ShouldReturnUnauthorizedResult()
     {
         // Arrange
         var movie = Movie.Create("Test Movie", null, null, null, null, null, null);
@@ -123,9 +126,11 @@ public class CreateCommentCommandHandlerTests
             Text = "Great movie!"
         };
 
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
         // Assert
-        Assert.That(async () => await _handler.Handle(command, CancellationToken.None),
-            Throws.TypeOf<UnauthorizedAccessException>());
+        Assert.That(result.Status, Is.EqualTo(ResultStatus.Unauthorized));
     }
 
     [Test]

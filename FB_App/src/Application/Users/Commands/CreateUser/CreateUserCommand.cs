@@ -8,6 +8,7 @@ public record CreateUserCommand : IRequest<Result<string>>
 {
     public string Email { get; init; } = string.Empty;
     public string Password { get; init; } = string.Empty;
+    public string UserName { get; init; } = string.Empty;
 }
 
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<string>>
@@ -24,6 +25,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
         return await _identityService.CreateUserAsync(
             request.Email,
             request.Password,
-            "User");
+            "User",
+            request.UserName);
     }
 }

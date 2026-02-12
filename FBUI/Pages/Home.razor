@@ -1,7 +1,51 @@
 ﻿@page "/"
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Home - FB App</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="py-16">
+    <div class="text-center mb-16">
+        <h1 class="text-5xl font-light tracking-tight text-neutral-100 mb-6">
+            FB App
+        </h1>
+        <p class="text-lg text-neutral-400 max-w-lg mx-auto leading-relaxed">
+            Discover and share your thoughts on movies.
+        </p>
 
-Welcome to your new app.
+        <div class="flex justify-center gap-4 mt-10">
+            <FluentButton Appearance="Appearance.Accent" OnClick="@(() => Navigation.NavigateTo("/movies"))" Class="px-6">
+                Browse Movies
+            </FluentButton>
+            <AuthorizeView>
+                <NotAuthorized>
+                    <FluentButton Appearance="Appearance.Accent" OnClick="@(() => Navigation.NavigateTo("/register"))" Class="px-6">
+                        Get Started
+                    </FluentButton>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
+        <div class="text-center py-8">
+            <h3 class="text-sm font-medium uppercase tracking-widest text-neutral-500 mb-3">Discover</h3>
+            <p class="text-neutral-400 text-sm leading-relaxed">
+                Explore movies across all genres.
+            </p>
+        </div>
+
+        <div class="text-center py-8">
+            <h3 class="text-sm font-medium uppercase tracking-widest text-neutral-500 mb-3">Rate</h3>
+            <p class="text-neutral-400 text-sm leading-relaxed">
+                Share your ratings with others.
+            </p>
+        </div>
+
+        <div class="text-center py-8">
+            <h3 class="text-sm font-medium uppercase tracking-widest text-neutral-500 mb-3">Discuss</h3>
+            <p class="text-neutral-400 text-sm leading-relaxed">
+                Engage with movie enthusiasts.
+            </p>
+        </div>
+    </div>
+</div>

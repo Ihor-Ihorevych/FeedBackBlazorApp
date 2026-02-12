@@ -9,6 +9,7 @@ public class AtomicOperationCommandBehaviour<TRequest, TResponse> : IPipelineBeh
     private readonly ILogger<AtomicOperationCommandBehaviour<TRequest, TResponse>> _logger;
     private readonly IApplicationDbContext _context;
     private const string CommandSuffix_ = "Command";
+    private const string ErrorMessage_ = "Error occurred during atomic operation. Transaction has been rolled back. Errors: {Message}";
     public AtomicOperationCommandBehaviour(ILogger<AtomicOperationCommandBehaviour<TRequest, TResponse>> logger,
                                      IApplicationDbContext context)
     {
@@ -34,10 +35,7 @@ public class AtomicOperationCommandBehaviour<TRequest, TResponse> : IPipelineBeh
         catch (Exception ex)
         {
             await transaction.RollbackAsync(cancellationToken);
-            string errorMessage =
-                "Error occurred during atomic operation. Transaction has been rolled back. Errors: {Message}";
-
-            _logger.LogIfLevel(LogLevel.Error, errorMessage, ex.Message);
+            _logger.LogIfLevel(LogLevel.Error, ErrorMessage_, ex.Message);
             throw;
         }
     }
