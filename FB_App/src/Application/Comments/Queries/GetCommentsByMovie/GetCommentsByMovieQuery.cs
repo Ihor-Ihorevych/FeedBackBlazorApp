@@ -17,12 +17,14 @@ public class GetCommentsByMovieQueryHandler : IRequestHandler<GetCommentsByMovie
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IIdentityService _identityService;
+    private readonly IUser _user;
 
-    public GetCommentsByMovieQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService)
+    public GetCommentsByMovieQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService, IUser user)
     {
         _context = context;
         _mapper = mapper;
         _identityService = identityService;
+        _user = user;
     }
 
     public async Task<List<CommentDetailDto>> Handle(GetCommentsByMovieQuery request, CancellationToken cancellationToken)
@@ -30,6 +32,22 @@ public class GetCommentsByMovieQueryHandler : IRequestHandler<GetCommentsByMovie
         var query = _context.Comments
             .AsNoTracking()
             .Where(c => c.MovieId == request.MovieId);
+
+        var isAdmin = _user.Roles?.Contains(Roles.Administrator) ?? false;
+        var currentUserId = _user.Id;
+
+        if (!isAdmin)
+        {
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                query = query.Where(c => c.Status == CommentStatus.Approved);
+            }
+            else
+            {
+                query = query.Where(c => c.Status == CommentStatus.Approved ||
+                                         (c.Status == CommentStatus.Pending && c.UserId == currentUserId));
+            }
+        }
 
         if (request.Status.HasValue)
         {

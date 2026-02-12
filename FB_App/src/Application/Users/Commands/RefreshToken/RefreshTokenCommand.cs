@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FB_App.Application.Users.Commands.RefreshToken;
 

@@ -97,12 +97,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Comments/movie/{movieId}/{id}/approve": {

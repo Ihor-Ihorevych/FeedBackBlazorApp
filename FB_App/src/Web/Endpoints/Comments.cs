@@ -12,7 +12,7 @@ public class Comments : EndpointGroupBase
     public override void Map(RouteGroupBuilder groupBuilder)
     {
         groupBuilder.MapPost(CreateComment, "/").RequireAuthorization();
-        groupBuilder.MapGet(GetCommentsByMovie, "/movie/{movieId}").RequireAuthorization();
+        groupBuilder.MapGet(GetCommentsByMovie, "/movie/{movieId}").AllowAnonymous();
         groupBuilder.MapPut(ApproveComment, "/movie/{movieId}/{id}/approve").RequireAuthorization();
         groupBuilder.MapPut(RejectComment, "/movie/{movieId}/{id}/reject").RequireAuthorization();
     }

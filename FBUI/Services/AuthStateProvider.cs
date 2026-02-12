@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Blazored.LocalStorage;
-using FBUI.Client;
+using FBUI.ApiClient;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace FBUI.Services;
@@ -9,11 +9,11 @@ public class AuthStateProvider : AuthenticationStateProvider
 {
     private readonly ILocalStorageService _localStorage;
     private readonly TokenStorageService _tokenStorage;
-    private readonly FbApiClient _apiClient;
+    private readonly IFBApiClient _apiClient;
     private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
     private bool _initialized;
 
-    public AuthStateProvider(ILocalStorageService localStorage, TokenStorageService tokenStorage, FbApiClient apiClient)
+    public AuthStateProvider(ILocalStorageService localStorage, TokenStorageService tokenStorage, IFBApiClient apiClient)
     {
         _localStorage = localStorage;
         _tokenStorage = tokenStorage;

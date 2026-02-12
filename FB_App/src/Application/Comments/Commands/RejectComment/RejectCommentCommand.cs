@@ -24,7 +24,7 @@ public class RejectCommentCommandHandler : IRequestHandler<RejectCommentCommand,
     public async Task<Result> Handle(RejectCommentCommand request, CancellationToken cancellationToken)
     {
         var movie = await _context.Movies
-            .Include(m => m.Comments.Where(c => c.MovieId == m.Id))
+            .Include(m => m.Comments)
             .FirstOrDefaultAsync(m => m.Id == request.MovieId, cancellationToken);
 
         if (movie == null)

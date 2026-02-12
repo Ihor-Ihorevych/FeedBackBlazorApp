@@ -1,4 +1,4 @@
-using Ardalis.Result;
+ using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
@@ -6,7 +6,7 @@ using FB_App.Domain.Entities;
 
 namespace FB_App.Application.Comments.Commands.CreateComment;
 
-[Authorize(Roles = Roles.User)]
+[Authorize(Roles = $"{Roles.Administrator},{Roles.User}")]
 public record CreateCommentCommand : IRequest<Result<Guid>>
 {
     public Guid MovieId { get; init; }

@@ -3,6 +3,7 @@ using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
 using FB_App.Domain.Entities;
+using FB_App.Domain.Entities.Values;
 
 namespace FB_App.Application.Movies.Commands.UpdateMovie;
 
@@ -31,7 +32,7 @@ public class UpdateMovieCommandHandler : IRequestHandler<UpdateMovieCommand, Res
     public async Task<Result> Handle(UpdateMovieCommand request, CancellationToken cancellationToken)
     {
         var movie = await _context.Movies
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+            .FindAsync(new object[] { (MovieId)request.Id }, cancellationToken);
 
         if (movie == null)
         {

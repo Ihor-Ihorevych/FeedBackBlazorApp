@@ -1,0 +1,171 @@
+@page "/movies/{Id:guid}/edit"
+@attribute [Authorize(Roles = "Administrator")]
+@inject IFBApiClient ApiClient
+@inject NavigationManager Navigation
+@inject IToastService ToastService
+
+<PageTitle>Edit Movie - FB App</PageTitle>
+
+<div class="max-w-2xl mx-auto px-4 py-8 space-y-6">
+    <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => Navigation.NavigateTo($"/movies/{Id}"))">
+        <FluentIcon Value="@(new Icons.Regular.Size20.ArrowLeft())" Slot="start" />
+        Back to Movie
+    </FluentButton>
+
+    <FluentCard Class="p-6 space-y-6">
+        <div>
+            <h1 class="text-2xl font-semibold text-neutral-100">Edit Movie</h1>
+            <p class="text-sm text-neutral-400 mt-1">Update the movie details below.</p>
+        </div>
+
+        @if (_isLoading)
+        {
+            <div class="flex justify-center py-10">
+                <FluentProgressRing />
+            </div>
+        }
+        else
+        {
+            <EditForm Model="@_model" OnValidSubmit="HandleSubmitAsync" FormName="EditMovieForm">
+                <DataAnnotationsValidator />
+
+                <div class="space-y-5">
+                    <div>
+                        <FluentTextField @bind-Value="_model.Title"
+                                         Label="Title"
+                                         Placeholder="Enter movie title"
+                                         Style="width: 100%;"
+                                         Required="true" />
+                        <ValidationMessage For="@(() => _model.Title)" class="text-red-500 text-sm mt-1" />
+                    </div>
+
+                    <div>
+                        <FluentTextArea @bind-Value="_model.Description"
+                                        Label="Description"
+                                        Placeholder="Enter movie description"
+                                        Rows="4"
+                                        Style="width: 100%;" />
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <FluentTextField @bind-Value="_model.Director"
+                                             Label="Director"
+                                             Placeholder="Director name"
+                                             Style="width: 100%;" />
+                        </div>
+                        <div>
+                            <FluentTextField @bind-Value="_model.Genre"
+                                             Label="Genre"
+                                             Placeholder="e.g., Action, Drama"
+                                             Style="width: 100%;" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <FluentTextField @bind-Value="_model.ReleaseYear"
+                                         Label="Release Year"
+                                         TextFieldType="TextFieldType.Number"
+                                         Placeholder="e.g., 2024"
+                                         Style="width: 100%;" />
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(_errorMessage))
+                    {
+                        <FluentMessageBar Intent="MessageIntent.Error">
+                            @_errorMessage
+                        </FluentMessageBar>
+                    }
+
+                    <div class="flex gap-3 pt-2">
+                        <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" Loading="@_isSaving">
+                            <FluentIcon Value="@(new Icons.Regular.Size20.Save())" Slot="start" />
+                            Save Changes
+                        </FluentButton>
+                        <FluentButton Appearance="Appearance.Outline" OnClick="@(() => Navigation.NavigateTo($"/movies/{Id}"))">
+                            Cancel
+                        </FluentButton>
+                    </div>
+                </div>
+            </EditForm>
+        }
+    </FluentCard>
+</div>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private readonly EditMovieModel _model = new();
+    private bool _isLoading = true;
+    private bool _isSaving;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMovieAsync();
+    }
+
+    private async Task LoadMovieAsync()
+    {
+        _isLoading = true;
+
+        try
+        {
+            var movie = await ApiClient.GetMovieByIdAsync(Id);
+            _model.Title = movie.Title;
+            _model.Description = movie.Description;
+            _model.Director = movie.Director;
+            _model.Genre = movie.Genre;
+            _model.ReleaseYear = movie.ReleaseYear?.ToString();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to load movie: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        _isSaving = true;
+        _errorMessage = null;
+
+        try
+        {
+            var command = new UpdateMovieCommand
+            {
+                Id = Id,
+                Title = _model.Title,
+                Description = _model.Description,
+                Director = _model.Director,
+                Genre = _model.Genre,
+                ReleaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : null
+            };
+
+            await ApiClient.UpdateMovieAsync(Id, command);
+            ToastService.ShowSuccess("Movie updated successfully!");
+            Navigation.NavigateTo($"/movies/{Id}");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to update movie: {ex.Message}";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private class EditMovieModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public string? Director { get; set; }
+        public string? Genre { get; set; }
+        public string? ReleaseYear { get; set; }
+    }
+}

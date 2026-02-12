@@ -24,8 +24,8 @@ public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentComman
     public async Task<Result> Handle(ApproveCommentCommand request, CancellationToken cancellationToken)
     {
         var movie = await _context.Movies
-            .Include(m => m.Comments.Where(c => c.MovieId == m.Id))
-            .FirstOrDefaultAsync(m => m.Id == request.MovieId, cancellationToken);
+                    .Include(m => m.Comments)
+                    .FirstOrDefaultAsync(m => m.Id == request.MovieId, cancellationToken);
 
         if (movie == null)
         {
