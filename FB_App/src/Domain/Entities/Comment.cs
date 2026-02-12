@@ -2,6 +2,7 @@ namespace FB_App.Domain.Entities;
 
 using FB_App.Domain.Entities.Values;
 using FB_App.Domain.Enums;
+using FB_App.Domain.Events;
 
 public sealed class Comment : BaseAuditableEntity<CommentId>
 {
@@ -80,13 +81,15 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
     {
         if (string.IsNullOrWhiteSpace(reviewedBy))
             throw new ArgumentException("Reviewed by cannot be null or empty.", nameof(reviewedBy));
-        
+
         if (!IsPending)
             throw new InvalidOperationException("Only pending comments can be approved.");
 
         Status = CommentStatus.Approved;
         ReviewedBy = reviewedBy;
         ReviewedAt = DateTimeOffset.UtcNow;
+
+        AddDomainEvent(new CommentApprovedEvent(this, reviewedBy));
     }
 
     /// <summary>
@@ -99,13 +102,15 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
     {
         if (string.IsNullOrWhiteSpace(reviewedBy))
             throw new ArgumentException("Reviewed by cannot be null or empty.", nameof(reviewedBy));
-        
+
         if (!IsPending)
             throw new InvalidOperationException("Only pending comments can be rejected.");
 
         Status = CommentStatus.Rejected;
         ReviewedBy = reviewedBy;
         ReviewedAt = DateTimeOffset.UtcNow;
+
+        AddDomainEvent(new CommentRejectedEvent(this, reviewedBy));
     }
 
     /// <summary>

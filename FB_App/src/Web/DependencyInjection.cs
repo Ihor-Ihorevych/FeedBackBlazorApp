@@ -18,10 +18,14 @@ public static class DependencyInjection
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
         builder.Services.AddScoped<IUser, CurrentUser>();
+        builder.Services.AddScoped<IAdminNotificationService, AdminNotificationService>();
 
         builder.Services.AddHttpContextAccessor();
 
         builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
+        // Add SignalR for real-time notifications
+        builder.Services.AddSignalR();
 
         // Configure CORS for Blazor WebAssembly client
         builder.Services.AddCors(options =>
@@ -29,7 +33,8 @@ public static class DependencyInjection
             options.AddPolicy(BlazorClientPolicy, policy =>
             {
                 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-                    ?? ["https://localhost:5002", "http://localhost:5003"];
+                    ?? ["https://localhost:7140", "http://localhost:5168", 
+                        "https://localhost:5002", "http://localhost:5003"];
 
                 policy.WithOrigins(allowedOrigins)
                       .AllowAnyMethod()

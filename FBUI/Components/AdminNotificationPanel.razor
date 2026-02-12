@@ -1,0 +1,142 @@
+@using FBUI.Services
+@inject AdminNotificationService NotificationService
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<AuthorizeView Roles="Administrator">
+    <Authorized>
+        @if (_notifications.Count > 0)
+        {
+            <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm">
+                @foreach (var notification in _notifications.TakeLast(5))
+                {
+                    <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-4 shadow-xl animate-slide-in">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-shrink-0">
+                                @if (notification.Type == "NewComment")
+                                {
+                                    <FluentIcon Value="@(new Icons.Regular.Size20.CommentAdd())" Color="Color.Success" />
+                                }
+                                else
+                                {
+                                    <FluentIcon Value="@(new Icons.Regular.Size20.Info())" Color="Color.Accent" />
+                                }
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-white">
+                                    @GetNotificationTitle(notification)
+                                </p>
+                                <p class="text-xs text-neutral-400 mt-1 truncate">
+                                    @GetNotificationMessage(notification)
+                                </p>
+                                @if (notification.MovieId.HasValue)
+                                {
+                                    <button class="text-xs text-blue-400 hover:text-blue-300 mt-2 transition-colors"
+                                            @onclick="() => NavigateToMovie(notification.MovieId.Value)">
+                                        View details →
+                                    </button>
+                                }
+                            </div>
+                            <button class="text-neutral-500 hover:text-white transition-colors"
+                                    @onclick="() => DismissNotification(notification)">
+                                <FluentIcon Value="@(new Icons.Regular.Size16.Dismiss())" />
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @* Connection indicator *@
+        <div class="fixed bottom-6 left-6 z-50">
+            <div class="flex items-center gap-2 bg-neutral-800/80 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs">
+                <span class="w-2 h-2 rounded-full @GetConnectionColor()"></span>
+                <span class="text-neutral-400">@_connectionState</span>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    private readonly List<AdminNotification> _notifications = new();
+    private string _connectionState = "Waiting for auth...";
+    private bool _isAdmin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        NotificationService.OnNotificationReceived += HandleNotification;
+        NotificationService.OnConnectionStateChanged += HandleConnectionStateChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Wait a bit for auth state to be fully initialized
+            await Task.Delay(500);
+
+            // Only connect if we have a token
+            if (!string.IsNullOrEmpty(NotificationService.GetCurrentToken()))
+            {
+                _isAdmin = true;
+                await NotificationService.StartAsync();
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+
+    private void HandleNotification(AdminNotification notification)
+    {
+        _notifications.Add(notification);
+        InvokeAsync(StateHasChanged);
+        _ = Task.Delay(3000).ContinueWith(_ =>
+        {
+            _notifications.Remove(notification);
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private void HandleConnectionStateChanged(string state)
+    {
+        _connectionState = state;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void DismissNotification(AdminNotification notification)
+    {
+        _notifications.Remove(notification);
+    }
+
+    private void NavigateToMovie(Guid movieId)
+    {
+        Navigation.NavigateTo($"/movies/{movieId}");
+    }
+
+    private static string GetNotificationTitle(AdminNotification notification) => notification.Type switch
+    {
+        "NewComment" => "New Comment Pending",
+        "CommentStatusChanged" => "Comment Status Updated",
+        _ => "Notification"
+    };
+
+    private static string GetNotificationMessage(AdminNotification notification) => notification.Type switch
+    {
+        "NewComment" => $"On \"{notification.MovieTitle}\": {notification.CommentPreview}",
+        "CommentStatusChanged" => $"Comment marked as {notification.NewStatus} by {notification.ReviewedBy}",
+        _ => "New notification received"
+    };
+
+    private string GetConnectionColor() => _connectionState switch
+    {
+        "Connected" => "bg-green-500",
+        "Reconnecting" => "bg-yellow-500 animate-pulse",
+        "Disconnected" or "Failed" => "bg-red-500",
+        _ => "bg-neutral-500 animate-pulse"
+    };
+
+    public void Dispose()
+    {
+        NotificationService.OnNotificationReceived -= HandleNotification;
+        NotificationService.OnConnectionStateChanged -= HandleConnectionStateChanged;
+    }
+}

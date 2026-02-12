@@ -7,7 +7,6 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
 {
     public static Movie Create(string title, string? description = null, int? releaseYear = null, string? director = null, string? genre = null, string? posterUrl = null, double? rating = null)
     {
-
         if (string.IsNullOrWhiteSpace(title))
             throw new ArgumentException("Title cannot be null or empty.", nameof(title));
         var movie = new Movie

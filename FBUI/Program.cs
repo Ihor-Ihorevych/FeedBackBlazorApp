@@ -18,6 +18,7 @@ builder.Services.AddSingleton<TokenStorageService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+builder.Services.AddScoped<AdminNotificationService>();
 builder.Services.AddTransient<AuthorizationMessageHandler>();
 builder.Services.AddHttpClient("FBApi", client =>
 {

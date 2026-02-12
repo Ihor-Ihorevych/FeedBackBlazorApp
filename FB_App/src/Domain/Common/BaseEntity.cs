@@ -2,13 +2,22 @@
 
 namespace FB_App.Domain.Common;
 
+/// <summary>
+/// Interface for entities that can raise domain events.
+/// </summary>
+public interface IHasDomainEvents
+{
+    IReadOnlyCollection<BaseEvent> DomainEvents { get; }
+    void ClearDomainEvents();
+}
+
 public abstract class BaseEntity : BaseEntity<int>;
 
 /// <summary>
 /// Generic base entity for entities with custom ID types.
 /// </summary>
 /// <typeparam name="TId">The type of the entity ID.</typeparam>
-public abstract class BaseEntity<TId> where TId : notnull
+public abstract class BaseEntity<TId> : IHasDomainEvents where TId : notnull
 {
     public abstract TId Id { get; }
 

@@ -1,4 +1,5 @@
 using FB_App.Infrastructure.Data;
+using FB_App.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,8 +29,16 @@ app.UseCors("BlazorClientPolicy");
 
 app.UseStaticFiles();
 
+// Authentication & Authorization must be before MapHub
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapDefaultEndpoints();
 app.MapEndpoints();
+
+// Map SignalR hubs with CORS policy
+app.MapHub<AdminNotificationHub>("/hubs/admin-notifications")
+   .RequireCors("BlazorClientPolicy");
 
 // Enable OpenAPI JSON document generation at runtime
 // Document available at: /swagger/v1/swagger.json
