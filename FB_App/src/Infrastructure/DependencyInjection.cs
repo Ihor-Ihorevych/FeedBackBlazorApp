@@ -4,7 +4,6 @@ using FB_App.Infrastructure.Caching;
 using FB_App.Infrastructure.Data;
 using FB_App.Infrastructure.Data.Interceptors;
 using FB_App.Infrastructure.Identity;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;

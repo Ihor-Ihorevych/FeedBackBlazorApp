@@ -1,12 +1,6 @@
-using FB_App.Domain.Common;
-using FB_App.Domain.Entities;
-
 namespace FB_App.Domain.Events;
 
-/// <summary>
-/// Domain event raised when a comment is rejected by an administrator.
-/// </summary>
-public class CommentRejectedEvent : BaseEvent
+public sealed class CommentRejectedEvent : BaseEvent
 {
     public CommentRejectedEvent(Comment comment, string rejectedBy)
     {

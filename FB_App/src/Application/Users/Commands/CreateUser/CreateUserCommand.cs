@@ -1,6 +1,5 @@
 using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
-using FB_App.Domain.Constants;
 
 namespace FB_App.Application.Users.Commands.CreateUser;
 

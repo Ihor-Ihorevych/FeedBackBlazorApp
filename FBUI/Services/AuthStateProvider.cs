@@ -32,10 +32,10 @@ public class AuthStateProvider : AuthenticationStateProvider, IAuthStateProvider
     {
         try
         {
-            var token = await _localStorage.GetItemAsync<string>("accessToken");
+            var token = await _localStorage.GetItemAsync<string>(AccessTokenKey_);
             if (string.IsNullOrEmpty(_tokenStorage.AccessToken))
             {
-                var refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
+                var refreshToken = await _localStorage.GetItemAsync<string>(RefreshTokenKey_);
                 _tokenStorage.SetTokens(token, refreshToken);
             }
 
