@@ -35,13 +35,11 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
-        // Register CacheService
         builder.Services.AddScoped<ICacheService, CacheService>();
 
         builder.Services.AddAuthentication(IdentityConstants.BearerScheme)
             .AddBearerToken(IdentityConstants.BearerScheme, options =>
             {
-                // Configure SignalR to read token from query string for WebSocket connections
                 options.Events = new()
                 {
                     OnMessageReceived = context =>

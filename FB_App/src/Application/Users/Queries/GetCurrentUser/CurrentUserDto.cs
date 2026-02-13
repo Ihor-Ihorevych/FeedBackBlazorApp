@@ -1,5 +1,3 @@
-using FB_App.Application.Common.Interfaces;
-
 namespace FB_App.Application.Users.Queries.GetCurrentUser;
 
 public record CurrentUserDto(
