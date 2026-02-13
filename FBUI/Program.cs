@@ -27,7 +27,7 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IAuthStateProvider, AuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<IAuthStateProvider>() as AuthenticationStateProvider);
 builder.Services.AddScoped<IAdminNotificationService, AdminNotificationService>();
-builder.Services.AddTransient<AuthorizationMessageHandler>();
+builder.Services.AddScoped<AuthorizationMessageHandler>();
 builder.Services.AddHttpClient("FBApi", (sp, client) =>
 {
     var apiSettings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;

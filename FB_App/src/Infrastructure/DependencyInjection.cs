@@ -1,5 +1,6 @@
 ﻿using FB_App.Application.Common.Interfaces;
 using FB_App.Domain.Constants;
+using FB_App.Infrastructure.Caching;
 using FB_App.Infrastructure.Data;
 using FB_App.Infrastructure.Data.Interceptors;
 using FB_App.Infrastructure.Identity;
@@ -33,6 +34,9 @@ public static class DependencyInjection
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
+
+        // Register CacheService
+        builder.Services.AddScoped<ICacheService, CacheService>();
 
         builder.Services.AddAuthentication(IdentityConstants.BearerScheme)
             .AddBearerToken(IdentityConstants.BearerScheme, options =>

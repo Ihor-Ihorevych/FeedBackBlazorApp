@@ -23,10 +23,12 @@ public record UpdateMovieCommand : IRequest<Result>
 public class UpdateMovieCommandHandler : IRequestHandler<UpdateMovieCommand, Result>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ICacheService _cache;
 
-    public UpdateMovieCommandHandler(IApplicationDbContext context)
+    public UpdateMovieCommandHandler(IApplicationDbContext context, ICacheService cache)
     {
         _context = context;
+        _cache = cache;
     }
 
     public async Task<Result> Handle(UpdateMovieCommand request, CancellationToken cancellationToken)
@@ -48,6 +50,9 @@ public class UpdateMovieCommandHandler : IRequestHandler<UpdateMovieCommand, Res
         movie.Rating = request.Rating;
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        
+        await _cache.RemoveAsync(CacheKeys.MovieById(request.Id), cancellationToken);
 
         return Result.Success();
     }

@@ -17,6 +17,7 @@ namespace FB_App.Application.UnitTests.Movies.Commands.UpdateMovie;
 public class UpdateMovieCommandHandlerTests
 {
     private Mock<IApplicationDbContext> _contextMock = null!;
+    private Mock<ICacheService> _cacheMock = null!;
     private Mock<DbSet<Movie>> _moviesDbSetMock = null!;
     private UpdateMovieCommandHandler _handler = null!;
 
@@ -24,9 +25,12 @@ public class UpdateMovieCommandHandlerTests
     public void SetUp()
     {
         _contextMock = new Mock<IApplicationDbContext>();
+        _cacheMock = new Mock<ICacheService>();
         _moviesDbSetMock = new Mock<DbSet<Movie>>();
         _contextMock.Setup(x => x.Movies).Returns(_moviesDbSetMock.Object);
-        _handler = new UpdateMovieCommandHandler(_contextMock.Object);
+        _cacheMock.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        _handler = new UpdateMovieCommandHandler(_contextMock.Object, _cacheMock.Object);
     }
 
     [Test]

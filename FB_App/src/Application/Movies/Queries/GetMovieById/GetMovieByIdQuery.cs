@@ -12,18 +12,29 @@ public class GetMovieByIdQueryHandler : IRequestHandler<GetMovieByIdQuery, Resul
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly ICacheService _cache;
 
-    public GetMovieByIdQueryHandler(IApplicationDbContext context, IMapper mapper)
+    public GetMovieByIdQueryHandler(
+        IApplicationDbContext context, 
+        IMapper mapper,
+        ICacheService cache)
     {
         _context = context;
         _mapper = mapper;
+        _cache = cache;
     }
 
     public async Task<Result<MovieDetailDto>> Handle(GetMovieByIdQuery request, CancellationToken cancellationToken)
     {
-        var movie = await _context.Movies
-            .ProjectTo<MovieDetailDto>(_mapper.ConfigurationProvider)
-            .FirstOrDefaultAsync(m => m.Id == request.Id, cancellationToken);
+        var cacheKey = CacheKeys.MovieById(request.Id);
+
+        var movie = await _cache.GetOrCreateAsync(
+            cacheKey,
+            async ct => await _context.Movies
+                .ProjectTo<MovieDetailDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(m => m.Id == request.Id, ct),
+            TimeSpan.FromMinutes(5),
+            cancellationToken);
 
         if (movie == null)
         {

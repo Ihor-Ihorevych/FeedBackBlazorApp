@@ -37,10 +37,8 @@ public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, Gui
             request.Rating);
 
         movie.AddDomainEvent(new MovieCreatedEvent(movie));
-
         _context.Movies.Add(movie);
         await _context.SaveChangesAsync(cancellationToken);
-
         return movie.Id;
     }
 }

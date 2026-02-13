@@ -3,7 +3,7 @@ using FB_App.Application.Common.Interfaces;
 using FB_App.Infrastructure.Data;
 using FB_App.Web.Services;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Caching.Hybrid;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 
@@ -24,10 +24,17 @@ public static class DependencyInjection
 
         builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
-        // Add SignalR for real-time notifications
-        builder.Services.AddSignalR();
+        builder.Services.AddMemoryCache();
+        builder.Services.AddHybridCache(options =>
+        {
+            options.DefaultEntryOptions = new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(5),
+                LocalCacheExpiration = TimeSpan.FromMinutes(2)
+            };
+        });
 
-        // Configure CORS for Blazor WebAssembly client
+        builder.Services.AddSignalR();
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(BlazorClientPolicy, policy =>
@@ -43,7 +50,6 @@ public static class DependencyInjection
             });
         });
 
-        // Customise default API behaviour
         builder.Services.Configure<ApiBehaviorOptions>(options =>
             options.SuppressModelStateInvalidFilter = true);
 

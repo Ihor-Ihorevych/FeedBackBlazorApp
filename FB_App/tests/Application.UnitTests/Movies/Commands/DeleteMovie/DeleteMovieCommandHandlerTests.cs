@@ -14,6 +14,7 @@ namespace FB_App.Application.UnitTests.Movies.Commands.DeleteMovie;
 public class DeleteMovieCommandHandlerTests
 {
     private Mock<IApplicationDbContext> _contextMock = null!;
+    private Mock<ICacheService> _cacheMock = null!;
     private Mock<DbSet<Movie>> _moviesDbSetMock = null!;
     private DeleteMovieCommandHandler _handler = null!;
 
@@ -21,16 +22,19 @@ public class DeleteMovieCommandHandlerTests
     public void SetUp()
     {
         _contextMock = new Mock<IApplicationDbContext>();
+        _cacheMock = new Mock<ICacheService>();
         _moviesDbSetMock = new Mock<DbSet<Movie>>();
         _contextMock.Setup(x => x.Movies).Returns(_moviesDbSetMock.Object);
-        _handler = new DeleteMovieCommandHandler(_contextMock.Object);
+        _cacheMock.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        _handler = new DeleteMovieCommandHandler(_contextMock.Object, _cacheMock.Object);
     }
 
     [Test]
     public async Task Handle_WithExistingMovie_ShouldRemoveFromContext()
     {
         // Arrange
-        
+
         var existingMovie = Movie.Create("Test Movie", null, null, null, null, null, null);
         var movieId = existingMovie.Id;
         _moviesDbSetMock.Setup(x => x.FindAsync(new object[] { movieId }, It.IsAny<CancellationToken>()))

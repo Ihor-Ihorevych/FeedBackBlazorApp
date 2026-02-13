@@ -3,7 +3,6 @@ using AutoMapper.QueryableExtensions;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Mappings;
 using FB_App.Application.Common.Models;
-using FB_App.Domain.Enums;
 
 namespace FB_App.Application.Movies.Queries.GetMovies;
 
@@ -19,17 +18,37 @@ public class GetMoviesQueryHandler : IRequestHandler<GetMoviesQuery, PaginatedLi
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly ICacheService _cache;
 
-    public GetMoviesQueryHandler(IApplicationDbContext context, IMapper mapper)
+    public GetMoviesQueryHandler(
+        IApplicationDbContext context, 
+        IMapper mapper,
+        ICacheService cache)
     {
         _context = context;
         _mapper = mapper;
+        _cache = cache;
     }
 
     public async Task<PaginatedList<MovieDto>> Handle(GetMoviesQuery request, CancellationToken cancellationToken)
     {
+        var cacheKey = CacheKeys.MoviesList(
+            request.PageNumber, 
+            request.PageSize, 
+            request.SearchTerm, 
+            request.Genre);
+
+        return await _cache.GetOrCreateAsync(
+            cacheKey,
+            async ct => await FetchMoviesAsync(request, ct),
+            TimeSpan.FromMinutes(2),
+            cancellationToken);
+    }
+
+    private async Task<PaginatedList<MovieDto>> FetchMoviesAsync(GetMoviesQuery request, CancellationToken cancellationToken)
+    {
         var query = _context.Movies.AsQueryable();
-        
+
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var searchToLower = request.SearchTerm.ToLower();

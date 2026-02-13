@@ -14,10 +14,12 @@ public record DeleteMovieCommand(Guid Id) : IRequest<Result>;
 public class DeleteMovieCommandHandler : IRequestHandler<DeleteMovieCommand, Result>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ICacheService _cache;
 
-    public DeleteMovieCommandHandler(IApplicationDbContext context)
+    public DeleteMovieCommandHandler(IApplicationDbContext context, ICacheService cache)
     {
         _context = context;
+        _cache = cache;
     }
 
     public async Task<Result> Handle(DeleteMovieCommand request, CancellationToken cancellationToken)
@@ -34,6 +36,8 @@ public class DeleteMovieCommandHandler : IRequestHandler<DeleteMovieCommand, Res
 
         _context.Movies.Remove(movie);
         await _context.SaveChangesAsync(cancellationToken);
+
+        await _cache.RemoveAsync(CacheKeys.MovieById(request.Id), cancellationToken);
 
         return Result.Success();
     }
