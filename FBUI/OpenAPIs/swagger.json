@@ -38,7 +38,14 @@
             }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -133,7 +140,14 @@
             "description": ""
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -176,7 +190,14 @@
             "description": ""
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -273,6 +294,16 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -312,7 +343,14 @@
             }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       },
@@ -350,10 +388,24 @@
             "description": ""
           },
           "400": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -384,7 +436,14 @@
             "description": ""
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -464,6 +523,16 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -496,6 +565,16 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -516,6 +595,16 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -528,6 +617,35 @@
   },
   "components": {
     "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "CreateCommentCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -732,6 +850,30 @@
           }
         }
       },
+      "HttpValidationProblemDetails": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ProblemDetails"
+          },
+          {
+            "type": "object",
+            "additionalProperties": {
+              "nullable": true
+            },
+            "properties": {
+              "errors": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       "CreateMovieCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -802,59 +944,6 @@
           "rating": {
             "type": "number",
             "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "HttpValidationProblemDetails": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ProblemDetails"
-          },
-          {
-            "type": "object",
-            "additionalProperties": {
-              "nullable": true
-            },
-            "properties": {
-              "errors": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        ]
-      },
-      "ProblemDetails": {
-        "type": "object",
-        "additionalProperties": {
-          "nullable": true
-        },
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
             "nullable": true
           }
         }
