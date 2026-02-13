@@ -12,7 +12,6 @@ public class AuthorizationMessageHandler : DelegatingHandler
 {
     private readonly ITokenStorageService _tokenStorage;
     private readonly ILocalStorageService _localStorage;
-    private readonly IOptions<ApiSettings> _apiSettings;
     private readonly IFBApiClient _apiClient;
 
     private static readonly SemaphoreSlim RefreshLock = new(1, 1);
@@ -22,12 +21,10 @@ public class AuthorizationMessageHandler : DelegatingHandler
     public AuthorizationMessageHandler(
         ITokenStorageService tokenStorage,
         ILocalStorageService localStorage,
-        IFBApiClient apiClient,
-        IOptions<ApiSettings> apiSettings)
+        IFBApiClient apiClient)
     {
         _tokenStorage = tokenStorage;
         _localStorage = localStorage;
-        _apiSettings = apiSettings;
         _apiClient = apiClient;
     }
 

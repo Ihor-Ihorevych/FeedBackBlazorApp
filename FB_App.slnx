@@ -1,5 +1,7 @@
 <Solution>
-  <Project Path="FBUI/FBUI.csproj" />
+  <Project Path="FBUI/FBUI.csproj">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
   <Project Path="FB_App/src/AppHost/AppHost.csproj" />
   <Project Path="FB_App/src/Application/Application.csproj" />
   <Project Path="FB_App/src/Domain/Domain.csproj" />
