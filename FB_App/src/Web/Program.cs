@@ -10,8 +10,7 @@ builder.AddInfrastructureServices();
 builder.AddWebServices();
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
+app.UseExceptionHandler(options => { });
 if (app.Environment.IsDevelopment())
 {
     await app.InitialiseDatabaseAsync();
@@ -24,12 +23,11 @@ else
 
 app.UseHttpsRedirection();
 
-// Enable CORS for Blazor WebAssembly client
 app.UseCors("BlazorClientPolicy");
 
 app.UseStaticFiles();
 
-// Authentication & Authorization must be before MapHub
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -54,10 +52,6 @@ app.UseSwaggerUi(settings =>
     settings.DocumentPath = "/swagger/{documentName}/swagger.json";
 });
 
-app.UseExceptionHandler(options => { });
-
 app.Map("/", () => Results.Redirect("/api"));
 
-app.Run();
-
-public partial class Program { }
+await app.RunAsync();

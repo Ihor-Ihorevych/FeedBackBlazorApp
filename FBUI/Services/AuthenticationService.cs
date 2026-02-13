@@ -1,7 +1,6 @@
 using Ardalis.Result;
 using Blazored.LocalStorage;
 using FBUI.ApiClient;
-using Microsoft.AspNetCore.Components.Authorization;
 
 namespace FBUI.Services;
 
@@ -53,7 +52,7 @@ public class AuthenticationService : IAuthenticationService
         }
         catch (ApiException<Exception> ex)
         {
-            return Result.Error(ex.Result.Message ?? "Registration failed");
+            return Result.Error(ex.ToString() ?? "Registration failed");
         }
         catch (Exception ex)
         {
@@ -141,10 +140,6 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
-    /// <summary>
-    /// Initializes in-memory token storage from local storage.
-    /// Should be called during app initialization.
-    /// </summary>
     public async Task InitializeAsync()
     {
         var accessToken = await _localStorage.GetItemAsync<string>(AccessTokenKey);
