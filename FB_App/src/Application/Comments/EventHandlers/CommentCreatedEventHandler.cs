@@ -1,6 +1,5 @@
 using FB_App.Application.Common.Interfaces;
 using FB_App.Domain.Events.Comments;
-using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace FB_App.Application.Comments.EventHandlers;

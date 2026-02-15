@@ -98,6 +98,7 @@
                     {
                         <FluentCard Class="p-4 space-y-4 bg-neutral-900/60">
                             <FluentTextArea @bind-Value="_newComment.Content"
+                                            @bind-Value:event="oninput"
                                             Label="Your comment"
                                             Placeholder="Write your comment"
                                             Rows="4"

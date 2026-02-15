@@ -6,10 +6,6 @@ using FB_App.Domain.Entities.Values;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FB_App.Application.UnitTests.Movies.Commands.UpdateMovie;
 

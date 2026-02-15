@@ -32,6 +32,7 @@
                 <div class="space-y-5">
                     <div>
                         <FluentTextField @bind-Value="_model.Title"
+                                         @bind-Value:event="oninput"
                                          Label="Title"
                                          Placeholder="Enter movie title"
                                          Style="width: 100%;"
@@ -41,6 +42,7 @@
 
                     <div>
                         <FluentTextArea @bind-Value="_model.Description"
+                                        @bind-Value:event="oninput"
                                         Label="Description"
                                         Placeholder="Enter movie description"
                                         Rows="4"
@@ -50,12 +52,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <FluentTextField @bind-Value="_model.Director"
+                                             @bind-Value:event="oninput"
                                              Label="Director"
                                              Placeholder="Director name"
                                              Style="width: 100%;" />
                         </div>
                         <div>
                             <FluentTextField @bind-Value="_model.Genre"
+                                             @bind-Value:event="oninput"
                                              Label="Genre"
                                              Placeholder="e.g., Action, Drama"
                                              Style="width: 100%;" />
@@ -64,10 +68,30 @@
 
                     <div>
                         <FluentTextField @bind-Value="_model.ReleaseYear"
+                                         @bind-Value:event="oninput"
                                          Label="Release Year"
                                          TextFieldType="TextFieldType.Number"
                                          Placeholder="e.g., 2024"
                                          Style="width: 100%;" />
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <FluentTextField @bind-Value="_model.PosterUrl"
+                                             @bind-Value:event="oninput"
+                                             Label="Poster URL"
+                                             Placeholder="https://example.com/poster.jpg"
+                                             Style="width: 100%;" />
+                        </div>
+                        <div>
+                            <FluentTextField @bind-Value="_model.Rating"
+                                             @bind-Value:event="oninput"
+                                             Label="Rating"
+                                             TextFieldType="TextFieldType.Number"
+                                             Placeholder="0-10"
+                                             Step="0.1"
+                                             Style="width: 100%;" />
+                        </div>
                     </div>
 
                     @if (!string.IsNullOrEmpty(_errorMessage))
@@ -118,6 +142,10 @@
             _model.Director = movie.Director;
             _model.Genre = movie.Genre;
             _model.ReleaseYear = movie.ReleaseYear?.ToString();
+            _model.PosterUrl = movie.PosterUrl;
+            _model.Rating = movie.Rating?.ToString();
+            
+            System.Diagnostics.Debug.WriteLine($"Movie loaded: Title={_model.Title}, Description={_model.Description}, Director={_model.Director}, Genre={_model.Genre}, ReleaseYear={_model.ReleaseYear}, PosterUrl={_model.PosterUrl}, Rating={_model.Rating}");
         }
         catch (Exception ex)
         {
@@ -143,8 +171,12 @@
                 Description = _model.Description,
                 Director = _model.Director,
                 Genre = _model.Genre,
-                ReleaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : null
+                ReleaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : null,
+                PosterUrl = _model.PosterUrl,
+                Rating = double.TryParse(_model.Rating, out var rating) ? rating : null
             };
+
+            System.Diagnostics.Debug.WriteLine($"Submitting command: Title={command.Title}, Description={command.Description}, Director={command.Director}, Genre={command.Genre}, ReleaseYear={command.ReleaseYear}, PosterUrl={command.PosterUrl}, Rating={command.Rating}");
 
             await ApiClient.UpdateMovieAsync(Id, command);
             ToastService.ShowSuccess("Movie updated successfully!");
@@ -167,5 +199,7 @@
         public string? Director { get; set; }
         public string? Genre { get; set; }
         public string? ReleaseYear { get; set; }
+        public string? PosterUrl { get; set; }
+        public string? Rating { get; set; }
     }
 }

@@ -4,9 +4,6 @@ using FB_App.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FB_App.Application.UnitTests.Movies.Commands.CreateMovie;
 
@@ -85,7 +82,7 @@ public class CreateMovieCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.That(result, Is.Not.EqualTo(Guid.Empty));
+        Assert.That(result.Value, Is.Not.Default);
     }
 
     [Test]

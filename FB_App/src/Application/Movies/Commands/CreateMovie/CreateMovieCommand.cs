@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
@@ -7,7 +8,7 @@ using FB_App.Domain.Events.Movies;
 namespace FB_App.Application.Movies.Commands.CreateMovie;
 
 [Authorize(Roles = Roles.Administrator)]
-public record CreateMovieCommand : IRequest<Guid>
+public record CreateMovieCommand : IRequest<Result<Guid>>
 {
     public string Title { get; init; } = string.Empty;
     public string? Description { get; init; }
@@ -18,7 +19,7 @@ public record CreateMovieCommand : IRequest<Guid>
     public double? Rating { get; init; }
 }
 
-public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, Guid>
+public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, Result<Guid>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -27,7 +28,7 @@ public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, Gui
         _context = context;
     }
 
-    public async Task<Guid> Handle(CreateMovieCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateMovieCommand request, CancellationToken cancellationToken)
     {
         var movie = Movie.Create(request.Title, request.Description,
             request.ReleaseYear,
@@ -36,9 +37,8 @@ public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, Gui
             request.PosterUrl,
             request.Rating);
 
-        movie.AddDomainEvent(new MovieCreatedEvent(movie));
         _context.Movies.Add(movie);
         await _context.SaveChangesAsync(cancellationToken);
-        return movie.Id;
+        return (Guid)movie.Id;
     }
 }

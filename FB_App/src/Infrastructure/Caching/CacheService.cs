@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Hybrid;
 
 namespace FB_App.Infrastructure.Caching;
 
-public class CacheService : ICacheService
+public sealed class CacheService : ICacheService
 {
     private readonly HybridCache _cache;
 

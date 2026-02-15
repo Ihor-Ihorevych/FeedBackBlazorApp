@@ -2,7 +2,6 @@ using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Movies.Commands.DeleteMovie;
 using FB_App.Domain.Entities;
-using FB_App.Domain.Entities.Values;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;

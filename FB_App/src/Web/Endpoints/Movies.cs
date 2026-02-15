@@ -72,8 +72,7 @@ public class Movies : EndpointGroupBase
         CreateMovieCommand command)
     {
         var id = await sender.Send(command);
-        
-        return TypedResults.Created($"/api/movies/{id}", id);
+        return TypedResults.Created($"/api/movies/{id}", id.Value);
     }
 
     public static async Task<Results<NoContent, ProblemHttpResult>> UpdateMovie(

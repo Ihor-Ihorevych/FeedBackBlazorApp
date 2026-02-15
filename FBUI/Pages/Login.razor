@@ -18,7 +18,8 @@
             <div class="space-y-5">
                 <div>
                     <FluentTextField 
-                        @bind-Value="_model.Email" 
+                        @bind-Value="_model.Email"
+                        @bind-Value:event="oninput"
                         Label="Email" 
                         TextFieldType="TextFieldType.Email"
                         Placeholder="you@example.com"
@@ -29,7 +30,8 @@
 
                 <div>
                     <FluentTextField 
-                        @bind-Value="_model.Password" 
+                        @bind-Value="_model.Password"
+                        @bind-Value:event="oninput"
                         Label="Password" 
                         TextFieldType="TextFieldType.Password"
                         Placeholder="••••••••"
