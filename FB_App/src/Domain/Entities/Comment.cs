@@ -2,24 +2,24 @@ namespace FB_App.Domain.Entities;
 
 using FB_App.Domain.Entities.Values;
 using FB_App.Domain.Enums;
-using FB_App.Domain.Events;
+using FB_App.Domain.Events.Comments;
 
 public sealed class Comment : BaseAuditableEntity<CommentId>
 {
     public override CommentId Id { get; } = CommentId.CreateNew();
 
     public MovieId MovieId { get; private set; } = null!;
-    public Movie Movie { get; internal set; } = null!;
+    public Movie Movie { get; private set; } = null!;
     
-    public string UserId { get; internal set; } = string.Empty;
+    public string UserId { get; private set; } = string.Empty;
     
-    public string Text { get; internal set; } = string.Empty;
+    public string Text { get; private set; } = string.Empty;
     
-    public CommentStatus Status { get; internal set; } = CommentStatus.Pending;
+    public CommentStatus Status { get; private set; } = CommentStatus.Pending;
     
-    public string? ReviewedBy { get; internal set; }
+    public string? ReviewedBy { get; private set; }
     
-    public DateTimeOffset? ReviewedAt { get; internal set; }
+    public DateTimeOffset? ReviewedAt { get; private set; }
 
     /// <summary>
     /// Default constructor for EF Core.

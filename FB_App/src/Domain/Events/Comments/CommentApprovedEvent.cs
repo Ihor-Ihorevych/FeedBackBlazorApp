@@ -1,4 +1,4 @@
-namespace FB_App.Domain.Events;
+namespace FB_App.Domain.Events.Comments;
 
 public sealed class CommentApprovedEvent : BaseEvent
 {

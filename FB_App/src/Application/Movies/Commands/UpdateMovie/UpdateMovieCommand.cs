@@ -34,24 +34,24 @@ public class UpdateMovieCommandHandler : IRequestHandler<UpdateMovieCommand, Res
     public async Task<Result> Handle(UpdateMovieCommand request, CancellationToken cancellationToken)
     {
         var movie = await _context.Movies
-            .FindAsync(new object[] { (MovieId)request.Id }, cancellationToken);
+            .FindAsync([(MovieId)request.Id], cancellationToken);
 
         if (movie == null)
         {
             return Result.NotFound($"{nameof(Movie)} ({request.Id}) was not found.");
         }
 
-        movie.Title = request.Title;
-        movie.Description = request.Description;
-        movie.ReleaseYear = request.ReleaseYear;
-        movie.Director = request.Director;
-        movie.Genre = request.Genre;
-        movie.PosterUrl = request.PosterUrl;
-        movie.Rating = request.Rating;
+        movie.UpdateDetails(
+            request.Title,
+            request.Description,
+            request.ReleaseYear,
+            request.Director,
+            request.Genre,
+            request.PosterUrl,
+            request.Rating);
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        
         await _cache.RemoveAsync(CacheKeys.MovieById(request.Id), cancellationToken);
 
         return Result.Success();

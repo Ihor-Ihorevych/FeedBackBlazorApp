@@ -67,26 +67,13 @@ public sealed class CommentId : ValueObject
     /// </summary>
     public static explicit operator CommentId(Guid value) => new(value);
 
-    /// <summary>
-    /// Determines whether two CommentId instances are equal.
-    /// </summary>
-    public static bool operator ==(CommentId? left, CommentId? right)
-    {
-        if (left is null)
-            return right is null;
-        return left.Equals(right);
-    }
-
-    /// <summary>
-    /// Determines whether two CommentId instances are not equal.
-    /// </summary>
-    public static bool operator !=(CommentId? left, CommentId? right) => !(left == right);
-
     public override bool Equals(object? obj)
     {
-        if (obj is CommentId other)
-            return Value == other.Value;
-        return false;
+        return obj switch
+        {
+            CommentId other => Value == other.Value,
+            _ => false
+        };
     }
 
     public override int GetHashCode() => Value.GetHashCode();

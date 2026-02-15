@@ -5,6 +5,7 @@ using FB_App.Domain.Constants;
 using FB_App.Domain.Entities;
 using FB_App.Domain.Entities.Values;
 using FB_App.Domain.Events;
+using FB_App.Domain.Events.Movies;
 
 namespace FB_App.Application.Movies.Commands.DeleteMovie;
 

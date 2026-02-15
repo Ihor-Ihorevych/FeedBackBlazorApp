@@ -2,6 +2,8 @@ namespace FB_App.Domain.Entities;
 
 using FB_App.Domain.Entities.Values;
 using FB_App.Domain.Enums;
+using FB_App.Domain.Events.Comments;
+using FB_App.Domain.Events.Movies;
 
 public sealed class Movie : BaseAuditableEntity<MovieId>
 {
@@ -25,24 +27,47 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
         return movie;
     }
 
+    /// <summary>
+    /// Default constructor for EF Core.
+    /// Movies should be created through the factory method.
+    /// </summary>
+    public Movie()
+    {
+    }
 
     private readonly HashSet<Comment> _comments = new();
 
     public override MovieId Id { get; } = MovieId.CreateNew();
 
-    public string Title { get; set; } = string.Empty;
+    public string Title { get; private set; } = string.Empty;
     
-    public string? Description { get; set; }
+    public string? Description { get; private set; }
     
-    public int? ReleaseYear { get; set; }
+    public int? ReleaseYear { get; private set; }
     
-    public string? Director { get; set; }
+    public string? Director { get; private set; }
     
-    public string? Genre { get; set; }
+    public string? Genre { get; private set; }
     
-    public string? PosterUrl { get; set; }
+    public string? PosterUrl { get; private set; }
     
-    public double? Rating { get; set; }
+    public double? Rating { get; private set; }
+
+    public void UpdateDetails(string title, string? description, int? releaseYear, string? director, string? genre, string? posterUrl, double? rating)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Title cannot be null or empty.", nameof(title));
+
+        Title = title;
+        Description = description;
+        ReleaseYear = releaseYear;
+        Director = director;
+        Genre = genre;
+        PosterUrl = posterUrl;
+        Rating = rating;
+
+        AddDomainEvent(new MovieDetailsUpdatedEvent(this));
+    }
     
     public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
 
@@ -86,9 +111,7 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
 
         _comments.Remove(comment);
 
-
-
-
+        AddDomainEvent(new CommentDeletedEvent(comment));
         return true;
     }
 

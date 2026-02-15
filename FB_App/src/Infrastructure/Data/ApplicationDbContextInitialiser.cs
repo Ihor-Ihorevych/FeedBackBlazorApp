@@ -110,62 +110,55 @@ public class ApplicationDbContextInitialiser
         {
             var movies = new List<Movie>
             {
-                new Movie
-                {
-                    Title = "The Shawshank Redemption",
-                    Description = "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-                    ReleaseYear = 1994,
-                    Director = "Frank Darabont",
-                    Genre = "Drama",
-                    Rating = 9.3
-                },
-                new Movie
-                {
-                    Title = "The Godfather",
-                    Description = "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
-                    ReleaseYear = 1972,
-                    Director = "Francis Ford Coppola",
-                    Genre = "Crime",
-                    Rating = 9.2
-                },
-                new Movie
-                {
-                    Title = "The Dark Knight",
-                    Description = "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests.",
-                    ReleaseYear = 2008,
-                    Director = "Christopher Nolan",
-                    Genre = "Action",
-                    Rating = 9.0
-                },
-                new Movie
-                {
-                    Title = "Inception",
-                    Description = "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea.",
-                    ReleaseYear = 2010,
-                    Director = "Christopher Nolan",
-                    Genre = "Sci-Fi",
-                    Rating = 8.8
-                },
-                new Movie
-                {
-                    Title = "Pulp Fiction",
-                    Description = "The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales of violence and redemption.",
-                    ReleaseYear = 1994,
-                    Director = "Quentin Tarantino",
-                    Genre = "Crime",
-                    Rating = 8.9
-                }
+                Movie.Create(
+                    "The Shawshank Redemption",
+                    "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+                    1994,
+                    "Frank Darabont",
+                    "Drama",
+                    null,
+                    9.3),
+                Movie.Create(
+                    "The Godfather",
+                    "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
+                    1972,
+                    "Francis Ford Coppola",
+                    "Crime",
+                    null,
+                    9.2),
+                Movie.Create(
+                    "The Dark Knight",
+                    "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests.",
+                    2008,
+                    "Christopher Nolan",
+                    "Action",
+                    null,
+                    9.0),
+                Movie.Create(
+                    "Inception",
+                    "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea.",
+                    2010,
+                    "Christopher Nolan",
+                    "Sci-Fi",
+                    null,
+                    8.8),
+                Movie.Create(
+                    "Pulp Fiction",
+                    "The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales of violence and redemption.",
+                    1994,
+                    "Quentin Tarantino",
+                    "Crime",
+                    null,
+                    8.9)
             };
 
             _context.Movies.AddRange(movies);
             await _context.SaveChangesAsync();
 
-            // Get the user ID for seeding comments
             var regularUser = await _userManager.FindByEmailAsync("user@localhost");
             
             if (regularUser != null)
             {
-                // Add comments through the Movie aggregate root
                 var comment1 = movies[0].AddComment(regularUser.Id, "One of the best movies ever made! A masterpiece.");
                 var comment2 = movies[0].AddComment(regularUser.Id, "The friendship between Andy and Red is so touching.");
                 var comment3 = movies[1].AddComment(regularUser.Id, "A timeless classic. Marlon Brando's performance is legendary.");

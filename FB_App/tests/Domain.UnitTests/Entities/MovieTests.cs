@@ -14,16 +14,13 @@ public class MovieTests
     [SetUp]
     public void SetUp()
     {
-        _movie = new Movie
-        {
-            Title = "Test Movie",
-            Description = "A test movie",
-            ReleaseYear = 2024,
-            Director = "Test Director",
-            Genre = "Drama",
-            PosterUrl = "https://example.com/poster.jpg",
-            Rating = 8.5
-        };
+        _movie = Movie.Create("Test Movie",
+                              "A test movie",
+                              2024,
+                              "Test Director",
+                              "Drama",
+                              "https://example.com/poster.jpg",
+                              8.5);
     }
 
     [Test]
