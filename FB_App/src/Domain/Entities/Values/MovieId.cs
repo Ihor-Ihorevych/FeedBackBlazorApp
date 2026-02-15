@@ -76,4 +76,16 @@ public sealed class MovieId : ValueObject
     }
 
     public override int GetHashCode() => Value.GetHashCode();
+
+    public static bool operator ==(MovieId? left, MovieId? right)
+    {
+        if (left is null)
+            return right is null;
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(MovieId? left, MovieId? right)
+    {
+        return !(left == right);
+    }
 }
