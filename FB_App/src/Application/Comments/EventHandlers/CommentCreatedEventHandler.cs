@@ -39,8 +39,8 @@ public class CommentCreatedEventHandler : INotificationHandler<CommentCreatedEve
             notification.Comment.MovieId,
             movieTitle,
             notification.Comment.Id,
-            notification.Comment.Text.Length > 100 
-                ? notification.Comment.Text[..100] + "..." 
+            notification.Comment.Text.Length > 100
+                ? notification.Comment.Text[..100] + "..."
                 : notification.Comment.Text,
             notification.Comment.UserId,
             cancellationToken);

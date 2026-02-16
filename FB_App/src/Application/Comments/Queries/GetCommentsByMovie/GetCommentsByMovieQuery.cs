@@ -1,5 +1,4 @@
 using FB_App.Application.Common.Interfaces;
-using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
 using FB_App.Domain.Enums;
 
@@ -65,7 +64,7 @@ public class GetCommentsByMovieQueryHandler : IRequestHandler<GetCommentsByMovie
                 {
                     comment.UserName = await _identityService.GetUserNameAsync(comment.UserId) ?? string.Empty;
                 });
-        
+
         await Task.WhenAll(userNameTasks);
 
         return result;

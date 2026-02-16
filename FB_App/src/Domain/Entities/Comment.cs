@@ -10,15 +10,15 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
 
     public MovieId MovieId { get; private set; } = null!;
     public Movie Movie { get; private set; } = null!;
-    
+
     public string UserId { get; private set; } = string.Empty;
-    
+
     public string Text { get; private set; } = string.Empty;
-    
+
     public CommentStatus Status { get; private set; } = CommentStatus.Pending;
-    
+
     public string? ReviewedBy { get; private set; }
-    
+
     public DateTimeOffset? ReviewedAt { get; private set; }
 
     /// <summary>
@@ -53,10 +53,10 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
     {
         if (movieId == Guid.Empty)
             throw new ArgumentException("Movie ID must be greater than zero.", nameof(movieId));
-        
+
         if (string.IsNullOrWhiteSpace(userId))
             throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
-        
+
         if (string.IsNullOrWhiteSpace(text))
             throw new ArgumentException("Comment text cannot be null or empty.", nameof(text));
 

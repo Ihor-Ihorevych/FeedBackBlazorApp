@@ -1,4 +1,3 @@
-using AutoMapper;
 using FB_App.Domain.Entities;
 using FB_App.Domain.Enums;
 
@@ -10,7 +9,7 @@ public class MovieDtoMappingProfile : Profile
     {
         CreateMap<Movie, MovieDto>()
             .ForMember(d => d.Id, opt => opt.MapFrom(s => (Guid)s.Id))
-            .ForMember(d => d.ApprovedCommentsCount, opt => 
+            .ForMember(d => d.ApprovedCommentsCount, opt =>
                 opt.MapFrom(s => s.Comments.Count(c => c.Status == CommentStatus.Approved)));
     }
 }

@@ -3,7 +3,6 @@ using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;
 using FB_App.Domain.Entities;
-using FB_App.Domain.Events.Movies;
 
 namespace FB_App.Application.Movies.Commands.CreateMovie;
 

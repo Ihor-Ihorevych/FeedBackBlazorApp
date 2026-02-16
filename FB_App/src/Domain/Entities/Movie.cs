@@ -40,17 +40,17 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
     public override MovieId Id { get; } = MovieId.CreateNew();
 
     public string Title { get; private set; } = string.Empty;
-    
+
     public string? Description { get; private set; }
-    
+
     public int? ReleaseYear { get; private set; }
-    
+
     public string? Director { get; private set; }
-    
+
     public string? Genre { get; private set; }
-    
+
     public string? PosterUrl { get; private set; }
-    
+
     public double? Rating { get; private set; }
 
     public void UpdateDetails(string title, string? description, int? releaseYear, string? director, string? genre, string? posterUrl, double? rating)
@@ -68,7 +68,7 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
 
         AddDomainEvent(new MovieDetailsUpdatedEvent(this));
     }
-    
+
     public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
 
     public int ApprovedCommentsCount => _comments.Count(c => c.IsApproved);
@@ -86,7 +86,7 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
     {
         if (string.IsNullOrWhiteSpace(userId))
             throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
-        
+
         if (string.IsNullOrWhiteSpace(text))
             throw new ArgumentException("Comment text cannot be null or empty.", nameof(text));
 
@@ -151,7 +151,7 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
     /// <summary>
     /// Gets all approved comments for this movie.
     /// </summary>
-    public IReadOnlyCollection<Comment> GetApprovedComments() => 
+    public IReadOnlyCollection<Comment> GetApprovedComments() =>
         _comments.Where(c => c.IsApproved).ToList().AsReadOnly();
 
     /// <summary>

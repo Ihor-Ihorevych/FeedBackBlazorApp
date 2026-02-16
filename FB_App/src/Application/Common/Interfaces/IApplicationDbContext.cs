@@ -1,6 +1,4 @@
-﻿using System.Data;
-using FB_App.Domain.Entities;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using FB_App.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FB_App.Application.Common.Interfaces;

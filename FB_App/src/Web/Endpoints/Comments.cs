@@ -36,7 +36,7 @@ public class Comments : EndpointGroupBase
     }
 
     public static async Task<Results<Created<Guid>, ProblemHttpResult>> CreateComment(
-        ISender sender, 
+        ISender sender,
         CreateCommentCommand command)
     {
         var result = await sender.Send(command);
@@ -58,8 +58,8 @@ public class Comments : EndpointGroupBase
         Guid movieId,
         CommentStatus? status = null)
     {
-        var query = new GetCommentsByMovieQuery 
-        { 
+        var query = new GetCommentsByMovieQuery
+        {
             MovieId = movieId,
             Status = status
         };
@@ -69,8 +69,8 @@ public class Comments : EndpointGroupBase
     }
 
     public static async Task<Results<NoContent, ProblemHttpResult>> ApproveComment(
-        ISender sender, 
-        Guid movieId, 
+        ISender sender,
+        Guid movieId,
         Guid id)
     {
         var result = await sender.Send(new ApproveCommentCommand(movieId, id));
@@ -88,8 +88,8 @@ public class Comments : EndpointGroupBase
     }
 
     public static async Task<Results<NoContent, ProblemHttpResult>> RejectComment(
-        ISender sender, 
-        Guid movieId, 
+        ISender sender,
+        Guid movieId,
         Guid id)
     {
         var result = await sender.Send(new RejectCommentCommand(movieId, id));

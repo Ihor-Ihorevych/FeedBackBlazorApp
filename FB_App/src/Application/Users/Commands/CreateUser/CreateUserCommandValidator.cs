@@ -20,13 +20,14 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
         RuleFor(v => v.UserName).NotEmpty()
             .WithMessage("Username is required.")
             .MinimumLength(3)
-            .WithMessage("Username must be at least 3 characters long.") 
+            .WithMessage("Username must be at least 3 characters long.")
             .MaximumLength(50)
             .WithMessage("Username must not exceed 50 characters.")
-            .MustAsync(async (username, cancellation) => 
+            .MustAsync(async (username, cancellation) =>
             {
-                var existingUser = await _identityService.GetUserNameAsync(username); 
-                return existingUser == null; })
+                var existingUser = await _identityService.GetUserNameAsync(username);
+                return existingUser == null;
+            })
             .WithMessage("Username is already taken.");
     }
 

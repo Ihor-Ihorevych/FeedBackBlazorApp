@@ -1,5 +1,3 @@
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Mappings;
 using FB_App.Application.Common.Models;
@@ -21,7 +19,7 @@ public class GetMoviesQueryHandler : IRequestHandler<GetMoviesQuery, PaginatedLi
     private readonly ICacheService _cache;
 
     public GetMoviesQueryHandler(
-        IApplicationDbContext context, 
+        IApplicationDbContext context,
         IMapper mapper,
         ICacheService cache)
     {
@@ -33,9 +31,9 @@ public class GetMoviesQueryHandler : IRequestHandler<GetMoviesQuery, PaginatedLi
     public async Task<PaginatedList<MovieDto>> Handle(GetMoviesQuery request, CancellationToken cancellationToken)
     {
         var cacheKey = CacheKeys.MoviesList(
-            request.PageNumber, 
-            request.PageSize, 
-            request.SearchTerm, 
+            request.PageNumber,
+            request.PageSize,
+            request.SearchTerm,
             request.Genre);
 
         return await _cache.GetOrCreateAsync(
@@ -52,8 +50,8 @@ public class GetMoviesQueryHandler : IRequestHandler<GetMoviesQuery, PaginatedLi
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var searchToLower = request.SearchTerm.ToLower();
-            query = query.Where(m => 
-                m.Title.ToLower().Contains(searchToLower) || 
+            query = query.Where(m =>
+                m.Title.ToLower().Contains(searchToLower) ||
                 (m.Description != null && m.Description.ToLower().Contains(searchToLower)));
         }
 

@@ -28,7 +28,7 @@ public class AuthorizationMessageHandler : DelegatingHandler
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(
-        HttpRequestMessage request, 
+        HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
         var token = _tokenStorage.AccessToken;
@@ -62,7 +62,7 @@ public class AuthorizationMessageHandler : DelegatingHandler
     }
 
     private static bool IsTokenExpiringSoon(string token)
-    { 
+    {
         try
         {
             var handler = new JwtSecurityTokenHandler();

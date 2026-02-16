@@ -16,7 +16,7 @@ public sealed class MovieId : ValueObject
     {
         if (value == Guid.Empty)
             throw new ArgumentException("MovieId cannot be empty.", nameof(value));
-        
+
         Value = value;
     }
 

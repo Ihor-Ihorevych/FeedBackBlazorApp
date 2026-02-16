@@ -1,7 +1,7 @@
-using System.Security.Claims;
 using Blazored.LocalStorage;
 using FBUI.ApiClient;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
 
 namespace FBUI.Services;
 

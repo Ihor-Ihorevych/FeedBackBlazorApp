@@ -1,6 +1,5 @@
 ﻿using Azure.Identity;
 using FB_App.Application.Common.Interfaces;
-using FB_App.Infrastructure.Data;
 using FB_App.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Hybrid;
@@ -40,7 +39,7 @@ public static class DependencyInjection
             options.AddPolicy(BlazorClientPolicy, policy =>
             {
                 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-                    ?? ["https://localhost:7140", "http://localhost:5168", 
+                    ?? ["https://localhost:7140", "http://localhost:5168",
                         "https://localhost:5002", "http://localhost:5003"];
 
                 policy.WithOrigins(allowedOrigins)

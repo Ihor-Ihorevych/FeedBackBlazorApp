@@ -25,7 +25,7 @@ public interface ICacheService
 /// </summary>
 public static class CacheKeys
 {
-    public static string MoviesList(int page, int size, string? search, string? genre) 
+    public static string MoviesList(int page, int size, string? search, string? genre)
         => $"movies:list:{page}:{size}:{search ?? "all"}:{genre ?? "all"}";
 
     public static string MovieById(Guid id) => $"movies:{id}";

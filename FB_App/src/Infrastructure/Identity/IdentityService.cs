@@ -107,8 +107,8 @@ public class IdentityService : IIdentityService
     {
         var result = await _userManager.DeleteAsync(user);
 
-        return result.Succeeded 
-            ? Result.Success() 
+        return result.Succeeded
+            ? Result.Success()
             : Result.Error(new ErrorList(result.Errors.Select(e => e.Description).ToArray()));
     }
 

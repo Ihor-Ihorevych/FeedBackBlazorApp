@@ -26,7 +26,7 @@ public class AdminNotificationHub : Hub
             Context.ConnectionId);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, "Administrators");
-        
+
         await base.OnConnectedAsync();
     }
 
@@ -38,7 +38,7 @@ public class AdminNotificationHub : Hub
             Context.ConnectionId);
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Administrators");
-        
+
         await base.OnDisconnectedAsync(exception);
     }
 }

@@ -42,7 +42,7 @@ public class Movies : EndpointGroupBase
     }
 
     public static async Task<Ok<PaginatedList<MovieDto>>> GetMovies(
-        ISender sender, 
+        ISender sender,
         [AsParameters] GetMoviesQuery query)
     {
         var result = await sender.Send(query);
@@ -50,7 +50,7 @@ public class Movies : EndpointGroupBase
     }
 
     public static async Task<Results<Ok<MovieDetailDto>, ProblemHttpResult>> GetMovieById(
-        ISender sender, 
+        ISender sender,
         Guid id)
     {
         var result = await sender.Send(new GetMovieByIdQuery(id));
@@ -68,7 +68,7 @@ public class Movies : EndpointGroupBase
     }
 
     public static async Task<Results<Created<Guid>, ValidationProblem>> CreateMovie(
-        ISender sender, 
+        ISender sender,
         CreateMovieCommand command)
     {
         var id = await sender.Send(command);
@@ -76,8 +76,8 @@ public class Movies : EndpointGroupBase
     }
 
     public static async Task<Results<NoContent, ProblemHttpResult>> UpdateMovie(
-        ISender sender, 
-        Guid id, 
+        ISender sender,
+        Guid id,
         UpdateMovieCommand command)
     {
         if (id != command.Id)

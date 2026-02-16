@@ -1,5 +1,3 @@
-using AutoMapper;
-using FB_App.Application.Comments.Queries;
 using FB_App.Domain.Entities;
 using FB_App.Domain.Enums;
 

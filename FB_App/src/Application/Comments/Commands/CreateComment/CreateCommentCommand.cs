@@ -1,4 +1,4 @@
- using Ardalis.Result;
+using Ardalis.Result;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Application.Common.Security;
 using FB_App.Domain.Constants;

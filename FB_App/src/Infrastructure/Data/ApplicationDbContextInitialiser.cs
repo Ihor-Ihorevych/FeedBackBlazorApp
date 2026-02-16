@@ -1,6 +1,5 @@
 ﻿using FB_App.Domain.Constants;
 using FB_App.Domain.Entities;
-using FB_App.Domain.Enums;
 using FB_App.Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -156,7 +155,7 @@ public class ApplicationDbContextInitialiser
             await _context.SaveChangesAsync();
 
             var regularUser = await _userManager.FindByEmailAsync("user@localhost");
-            
+
             if (regularUser != null)
             {
                 var comment1 = movies[0].AddComment(regularUser.Id, "One of the best movies ever made! A masterpiece.");

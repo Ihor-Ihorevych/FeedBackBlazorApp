@@ -16,7 +16,7 @@ public sealed class CommentId : ValueObject
     {
         if (value == Guid.Empty)
             throw new ArgumentException("CommentId cannot be empty.", nameof(value));
-        
+
         Value = value;
     }
 

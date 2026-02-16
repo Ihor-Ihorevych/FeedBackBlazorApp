@@ -10,7 +10,7 @@ namespace FB_App.Application.UnitTests.Users.Commands.CreateUser;
 public class CreateUserCommandValidatorTests
 {
     private CreateUserCommandValidator _validator = null!;
-    
+
 
     [SetUp]
     public void SetUp()
@@ -32,9 +32,9 @@ public class CreateUserCommandValidatorTests
             Password = "ValidPass1!",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Email)));
     }
@@ -48,9 +48,9 @@ public class CreateUserCommandValidatorTests
             Password = "ValidPass1!",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Email) &&
                  f.ErrorMessage == "Email is required."));
@@ -65,9 +65,9 @@ public class CreateUserCommandValidatorTests
             Password = "ValidPass1!",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Email) &&
                  f.ErrorMessage == "Email must be a valid email address."));
@@ -84,9 +84,9 @@ public class CreateUserCommandValidatorTests
             Password = "ValidPass1!",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Email)));
     }
@@ -104,9 +104,9 @@ public class CreateUserCommandValidatorTests
             Password = "ValidPass1!",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Password)));
     }
@@ -120,9 +120,9 @@ public class CreateUserCommandValidatorTests
             Password = "",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Password)));
     }
@@ -136,9 +136,9 @@ public class CreateUserCommandValidatorTests
             Password = "Ab1!",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Password)));
     }
@@ -152,9 +152,9 @@ public class CreateUserCommandValidatorTests
             Password = "validpass1!",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Password)));
     }
@@ -168,9 +168,9 @@ public class CreateUserCommandValidatorTests
             Password = "VALIDPASS1!",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Password)));
     }
@@ -184,9 +184,9 @@ public class CreateUserCommandValidatorTests
             Password = "ValidPass1",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Password)));
     }
@@ -203,9 +203,9 @@ public class CreateUserCommandValidatorTests
             Password = validPassword,
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Password)));
     }
@@ -223,9 +223,9 @@ public class CreateUserCommandValidatorTests
             Password = "SecurePass1!",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.IsValid, Is.True);
         Assert.That(result.Errors, Is.Empty);
     }
@@ -239,9 +239,9 @@ public class CreateUserCommandValidatorTests
             Password = "",
             UserName = "test-user"
         };
- 
+
         var result = await _validator.TestValidateAsync(command);
- 
+
         Assert.That(result.Errors, Has.Count.GreaterThanOrEqualTo(2));
         Assert.That(result.Errors, Has.Some.Matches<FluentValidation.Results.ValidationFailure>(
             f => f.PropertyName == nameof(command.Email)));

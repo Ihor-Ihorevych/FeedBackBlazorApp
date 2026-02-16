@@ -1,6 +1,4 @@
 using Ardalis.Result;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Domain.Entities;
 
@@ -15,7 +13,7 @@ public class GetMovieByIdQueryHandler : IRequestHandler<GetMovieByIdQuery, Resul
     private readonly ICacheService _cache;
 
     public GetMovieByIdQueryHandler(
-        IApplicationDbContext context, 
+        IApplicationDbContext context,
         IMapper mapper,
         ICacheService cache)
     {

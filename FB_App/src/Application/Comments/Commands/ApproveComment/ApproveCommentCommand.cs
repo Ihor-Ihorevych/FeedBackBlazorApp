@@ -44,7 +44,7 @@ public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentComman
         {
             return Result.NotFound($"{nameof(Comment)} ({request.CommentId}) was not found.");
         }
-        
+
 
         movie.ApproveComment((CommentId)request.CommentId, userId);
 
