@@ -1,10 +1,8 @@
+using Blazored.LocalStorage;
+using FBUI.ApiClient;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
-using Blazored.LocalStorage;
-using FBUI.ApiClient;
-using FBUI.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace FBUI.Services;
 
@@ -12,20 +10,21 @@ public class AuthorizationMessageHandler : DelegatingHandler
 {
     private readonly ITokenStorageService _tokenStorage;
     private readonly ILocalStorageService _localStorage;
-    private readonly IFBApiClient _apiClient;
+    private readonly IServiceScopeFactory _scopeFactory;
 
     private static readonly SemaphoreSlim RefreshLock = new(1, 1);
-    private const string AccessTokenKey = "accessToken";
-    private const string RefreshTokenKey = "refreshToken";
+    private const string AccessTokenKey_ = "accessToken";
+    private const string RefreshTokenKey_ = "refreshToken";
+    private const string BearerPrefix_ = "Bearer";
 
     public AuthorizationMessageHandler(
         ITokenStorageService tokenStorage,
         ILocalStorageService localStorage,
-        IFBApiClient apiClient)
+        IServiceScopeFactory factory)
     {
         _tokenStorage = tokenStorage;
         _localStorage = localStorage;
-        _apiClient = apiClient;
+        _scopeFactory = factory;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(
@@ -40,7 +39,7 @@ public class AuthorizationMessageHandler : DelegatingHandler
 
         if (!string.IsNullOrEmpty(token))
         {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Authorization = new AuthenticationHeaderValue(BearerPrefix_, token);
         }
 
         var response = await base.SendAsync(request, cancellationToken);
@@ -52,7 +51,7 @@ public class AuthorizationMessageHandler : DelegatingHandler
             if (!string.IsNullOrEmpty(newToken))
             {
                 var retryRequest = await CloneRequestAsync(request);
-                retryRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", newToken);
+                retryRequest.Headers.Authorization = new AuthenticationHeaderValue(BearerPrefix_, newToken);
 
                 response.Dispose();
                 response = await base.SendAsync(retryRequest, cancellationToken);
@@ -93,16 +92,18 @@ public class AuthorizationMessageHandler : DelegatingHandler
             {
                 return null;
             }
-
-            var apiClient = _apiClient;
-
-            var command = new RefreshTokenCommand { RefreshToken = refreshToken };
-            var response = await apiClient.PostApiUsersRefreshAsync(command, cancellationToken);
+            AccessTokenResponse? response = null;
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var apiClient = scope.ServiceProvider.GetRequiredService<IFBApiClient>();
+                var command = new RefreshTokenCommand { RefreshToken = refreshToken };
+                response = await apiClient.PostApiUsersRefreshAsync(command, cancellationToken);
+            }
 
             if (response?.AccessToken is not null)
             {
-                await _localStorage.SetItemAsync(AccessTokenKey, response.AccessToken, cancellationToken);
-                await _localStorage.SetItemAsync(RefreshTokenKey, response.RefreshToken, cancellationToken);
+                await _localStorage.SetItemAsync(AccessTokenKey_, response.AccessToken, cancellationToken);
+                await _localStorage.SetItemAsync(RefreshTokenKey_, response.RefreshToken, cancellationToken);
                 _tokenStorage.SetTokens(response.AccessToken, response.RefreshToken);
 
                 return response.AccessToken;
@@ -110,8 +111,8 @@ public class AuthorizationMessageHandler : DelegatingHandler
         }
         catch
         {
-            await _localStorage.RemoveItemAsync(AccessTokenKey, cancellationToken);
-            await _localStorage.RemoveItemAsync(RefreshTokenKey, cancellationToken);
+            await _localStorage.RemoveItemAsync(AccessTokenKey_, cancellationToken);
+            await _localStorage.RemoveItemAsync(RefreshTokenKey_, cancellationToken);
             _tokenStorage.ClearTokens();
         }
         finally

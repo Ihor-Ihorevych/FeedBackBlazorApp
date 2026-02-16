@@ -25,7 +25,7 @@ builder.Services.AddSingleton<INotificationTextHelper, NotificationTextHelper>()
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IAuthStateProvider, AuthStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<IAuthStateProvider>() as AuthenticationStateProvider);
+builder.Services.AddScoped(sp => (AuthenticationStateProvider)sp.GetRequiredService<IAuthStateProvider>());
 builder.Services.AddScoped<IAdminNotificationService, AdminNotificationService>();
 builder.Services.AddScoped<AuthorizationMessageHandler>();
 builder.Services.AddHttpClient("FBApi", (sp, client) =>

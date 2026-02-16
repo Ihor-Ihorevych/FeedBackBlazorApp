@@ -64,14 +64,12 @@ public class AuthStateProvider : AuthenticationStateProvider, IAuthStateProvider
             {
                 claims.Add(new Claim(ClaimTypes.Email, userInfo.Email));
             }
+            var roles = userInfo?.Roles
+                    ?.Where(r => !string.IsNullOrEmpty(r))
+                    ?.Select(r => new Claim(ClaimTypes.Role, r)) ?? [];
 
-            if (userInfo.Roles is not null)
-            {
-                foreach (var role in userInfo.Roles.Where(r => !string.IsNullOrEmpty(r)))
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role));
-                }
-            }
+            claims.AddRange(roles);
+
 
             var identity = new ClaimsIdentity(claims, "api");
             var user = new ClaimsPrincipal(identity);
