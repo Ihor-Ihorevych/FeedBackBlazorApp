@@ -2,85 +2,86 @@
 @inject NavigationManager Navigation
 @inject IAuthenticationService AuthService
 
-<FluentLayout>
-    <FluentHeader Class="bg-neutral-950/85 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50">
-        <div class="w-full max-w-7xl mx-auto px-6 py-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-12">
-                    <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                        <div class="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl text-white">
-							<FluentIcon Icon="Icons.Regular.Size24.DataArea" />
+<div class="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col">
+    <header class="sticky top-0 z-50 h-16 bg-neutral-950/95 backdrop-blur-xl border-b border-neutral-800 shadow-lg shadow-black/20 supports-[backdrop-filter:blur()]:bg-neutral-950/90">
+        <div class="h-full w-full max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between">
+            <!-- Left: Logo + Navigation -->
+            <div class="flex items-center gap-4 md:gap-12">
+                <a href="/" class="flex items-center gap-3 -ml-1 hover:opacity-80 transition-opacity duration-200">
+                    <div class="flex items-center justify-center w-10 h-10 md:w-11 md:h-11 bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-500 rounded-2xl text-white shadow-lg shadow-indigo-500/25">
+                        <FluentIcon Icon="Icons.Regular.Size24.DataArea" />
+                    </div>
+                    <span class="text-xl md:text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent drop-shadow-lg">FeedBack</span>
+                </a>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center gap-1">
+                    <NavLink href="/" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-400 hover:text-white hover:bg-neutral-800/50 rounded-xl transition-all duration-200 active:bg-indigo-500/20" Match="NavLinkMatch.All" ActiveClass="!text-white !bg-indigo-500/20 ring-2 ring-indigo-500/30">
+                        <FluentIcon Icon="Icons.Regular.Size24.Home" />
+                        <span>Home</span>
+                    </NavLink>
+                    <NavLink href="/movies" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-400 hover:text-white hover:bg-neutral-800/50 rounded-xl transition-all duration-200" Match="NavLinkMatch.Prefix" ActiveClass="!text-white !bg-indigo-500/20 ring-2 ring-indigo-500/30">
+                        <FluentIcon Icon="Icons.Regular.Size24.Video" />
+                        <span>Movies</span>
+                    </NavLink>
+                </nav>
+            </div>
+
+            <!-- Right: Auth Section -->
+            <div class="flex items-center gap-3">
+                <AuthorizeView>
+                    <Authorized Context="authContext">
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-500 rounded-2xl text-white text-sm font-bold shadow-lg shadow-indigo-500/25">
+                                @(authContext.User.Identity?.Name?.FirstOrDefault().ToString().ToUpper() ?? "U")
+                            </div>
+                            <div class="hidden md:flex flex-col gap-0.5 mr-2">
+                                <span class="text-sm font-semibold text-white leading-tight">@authContext.User.Identity?.Name</span>
+                                <AuthorizeView Roles="Administrator" Context="adminContext">
+                                    <span class="text-xs font-bold text-violet-400 uppercase tracking-widest">Admin</span>
+                                </AuthorizeView>
+                            </div>
+                            <button @onclick="LogoutAsync"
+                                    title="Sign out"
+                                    class="flex items-center justify-center w-10 h-10 bg-neutral-900/50 border border-neutral-700 rounded-xl text-neutral-400 hover:text-error hover:bg-error/10 hover:border-error/30 transition-all duration-200 shadow-sm hover:shadow-md hover:shadow-error/10 active:scale-95">
+                                <FluentIcon Icon="Icons.Regular.Size24.ArrowCircleDown" />
+                            </button>
                         </div>
-                        <span class="text-xl font-semibold tracking-tight bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">FeedBack</span>
-                    </a>
+                    </Authorized>
 
-                    <!-- Navigation -->
-                    <nav class="flex items-center gap-1">
-                        <NavLink href="/" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" Match="NavLinkMatch.All" ActiveClass="!text-white !bg-indigo-500/15">
-                            <FluentIcon Icon="Icons.Regular.Size24.Home"/>
-                            <span>Home</span>
-                        </NavLink>
-                        <NavLink href="/movies" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" Match="NavLinkMatch.Prefix" ActiveClass="!text-white !bg-indigo-500/15">
-							<FluentIcon Icon="Icons.Regular.Size24.Video" />
-                            <span class="hidden sm:inline">Movies</span>
-                        </NavLink>
-                    </nav>
-                </div>
-
-                <!-- Auth Section -->
-                <div class="flex items-center">
-                    <AuthorizeView>
-                        <Authorized Context="authContext">
-                            <div class="flex items-center gap-3">
-                                <div class="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl text-white text-sm font-semibold">
-                                    @(authContext.User.Identity?.Name?.FirstOrDefault().ToString().ToUpper() ?? "U")
-                                </div>
-                                <div class="hidden sm:flex flex-col gap-0.5">
-                                    <span class="text-sm font-medium text-white leading-tight">@authContext.User.Identity?.Name</span>
-                                    <AuthorizeView Roles="Administrator" Context="adminContext">
-                                        <span class="text-[0.65rem] font-medium text-violet-400 uppercase tracking-wider">Admin</span>
-                                    </AuthorizeView>
-                                </div>
-                                <button @onclick="LogoutAsync" 
-                                        title="Sign out"
-                                        class="flex items-center justify-center w-9 h-9 ml-2 bg-transparent border border-white/10 rounded-lg text-neutral-400 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10 transition-all cursor-pointer">
-									<FluentIcon Icon="Icons.Regular.Size24.ArrowCircleDown" />
-                                </button>
-                            </div>
-                        </Authorized>
-
-                        <NotAuthorized>
-                            <div class="flex items-center gap-4">
-                                <a href="/login" class="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors">
-                                    Sign in
-                                </a>
-                                <a href="/register" class="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-violet-500 rounded-lg shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all">
-                                    Get started
-									<FluentIcon Icon="Icons.Regular.Size16.ArrowRight" />
-                                </a>
-                            </div>
-                        </NotAuthorized>
-                    </AuthorizeView>
-                </div>
+                    <NotAuthorized>
+                        <div class="flex items-center gap-4">
+                            <a href="/login" class="px-4 py-2 text-sm font-semibold text-neutral-400 hover:text-white hover:bg-neutral-800/50 rounded-xl transition-all duration-200">
+                                Sign in
+                            </a>
+                            <a href="/register" class="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 rounded-xl shadow-xl shadow-indigo-500/40 hover:shadow-2xl hover:shadow-indigo-500/50 hover:-translate-y-0.5 active:scale-95 transition-all duration-200">
+                                Get started
+                                <FluentIcon Icon="Icons.Regular.Size16.ArrowRight" />
+                            </a>
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
             </div>
         </div>
-    </FluentHeader>
+    </header>
 
-    <FluentBodyContent Class="flex-1 px-8 pt-12 pb-10 bg-neutral-950">
+    <!-- Main Content -->
+    <main class="flex-1 px-4 md:px-8 pt-4 md:pt-12 pb-10 md:pb-20">
         <div class="max-w-6xl mx-auto">
             <FluentMessageBarProvider Section="@MessagesTop" />
             @Body
         </div>
-    </FluentBodyContent>
+    </main>
 
-    <FluentFooter Class="bg-neutral-950/85 backdrop-blur-xl border-t border-white/5 py-6">
+    <!-- Footer -->
+    <footer class="bg-neutral-950/90 backdrop-blur-xl border-t border-neutral-800 py-8 mt-auto">
         <div class="text-center">
             <p class="text-xs text-neutral-500">© @DateTime.Now.Year FeedBack App. Built with Blazor & .NET 10</p>
         </div>
-    </FluentFooter>
+    </footer>
 
     <FBUI.Components.AdminNotificationPanel />
-</FluentLayout>
+</div>
 
 @code {
     private const string MessagesTop = "messages-top";
