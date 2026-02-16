@@ -32,7 +32,7 @@
                 <div class="space-y-5">
                     <div>
                         <FluentTextField @bind-Value="_model.Title"
-                                         @bind-Value:event="oninput"
+                                         Immediate="true"
                                          Label="Title"
                                          Placeholder="Enter movie title"
                                          Style="width: 100%;"
@@ -42,7 +42,7 @@
 
                     <div>
                         <FluentTextArea @bind-Value="_model.Description"
-                                        @bind-Value:event="oninput"
+                                        Immediate="true"
                                         Label="Description"
                                         Placeholder="Enter movie description"
                                         Rows="4"
@@ -52,14 +52,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <FluentTextField @bind-Value="_model.Director"
-                                             @bind-Value:event="oninput"
+                                             Immediate="true"
                                              Label="Director"
                                              Placeholder="Director name"
                                              Style="width: 100%;" />
                         </div>
                         <div>
                             <FluentTextField @bind-Value="_model.Genre"
-                                             @bind-Value:event="oninput"
+                                             Immediate="true"
                                              Label="Genre"
                                              Placeholder="e.g., Action, Drama"
                                              Style="width: 100%;" />
@@ -68,7 +68,7 @@
 
                     <div>
                         <FluentTextField @bind-Value="_model.ReleaseYear"
-                                         @bind-Value:event="oninput"
+                                         Immediate="true"
                                          Label="Release Year"
                                          TextFieldType="TextFieldType.Number"
                                          Placeholder="e.g., 2024"
@@ -78,14 +78,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <FluentTextField @bind-Value="_model.PosterUrl"
-                                             @bind-Value:event="oninput"
+                                             Immediate="true"
                                              Label="Poster URL"
                                              Placeholder="https://example.com/poster.jpg"
                                              Style="width: 100%;" />
                         </div>
                         <div>
                             <FluentTextField @bind-Value="_model.Rating"
-                                             @bind-Value:event="oninput"
+                                             Immediate="true"
                                              Label="Rating"
                                              TextFieldType="TextFieldType.Number"
                                              Placeholder="0-10"
