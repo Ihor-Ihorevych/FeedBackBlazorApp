@@ -7,6 +7,8 @@ namespace FB_App.Web.Services;
 
 public class AdminNotificationService : IAdminNotificationService
 {
+    private const string AdminGroupName_ = "Administrators";
+    private const string RecieveNotification_ = "ReceiveNotification";
     private readonly IHubContext<AdminNotificationHub> _hubContext;
     private readonly ILogger<AdminNotificationService> _logger;
 
@@ -43,8 +45,52 @@ public class AdminNotificationService : IAdminNotificationService
         };
 
         await _hubContext.Clients
-            .Group("Administrators")
-            .SendAsync("ReceiveNotification", notification, cancellationToken);
+            .Group(AdminGroupName_)
+            .SendAsync(RecieveNotification_, notification, cancellationToken);
+    }
+
+    public async Task NotifyMovieCreatedAsync(
+        Guid movieId,
+        string movieTitle,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation(
+            "Sending movie created notification to administrators. MovieId: {MovieId}",
+            movieId);
+
+        var notification = new
+        {
+            Type = "MovieCreated",
+            MovieId = movieId,
+            MovieTitle = movieTitle,
+            Timestamp = DateTimeOffset.UtcNow
+        };
+
+        await _hubContext.Clients
+            .Group(AdminGroupName_)
+            .SendAsync(RecieveNotification_, notification, cancellationToken);
+    }
+
+    public async Task NotifyMovieDeletedAsync(
+        Guid movieId,
+        string movieTitle,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation(
+            "Sending movie deleted notification to administrators. MovieId: {MovieId}",
+            movieId);
+
+        var notification = new
+        {
+            Type = "MovieDeleted",
+            MovieId = movieId,
+            MovieTitle = movieTitle,
+            Timestamp = DateTimeOffset.UtcNow
+        };
+
+        await _hubContext.Clients
+            .Group(AdminGroupName_)
+            .SendAsync(RecieveNotification_, notification, cancellationToken);
     }
 
     public async Task NotifyCommentStatusChangedAsync(
@@ -68,7 +114,7 @@ public class AdminNotificationService : IAdminNotificationService
         };
 
         await _hubContext.Clients
-            .Group("Administrators")
-            .SendAsync("ReceiveNotification", notification, cancellationToken);
+            .Group(AdminGroupName_)
+            .SendAsync(RecieveNotification_, notification, cancellationToken);
     }
 }

@@ -23,6 +23,28 @@ public interface IAdminNotificationService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Notifies all connected administrators that a movie was created.
+    /// </summary>
+    /// <param name="movieId">The ID of the movie.</param>
+    /// <param name="movieTitle">The title of the movie.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task NotifyMovieCreatedAsync(
+        Guid movieId,
+        string movieTitle,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Notifies all connected administrators that a movie was deleted.
+    /// </summary>
+    /// <param name="movieId">The ID of the movie.</param>
+    /// <param name="movieTitle">The title of the movie.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task NotifyMovieDeletedAsync(
+        Guid movieId,
+        string movieTitle,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Notifies all connected administrators about a comment status change.
     /// </summary>
     /// <param name="commentId">The ID of the comment.</param>

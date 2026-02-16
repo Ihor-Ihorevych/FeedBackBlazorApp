@@ -41,7 +41,7 @@ public class GetMoviesQueryHandler : IRequestHandler<GetMoviesQuery, PaginatedLi
         return await _cache.GetOrCreateAsync(
             cacheKey,
             async ct => await FetchMoviesAsync(request, ct),
-            TimeSpan.FromMinutes(2),
+            TimeSpan.FromSeconds(30),
             cancellationToken);
     }
 
