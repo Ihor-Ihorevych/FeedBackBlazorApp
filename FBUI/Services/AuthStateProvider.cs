@@ -1,5 +1,4 @@
 using Blazored.LocalStorage;
-using FBUI.ApiClient;
 using FBUI.ApiClient.Contracts;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;

@@ -1,7 +1,7 @@
 using Ardalis.Result;
 using Blazored.LocalStorage;
-using FBUI.ApiClient;
 using FBUI.ApiClient.Contracts;
+using FBUI.Extensions;
 
 namespace FBUI.Services;
 
@@ -51,11 +51,11 @@ public class AuthenticationService : IAuthenticationService
             await _apiClient.PostApiUsersRegisterAsync(command);
             return Result.Success();
         }
-        catch (ApiException<Exception> ex)
+        catch (ApiException<HttpValidationProblemDetails> ex)
         {
-            return Result.Error(ex.ToString() ?? "Registration failed");
+            return Result.Error(ex.GetValidationErrors());
         }
-        catch (Exception ex)
+        catch (ApiException ex)
         {
             return Result.Error(ex.Message);
         }
@@ -85,15 +85,27 @@ public class AuthenticationService : IAuthenticationService
 
             return Result<AccessTokenResponse>.Error("Login failed");
         }
-        catch (ApiException ex) when (ex.StatusCode == 401)
+        catch (ApiException<ProblemDetails> ex) when (ex.StatusCode == 401)
         {
             return Result<AccessTokenResponse>.Unauthorized();
         }
-        catch (Exception ex)
+        catch (ApiException<HttpValidationProblemDetails> ex)
+        {
+            return Result<AccessTokenResponse>.Invalid(validationError:
+
+                new ValidationError
+                {
+                    ErrorMessage = ex.GetValidationErrors()
+                }
+            );
+        }
+        catch (ApiException ex)
         {
             return Result<AccessTokenResponse>.Error(ex.Message);
         }
     }
+
+
 
     public async Task LogoutAsync()
     {
@@ -134,7 +146,7 @@ public class AuthenticationService : IAuthenticationService
 
             return Result.Error("Token refresh failed");
         }
-        catch
+        catch (ApiException)
         {
             await LogoutAsync();
             return Result.Error("Token refresh failed");

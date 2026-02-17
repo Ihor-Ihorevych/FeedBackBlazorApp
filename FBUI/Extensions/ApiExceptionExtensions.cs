@@ -1,4 +1,3 @@
-using FBUI.ApiClient;
 using FBUI.ApiClient.Contracts;
 
 namespace FBUI.Extensions;

@@ -87,10 +87,12 @@
             }
             else
             {
-                _errorMessage = result.Status == Ardalis.Result.ResultStatus.Unauthorized 
-                    ? "Invalid email or password" 
-                    : string.Join(", ", result.Errors);
+                _errorMessage = "Invalid email or password";
             }
+        }
+        catch (ApiException<ProblemDetails> ex)
+        {
+            _errorMessage = ex.Result?.Detail ?? ex.Result?.Title ?? "Authentication failed";
         }
         catch (ApiException<HttpValidationProblemDetails> ex)
         {
@@ -98,7 +100,7 @@
         }
         catch (Exception ex)
         {
-            _errorMessage = ex.Message;
+            _errorMessage = "An error occurred. Please try again.";
         }
         finally
         {

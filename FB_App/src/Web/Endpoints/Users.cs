@@ -21,6 +21,7 @@ public class Users : EndpointGroupBase
             .AllowAnonymous()
             .Produces<AccessTokenResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem()
             .WithDescription("Authenticates user and returns access token");
 
         groupBuilder.MapPost("/refresh", Refresh)
@@ -44,11 +45,16 @@ public class Users : EndpointGroupBase
         return TypedResults.Ok(result.Value);
     }
 
-    private static async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult>> Login(
+    private static async Task<Results<Ok<AccessTokenResponse>, ProblemHttpResult, ValidationProblem>> Login(
         ISender sender,
         LoginUserCommand command)
     {
         var result = await sender.Send(command);
+        if (!result.IsSuccess)
+        {
+            return TypedResults.Problem(statusCode:
+                StatusCodes.Status401Unauthorized, title: "Invalid credentials");
+        }
         return TypedResults.Ok(result.Value);
     }
 
