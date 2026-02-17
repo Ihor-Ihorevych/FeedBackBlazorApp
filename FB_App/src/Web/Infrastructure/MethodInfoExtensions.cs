@@ -4,10 +4,10 @@ namespace FB_App.Web.Infrastructure;
 
 public static class MethodInfoExtensions
 {
+    private static readonly char[] InvalidChars_ = ['<', '>'];
     public static bool IsAnonymous(this MethodInfo method)
     {
-        var invalidChars = new[] { '<', '>' };
-        return method.Name.Any(invalidChars.Contains);
+        return method.Name.Any(InvalidChars_.Contains);
     }
 
     public static void AnonymousMethod(this IGuardClause guardClause, Delegate input)

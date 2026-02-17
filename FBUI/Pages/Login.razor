@@ -92,7 +92,7 @@
                     : string.Join(", ", result.Errors);
             }
         }
-        catch (Exception ex)
+        catch (ApiException<HttpValidationProblemDetails> ex)
         {
             _errorMessage = $"An error occurred: {ex.Message}";
         }

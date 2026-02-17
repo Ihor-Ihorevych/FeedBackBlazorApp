@@ -39,14 +39,14 @@
   <ItemGroup>
     <Folder Include="OpenAPIs\" />
   </ItemGroup>
-
 	<ItemGroup>
 		<OpenApiReference Include="OpenAPIs\swagger.json" CodeGenerator="NSwagCSharp"
-						  Namespace="FBUI.ApiClient"
-						  ClassName="FBApiClient"
-                          OutputPath="ApiClients.cs">
-			<Options>/GenerateClientInterfaces:true</Options>
+  Namespace="FBUI.ApiClient"
+  ClassName="FBApiClient"
+  OutputPath="ApiClients.cs">
+			<Options>/GenerateClientClasses:true /GenerateClientInterfaces:true /GenerateContractsOutput:true /ContractsNamespace:FBUI.ApiClient.Contracts /ContractsOutput:ApiContracts.cs /GenerateExceptionClasses:true /ExceptionClass:ApiException /ExceptionBaseClass:System.Exception /HandleHttpStatusCodeException:true /WrapDtoExceptions:true /GenerateDtoTypes:true /GenerateJsonMethods:true  /ParameterArrayType:Array /ParameterArrayFormat:Json /ParameterDictionaryType:Dictionary</Options>
 		</OpenApiReference>
+
 	</ItemGroup>
 
   <PropertyGroup>

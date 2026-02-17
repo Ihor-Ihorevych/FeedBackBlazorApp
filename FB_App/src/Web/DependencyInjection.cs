@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection
 {
-    public const string BlazorClientPolicy = "BlazorClientPolicy";
+    public const string BlazorClientPolicy_ = "BlazorClientPolicy";
 
     public static void AddWebServices(this IHostApplicationBuilder builder)
     {
@@ -36,7 +36,7 @@ public static class DependencyInjection
         builder.Services.AddSignalR();
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy(BlazorClientPolicy, policy =>
+            options.AddPolicy(BlazorClientPolicy_, policy =>
             {
                 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
                     ?? ["https://localhost:7140", "http://localhost:5168",
@@ -60,8 +60,6 @@ public static class DependencyInjection
             configure.Title = "FB_App API";
             configure.Version = "v1";
             configure.Description = "FB_App API Documentation";
-
-            // Add JWT
             configure.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
             {
                 Type = OpenApiSecuritySchemeType.ApiKey,

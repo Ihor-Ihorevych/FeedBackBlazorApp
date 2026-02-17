@@ -125,14 +125,22 @@
             ToastService.ShowSuccess("Movie created successfully!");
             Navigation.NavigateTo($"/movies/{movieId}");
         }
-        catch (ApiException<Exception> ex)
+        catch (ApiException<HttpValidationProblemDetails> ex)
         {
-            Console.WriteLine();
-            _errorMessage = Newtonsoft.Json.JsonConvert.SerializeObject(ex);
+            _errorMessage = string.Join(',', ex.Result.Errors
+                                        .Select(c =>
+                                        {
+                                            return $"{c.Key}: {string.Join(", ", c.Value)}";
+                                        }));
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
         }
         finally
         {
             _isLoading = false;
+            StateHasChanged();
         }
     }
 
