@@ -1,10 +1,11 @@
 @page "/movies"
-@implements IDisposable
 @inject IFBApiClient ApiClient
 @inject NavigationManager Navigation
 @inject IToastService ToastService
 @inject IDialogService DialogService
 @using FBUI.Components;
+@using Microsoft.FluentUI.AspNetCore.Components;
+
 <PageTitle>Movies - FB App</PageTitle>
 
 <div class="py-8">
@@ -15,7 +16,9 @@
         </div>
         <AuthorizeView Roles="Administrator">
             <Authorized>
-                <FluentButton Appearance="Appearance.Outline" OnClick="@(() => Navigation.NavigateTo("/movies/create"))" Class="border-neutral-700 text-neutral-300">
+                <FluentButton Appearance="Appearance.Outline"
+                              OnClick="@(() => Navigation.NavigateTo("/movies/create"))"
+                              Class="border-neutral-700 text-neutral-300">
                     Add Movie
                 </FluentButton>
             </Authorized>
@@ -25,7 +28,7 @@
     <div class="mb-8 space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FluentTextField @bind-Value="_searchTerm"
-                             @bind-Value:after="OnSearchChanged"
+                             @bind-Value:after="OnFilterValuesChanged"
                              Immediate="true"
                              Label="Search movies"
                              Placeholder="Search by title, director, or description..."
@@ -34,7 +37,7 @@
             </FluentTextField>
 
             <FluentTextField @bind-Value="_genreFilter"
-                             @bind-Value:after="OnGenreChanged"
+                             @bind-Value:after="OnFilterValuesChanged"
                              Immediate="true"
                              Label="Filter by genre"
                              Placeholder="e.g., Action, Drama, Comedy..."
@@ -59,7 +62,9 @@
                         Genre: @_genreFilter
                     </FluentBadge>
                 }
-                <FluentButton Appearance="Appearance.Lightweight" OnClick="ClearAllFilters" Class="text-xs">
+                <FluentButton Appearance="Appearance.Lightweight"
+                              OnClick="ClearAllFilters"
+                              Class="text-xs">
                     Clear all
                 </FluentButton>
             </div>
@@ -77,7 +82,9 @@
         <div class="py-20 text-center">
             <p class="text-neutral-400 mb-4">Failed to load movies</p>
             <p class="text-sm text-neutral-500 mb-6">@_error</p>
-            <FluentButton Appearance="Appearance.Outline" OnClick="LoadMoviesAsync" Class="border-neutral-700 text-neutral-300">
+            <FluentButton Appearance="Appearance.Outline"
+                          OnClick="LoadMoviesAsync"
+                          Class="border-neutral-700 text-neutral-300">
                 Try Again
             </FluentButton>
         </div>
@@ -97,13 +104,11 @@
                 <MovieCard Movie="@movie" />
             }
         </div>
-
         @if (_movies.TotalPages > 1)
         {
             <div class="flex justify-center mt-12">
-                <FluentPaginator State="@_paginationState" CurrentPage="@(_currentPage - 1)"
-                                 TotalItemCount="@_movies.TotalCount" ItemsPerPage="@_pageSize"
-                                 OnPageChange="OnPageChangeAsync" />
+                <FluentPaginator State="@_paginationState"
+                CurrentPageIndexChanged="OnPageIndexChangedAsync" />
             </div>
         }
     }
@@ -113,13 +118,15 @@
     private PaginatedListOfMovieDto? _movies;
     private bool _isLoading = true;
     private string? _error;
-    private int _currentPage = 1;
+
     private const int _pageSize = 12;
-    private readonly PaginationState _paginationState = new() { ItemsPerPage = _pageSize };
+    private readonly PaginationState _paginationState = new()
+    {
+        ItemsPerPage = _pageSize
+    };
 
     private string _searchTerm = string.Empty;
     private string _genreFilter = string.Empty;
-    private System.Threading.Timer? _debounceTimer;
 
     protected override async Task OnInitializedAsync()
     {
@@ -133,7 +140,34 @@
 
         try
         {
-            _movies = await ApiClient.GetMoviesAsync(_currentPage, _pageSize, _searchTerm, _genreFilter);
+            var apiPageNumber = _paginationState.CurrentPageIndex + 1;
+
+            _movies = await ApiClient.GetMoviesAsync(
+                apiPageNumber,
+                _paginationState.ItemsPerPage,
+                _searchTerm,
+                _genreFilter
+            );
+
+            if (_movies is { TotalCount: { } itemsTotalCount })
+            {
+                await _paginationState.SetTotalItemCountAsync(itemsTotalCount);
+            }
+
+            if (_movies.TotalPages > 0 &&
+                _paginationState.CurrentPageIndex >= _movies.TotalPages)
+            {
+                var lastPageIndex = _movies.TotalPages - 1;
+                await _paginationState.SetCurrentPageIndexAsync(lastPageIndex);
+                var correctedPageNumber = lastPageIndex + 1;
+
+                _movies = await ApiClient.GetMoviesAsync(
+                    correctedPageNumber,
+                    _paginationState.ItemsPerPage,
+                    _searchTerm,
+                    _genreFilter
+                );
+            }
         }
         catch (ApiException ex)
         {
@@ -159,49 +193,33 @@
         }
     }
 
-    private async Task OnPageChangeAsync(int pageNumber)
+    private async Task OnPageIndexChangedAsync(int pageIndex)
     {
-        _currentPage = pageNumber + 1;
+        await _paginationState.SetCurrentPageIndexAsync(pageIndex);
         await LoadMoviesAsync();
     }
 
-    private void OnSearchChanged()
+    private async void OnFilterValuesChanged()
     {
-        _debounceTimer?.Dispose();
-        _debounceTimer = new System.Threading.Timer(_ =>
+        await Task.Delay(500);
+        await InvokeAsync(async () =>
         {
-            InvokeAsync(async () =>
-            {
-                _currentPage = 1;
-                await LoadMoviesAsync();
-            });
-        }, null, 500, System.Threading.Timeout.Infinite);
-    }
-
-    private void OnGenreChanged()
-    {
-        _debounceTimer?.Dispose();
-        _debounceTimer = new System.Threading.Timer(_ =>
-        {
-            InvokeAsync(async () =>
-            {
-                _currentPage = 1;
-                await LoadMoviesAsync();
-            });
-        }, null, 500, System.Threading.Timeout.Infinite);
+            await _paginationState.SetCurrentPageIndexAsync(0);
+            await LoadMoviesAsync();
+        });
     }
 
     private async Task ClearSearchTerm()
     {
         _searchTerm = string.Empty;
-        _currentPage = 1;
+        await _paginationState.SetCurrentPageIndexAsync(0);
         await LoadMoviesAsync();
     }
 
     private async Task ClearGenreFilter()
     {
         _genreFilter = string.Empty;
-        _currentPage = 1;
+        await _paginationState.SetCurrentPageIndexAsync(0);
         await LoadMoviesAsync();
     }
 
@@ -209,12 +227,7 @@
     {
         _searchTerm = string.Empty;
         _genreFilter = string.Empty;
-        _currentPage = 1;
+        await _paginationState.SetCurrentPageIndexAsync(0);
         await LoadMoviesAsync();
-    }
-
-    public void Dispose()
-    {
-        _debounceTimer?.Dispose();
     }
 }

@@ -40,7 +40,7 @@ public class ApplicationDbContextInitialiser
     {
         try
         {
-            // See https://jasontaylor.dev/ef-core-database-initialisation-strategies
+            // See [https://jasontaylor.dev/ef-core-database-initialisation-strategies](https://jasontaylor.dev/ef-core-database-initialisation-strategies)
             await _context.Database.EnsureDeletedAsync();
             await _context.Database.EnsureCreatedAsync();
         }
@@ -109,6 +109,7 @@ public class ApplicationDbContextInitialiser
         {
             var movies = new List<Movie>
             {
+                // Original movies
                 Movie.Create(
                     "The Shawshank Redemption",
                     "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
@@ -148,31 +149,167 @@ public class ApplicationDbContextInitialiser
                     "Quentin Tarantino",
                     "Crime",
                     null,
-                    8.9)
+                    8.9),
+
+                // Additional classic movies
+                Movie.Create(
+                    "Forrest Gump",
+                    "The history of the US from the 1950s to the '70s unfolds from the perspective of an Alabama man with an IQ of 75, who yearns to be reunited with his childhood sweetheart.",
+                    1994,
+                    "Robert Zemeckis",
+                    "Drama",
+                    null,
+                    8.8),
+                Movie.Create(
+                    "Schindler's List",
+                    "In German-occupied Poland during World War II, industrialist Oskar Schindler gradually becomes concerned for his Jewish workforce after witnessing their persecution by the Nazis.",
+                    1993,
+                    "Steven Spielberg",
+                    "Biography",
+                    null,
+                    9.0),
+                Movie.Create(
+                    "The Lord of the Rings: The Return of the King",
+                    "Gandalf and Aragorn lead the World of Men against Sauron's army to draw his gaze from Frodo and Sam as they approach Mount Doom with the One Ring.",
+                    2003,
+                    "Peter Jackson",
+                    "Action",
+                    null,
+                    9.0),
+                Movie.Create(
+                    "Fight Club",
+                    "An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into something much more.",
+                    1999,
+                    "David Fincher",
+                    "Drama",
+                    null,
+                    8.8),
+                Movie.Create(
+                    "The Matrix",
+                    "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.",
+                    1999,
+                    "Lana Wachowski, Lilly Wachowski",
+                    "Action",
+                    null,
+                    8.7),
+
+                // Modern blockbusters
+                Movie.Create(
+                    "Interstellar",
+                    "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
+                    2014,
+                    "Christopher Nolan",
+                    "Adventure",
+                    null,
+                    8.7),
+                Movie.Create(
+                    "Parasite",
+                    "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.",
+                    2019,
+                    "Bong Joon Ho",
+                    "Thriller",
+                    null,
+                    8.5),
+                Movie.Create(
+                    "Avengers: Infinity War",
+                    "The Avengers and their allies must be willing to sacrifice all in an attempt to defeat the powerful Thanos before his blitz of devastation and ruin puts an end to the universe.",
+                    2018,
+                    "Anthony Russo, Joe Russo",
+                    "Action",
+                    null,
+                    8.4),
+                Movie.Create(
+                    "Dune",
+                    "A noble family becomes embroiled in a war for control over the galaxy's most valuable asset. Their involvement will bring the royal house much glory, or utter destruction.",
+                    2021,
+                    "Denis Villeneuve",
+                    "Action",
+                    null,
+                    8.3),
+                Movie.Create(
+                    "Oppenheimer",
+                    "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.",
+                    2023,
+                    "Christopher Nolan",
+                    "Biography",
+                    null,
+                    8.4),
+
+                // Additional variety
+                Movie.Create(
+                    "Goodfellas",
+                    "The story of Henry Hill and his life in the mob, covering his relationship with his wife Karen Hill and his mob partners Jimmy Conway and Tommy DeVito in the Italian-American crime syndicate.",
+                    1990,
+                    "Martin Scorsese",
+                    "Biography",
+                    null,
+                    8.7),
+                Movie.Create(
+                    "Se7en",
+                    "Two detectives, a rookie and a veteran, hunt a serial killer who uses the seven deadly sins as his motives.",
+                    1995,
+                    "David Fincher",
+                    "Crime",
+                    null,
+                    8.6),
+                Movie.Create(
+                    "Gladiator",
+                    "A former Roman General sets out to exact vengeance against the corrupt emperor who murdered his family and sent him into slavery.",
+                    2000,
+                    "Ridley Scott",
+                    "Action",
+                    null,
+                    8.5),
+                Movie.Create(
+                    "The Silence of the Lambs",
+                    "A young F.B.I. cadet must receive the help of an incarcerated and manipulative cannibal killer to help catch another serial killer, a madman who skins his victims.",
+                    1991,
+                    "Jonathan Demme",
+                    "Thriller",
+                    null,
+                    8.6),
+                Movie.Create(
+                    "Spirited Away",
+                    "During her family's move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits, and where humans are changed into beasts.",
+                    2001,
+                    "Hayao Miyazaki",
+                    "Animation",
+                    null,
+                    8.6)
             };
 
             _context.Movies.AddRange(movies);
             await _context.SaveChangesAsync();
 
             var regularUser = await _userManager.FindByEmailAsync("user@localhost");
+            var adminUser = await _userManager.FindByEmailAsync("administrator@localhost");
 
             if (regularUser != null)
             {
+                // Comments from regular user
                 var comment1 = movies[0].AddComment(regularUser.Id, "One of the best movies ever made! A masterpiece.");
                 var comment2 = movies[0].AddComment(regularUser.Id, "The friendship between Andy and Red is so touching.");
                 var comment3 = movies[1].AddComment(regularUser.Id, "A timeless classic. Marlon Brando's performance is legendary.");
                 var comment4 = movies[2].AddComment(regularUser.Id, "Heath Ledger's Joker is unforgettable!");
                 var comment5 = movies[3].AddComment(regularUser.Id, "Mind-bending and visually stunning.");
+                var comment6 = movies[5].AddComment(regularUser.Id, "Life is like a box of chocolates, you never know what you're gonna get!");
+                var comment7 = movies[6].AddComment(regularUser.Id, "One of the most powerful films about the Holocaust.");
+                var comment8 = movies[11].AddComment(regularUser.Id, "The music, the visuals, the story - perfection!");
 
-                // Save all comments first to generate IDs
+               
                 await _context.SaveChangesAsync();
 
-                // Now approve comments with their generated IDs
-                movies[0].ApproveComment(comment1.Id, administrator.Id);
-                movies[0].ApproveComment(comment2.Id, administrator.Id);
-                movies[1].ApproveComment(comment3.Id, administrator.Id);
-                movies[2].ApproveComment(comment4.Id, administrator.Id);
-                movies[3].ApproveComment(comment5.Id, administrator.Id);
+                if (adminUser != null)
+                {
+                    movies[0].ApproveComment(comment1.Id, adminUser.Id);
+                    movies[0].ApproveComment(comment2.Id, adminUser.Id);
+                    movies[1].ApproveComment(comment3.Id, adminUser.Id);
+                    movies[2].ApproveComment(comment4.Id, adminUser.Id);
+                    movies[3].ApproveComment(comment5.Id, adminUser.Id);
+                    movies[5].ApproveComment(comment6.Id, adminUser.Id);
+                    movies[6].ApproveComment(comment7.Id, adminUser.Id);
+                    movies[11].ApproveComment(comment8.Id, adminUser.Id);
+                }
 
                 await _context.SaveChangesAsync();
             }
