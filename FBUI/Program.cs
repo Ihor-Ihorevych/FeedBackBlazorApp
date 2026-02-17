@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using FBUI;
 using FBUI.ApiClient;
+using FBUI.ApiClient.Contracts;
 using FBUI.Configuration;
 using FBUI.Services;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -27,6 +28,7 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IAuthStateProvider, AuthStateProvider>();
 builder.Services.AddScoped(sp => (AuthenticationStateProvider)sp.GetRequiredService<IAuthStateProvider>());
 builder.Services.AddScoped<IAdminNotificationService, AdminNotificationService>();
+builder.Services.AddScoped<ICommentModerationService, CommentModerationService>();
 builder.Services.AddScoped<AuthorizationMessageHandler>();
 builder.Services.AddHttpClient("FBApi", (sp, client) =>
 {

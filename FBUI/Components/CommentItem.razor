@@ -1,0 +1,72 @@
+<FluentCard Class="p-4">
+    <div class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+            <div class="text-sm font-medium text-neutral-200 truncate">
+                @(string.IsNullOrWhiteSpace(Comment.UserName) ? "Anonymous" : Comment.UserName)
+            </div>
+            <div class="text-xs text-neutral-500">
+                @Comment.Created.ToString("MMM dd, yyyy 'at' HH:mm")
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <FluentBadge Appearance="@GetStatusAppearance(Comment.Status)">
+                @Comment.Status
+            </FluentBadge>
+            <AuthorizeView Roles="Administrator">
+                <Authorized>
+                    @if (Comment.Status == CommentStatus.Pending)
+                    {
+                        <FluentButton Appearance="Appearance.Outline"
+                                      Size="ComponentSize.Small"
+                                      Disabled="@IsModeratingComment"
+                                      OnClick="HandleApprove">
+                            Approve
+                        </FluentButton>
+                        <FluentButton Appearance="Appearance.Outline"
+                                      Size="ComponentSize.Small"
+                                      Color="Color.Error"
+                                      Disabled="@IsModeratingComment"
+                                      OnClick="HandleReject">
+                            Reject
+                        </FluentButton>
+                    }
+                </Authorized>
+            </AuthorizeView>
+        </div>
+    </div>
+    <div class="mt-3 text-sm text-neutral-300 leading-relaxed">
+        @Comment.Text
+    </div>
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommentDetailDto Comment { get; set; } = default!;
+
+    [Parameter]
+    public bool IsModeratingComment { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnApprove { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnReject { get; set; }
+
+    private async Task HandleApprove()
+    {
+        await OnApprove.InvokeAsync(Comment.Id);
+    }
+
+    private async Task HandleReject()
+    {
+        await OnReject.InvokeAsync(Comment.Id);
+    }
+
+    private static Appearance GetStatusAppearance(CommentStatus status) => status switch
+    {
+        CommentStatus.Approved => Appearance.Accent,
+        CommentStatus.Pending => Appearance.Neutral,
+        CommentStatus.Rejected => Appearance.Lightweight,
+        _ => Appearance.Neutral
+    };
+}

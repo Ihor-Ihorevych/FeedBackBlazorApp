@@ -182,6 +182,10 @@
             ToastService.ShowSuccess("Movie updated successfully!");
             Navigation.NavigateTo($"/movies/{Id}");
         }
+        catch (ApiException<HttpValidationProblemDetails> ex)
+        {
+            _errorMessage = ex.GetValidationErrors();
+        }
         catch (Exception ex)
         {
             _errorMessage = $"Failed to update movie: {ex.Message}";

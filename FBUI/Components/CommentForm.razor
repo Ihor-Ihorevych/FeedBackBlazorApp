@@ -1,0 +1,41 @@
+<FluentCard Class="p-4 space-y-4 bg-neutral-900/60">
+    <FluentTextArea @bind-Value="Content"
+                    Immediate="true"
+                    Label="Your comment"
+                    Placeholder="Write your comment"
+                    Rows="4"
+                    Style="width: 100%;" />
+    <div class="flex gap-3 justify-end">
+        <FluentButton Appearance="Appearance.Accent" OnClick="HandleSubmit" Loading="@IsSubmitting">
+            Submit
+        </FluentButton>
+        <FluentButton Appearance="Appearance.Outline" OnClick="OnCancel">
+            Cancel
+        </FluentButton>
+    </div>
+</FluentCard>
+
+@code {
+    [Parameter]
+    public string Content { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> ContentChanged { get; set; }
+
+    [Parameter]
+    public bool IsSubmitting { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSubmit { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        if (!string.IsNullOrWhiteSpace(Content))
+        {
+            await OnSubmit.InvokeAsync(Content);
+        }
+    }
+}

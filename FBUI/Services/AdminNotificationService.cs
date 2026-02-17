@@ -21,7 +21,6 @@ public interface IAdminNotificationService : IAsyncDisposable
     event Action<string>? OnConnectionStateChanged;
     event Action<AdminNotification>? OnNotificationReceived;
 
-    ValueTask DisposeAsync();
     string? GetCurrentToken();
     Task StartAsync();
     Task StopAsync();

@@ -1,5 +1,6 @@
 using Blazored.LocalStorage;
 using FBUI.ApiClient;
+using FBUI.ApiClient.Contracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;

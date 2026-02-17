@@ -1,13 +1,14 @@
 @page "/movies"
+@implements IDisposable
 @inject IFBApiClient ApiClient
 @inject NavigationManager Navigation
 @inject IToastService ToastService
 @inject IDialogService DialogService
-
+@using FBUI.Components;
 <PageTitle>Movies - FB App</PageTitle>
 
 <div class="py-8">
-    <div class="flex justify-between items-end mb-12">
+    <div class="flex justify-between items-end mb-8">
         <div>
             <h1 class="text-3xl font-light tracking-tight text-neutral-100">Movies</h1>
             <p class="text-neutral-500 mt-2 text-sm">Browse and discover</p>
@@ -19,6 +20,50 @@
                 </FluentButton>
             </Authorized>
         </AuthorizeView>
+    </div>
+
+    <div class="mb-8 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FluentTextField @bind-Value="_searchTerm"
+                             @bind-Value:after="OnSearchChanged"
+                             Immediate="true"
+                             Label="Search movies"
+                             Placeholder="Search by title, director, or description..."
+                             Style="width: 100%;">
+                <FluentIcon Value="@(new Icons.Regular.Size20.Search())" Slot="start" />
+            </FluentTextField>
+
+            <FluentTextField @bind-Value="_genreFilter"
+                             @bind-Value:after="OnGenreChanged"
+                             Immediate="true"
+                             Label="Filter by genre"
+                             Placeholder="e.g., Action, Drama, Comedy..."
+                             Style="width: 100%;">
+                <FluentIcon Value="@(new Icons.Regular.Size20.Filter())" Slot="start" />
+            </FluentTextField>
+        </div>
+
+        @if (!string.IsNullOrEmpty(_searchTerm) || !string.IsNullOrEmpty(_genreFilter))
+        {
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-neutral-400">Active filters:</span>
+                @if (!string.IsNullOrEmpty(_searchTerm))
+                {
+                    <FluentBadge Appearance="Appearance.Accent" OnDismissClick="ClearSearchTerm">
+                        Search: @_searchTerm
+                    </FluentBadge>
+                }
+                @if (!string.IsNullOrEmpty(_genreFilter))
+                {
+                    <FluentBadge Appearance="Appearance.Accent" OnDismissClick="ClearGenreFilter">
+                        Genre: @_genreFilter
+                    </FluentBadge>
+                }
+                <FluentButton Appearance="Appearance.Lightweight" OnClick="ClearAllFilters" Class="text-xs">
+                    Clear all
+                </FluentButton>
+            </div>
+        }
     </div>
 
     @if (_isLoading)
@@ -49,28 +94,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach (var movie in _movies.Items)
             {
-                <div class="group cursor-pointer border border-neutral-800 rounded-lg p-5 hover:border-neutral-600 transition-colors bg-neutral-900"
-                     @onclick="@(() => Navigation.NavigateTo($"/movies/{movie.Id}"))">
-                    <h3 class="font-medium text-neutral-100 mb-2 group-hover:text-neutral-300">
-                        @movie.Title
-                    </h3>
-                    @if (!string.IsNullOrEmpty(movie.Description))
-                    {
-                        <p class="text-sm text-neutral-400 line-clamp-2 mb-4">
-                            @movie.Description
-                        </p>
-                    }
-                    <div class="flex items-center justify-between text-xs text-neutral-500">
-                        @if (movie.ReleaseYear.HasValue)
-                        {
-                            <span>@movie.ReleaseYear.Value</span>
-                        }
-                        @if (movie.Rating.HasValue)
-                        {
-                            <span class="text-amber-500">★ @movie.Rating.Value.ToString("F1")</span>
-                        }
-                    </div>
-                </div>
+                <MovieCard Movie="@movie" />
             }
         </div>
 
@@ -93,6 +117,10 @@
     private const int _pageSize = 12;
     private readonly PaginationState _paginationState = new() { ItemsPerPage = _pageSize };
 
+    private string _searchTerm = string.Empty;
+    private string _genreFilter = string.Empty;
+    private System.Threading.Timer? _debounceTimer;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadMoviesAsync();
@@ -105,7 +133,7 @@
 
         try
         {
-            _movies = await ApiClient.GetMoviesAsync(_currentPage, _pageSize, string.Empty, string.Empty);
+            _movies = await ApiClient.GetMoviesAsync(_currentPage, _pageSize, _searchTerm, _genreFilter);
         }
         catch (ApiException ex)
         {
@@ -127,6 +155,7 @@
         finally
         {
             _isLoading = false;
+            StateHasChanged();
         }
     }
 
@@ -134,5 +163,58 @@
     {
         _currentPage = pageNumber + 1;
         await LoadMoviesAsync();
+    }
+
+    private void OnSearchChanged()
+    {
+        _debounceTimer?.Dispose();
+        _debounceTimer = new System.Threading.Timer(_ =>
+        {
+            InvokeAsync(async () =>
+            {
+                _currentPage = 1;
+                await LoadMoviesAsync();
+            });
+        }, null, 500, System.Threading.Timeout.Infinite);
+    }
+
+    private void OnGenreChanged()
+    {
+        _debounceTimer?.Dispose();
+        _debounceTimer = new System.Threading.Timer(_ =>
+        {
+            InvokeAsync(async () =>
+            {
+                _currentPage = 1;
+                await LoadMoviesAsync();
+            });
+        }, null, 500, System.Threading.Timeout.Infinite);
+    }
+
+    private async Task ClearSearchTerm()
+    {
+        _searchTerm = string.Empty;
+        _currentPage = 1;
+        await LoadMoviesAsync();
+    }
+
+    private async Task ClearGenreFilter()
+    {
+        _genreFilter = string.Empty;
+        _currentPage = 1;
+        await LoadMoviesAsync();
+    }
+
+    private async Task ClearAllFilters()
+    {
+        _searchTerm = string.Empty;
+        _genreFilter = string.Empty;
+        _currentPage = 1;
+        await LoadMoviesAsync();
+    }
+
+    public void Dispose()
+    {
+        _debounceTimer?.Dispose();
     }
 }

@@ -1,0 +1,59 @@
+@inject NavigationManager Navigation
+
+<div class="group cursor-pointer border border-neutral-800 rounded-lg p-5 hover:border-neutral-600 transition-colors bg-neutral-900"
+     @onclick="HandleClick">
+    <h3 class="font-medium text-neutral-100 mb-2 group-hover:text-neutral-300">
+        @Movie.Title
+    </h3>
+    @if (!string.IsNullOrEmpty(Movie.Description))
+    {
+        <p class="text-sm text-neutral-400 line-clamp-2 mb-4">
+            @Movie.Description
+        </p>
+    }
+    <div class="flex items-center justify-between text-xs text-neutral-500">
+        <div class="flex items-center gap-2">
+            @if (Movie.ReleaseYear.HasValue)
+            {
+                <span>@Movie.ReleaseYear.Value</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(Movie.Genre))
+            {
+                <span class="px-2 py-1 rounded-full bg-neutral-800 text-neutral-400">@Movie.Genre</span>
+            }
+        </div>
+        @if (Movie.Rating.HasValue)
+        {
+            <span class="text-amber-500 flex items-center gap-1">
+                <FluentIcon Value="@(new Icons.Filled.Size16.Star())" Color="Color.Custom" CustomColor="#f59e0b" />
+                @Movie.Rating.Value.ToString("F1")
+            </span>
+        }
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Movie.Director))
+    {
+        <div class="mt-3 text-xs text-neutral-500">
+            <span class="text-neutral-600">Director:</span> @Movie.Director
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public MovieDto Movie { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<MovieDto> OnClick { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(Movie);
+        }
+        else
+        {
+            Navigation.NavigateTo($"/movies/{Movie.Id}");
+        }
+    }
+}

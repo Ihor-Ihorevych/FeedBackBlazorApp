@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using Blazored.LocalStorage;
 using FBUI.ApiClient;
+using FBUI.ApiClient.Contracts;
 
 namespace FBUI.Services;
 

@@ -1,0 +1,63 @@
+@inject NavigationManager Navigation
+
+<FluentCard Class="p-6 space-y-6">
+    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div class="space-y-3">
+            <h1 class="text-3xl font-semibold text-neutral-100">@Movie.Title</h1>
+            <div class="flex flex-wrap gap-2 text-sm text-neutral-400">
+                @if (!string.IsNullOrWhiteSpace(Movie.Director))
+                {
+                    <span class="px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800">@Movie.Director</span>
+                }
+                @if (!string.IsNullOrWhiteSpace(Movie.Genre))
+                {
+                    <span class="px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800">@Movie.Genre</span>
+                }
+                @if (Movie.ReleaseYear.HasValue)
+                {
+                    <span class="px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800">@Movie.ReleaseYear.Value</span>
+                }
+            </div>
+        </div>
+        @if (Movie.Rating.HasValue)
+        {
+            <div class="flex items-center gap-2 text-amber-400">
+                <FluentIcon Value="@(new Icons.Filled.Size20.Star())" Color="Color.Success" />
+                <span class="text-lg font-semibold">@Movie.Rating.Value.ToString("F1")</span>
+            </div>
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(Movie.Description))
+    {
+        <div class="text-neutral-300 text-sm leading-relaxed">
+            @Movie.Description
+        </div>
+    }
+
+    <AuthorizeView Roles="Administrator">
+        <Authorized>
+            <div class="flex flex-wrap gap-3">
+                <FluentButton Appearance="Appearance.Outline" OnClick="OnEdit">
+                    <FluentIcon Value="@(new Icons.Regular.Size20.Edit())" Slot="start" />
+                    Edit Movie
+                </FluentButton>
+                <FluentButton Appearance="Appearance.Outline" OnClick="OnDelete" Color="Color.Error">
+                    <FluentIcon Value="@(new Icons.Regular.Size20.Delete())" Slot="start" />
+                    Delete Movie
+                </FluentButton>
+            </div>
+        </Authorized>
+    </AuthorizeView>
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public MovieDetailDto Movie { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnEdit { get; set; }
+
+    [Parameter]
+    public EventCallback OnDelete { get; set; }
+}

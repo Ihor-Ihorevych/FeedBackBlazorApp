@@ -41,37 +41,14 @@ public class Users : EndpointGroupBase
         CreateUserCommand command)
     {
         var result = await sender.Send(command);
-
-        if (!result.IsSuccess)
-        {
-            return TypedResults.ValidationProblem(
-                new Dictionary<string, string[]>
-                {
-                    { "Registration", result.Errors.Select(e => e.ToString()).ToArray() }
-                },
-                detail: "One or more validation errors occurred during registration.",
-                title: "Registration Failed");
-        }
-
         return TypedResults.Ok(result.Value);
     }
 
-    private static async Task<Results<Ok<AccessTokenResponse>, ProblemHttpResult>> Login(
+    private static async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult>> Login(
         ISender sender,
         LoginUserCommand command)
     {
         var result = await sender.Send(command);
-
-        if (!result.IsSuccess)
-        {
-            var errorMessage = result.Errors.FirstOrDefault()?.ToString() ?? "Invalid credentials";
-            return TypedResults.Problem(
-                detail: errorMessage,
-                title: "Authentication Failed",
-                statusCode: StatusCodes.Status401Unauthorized,
-                type: "https://tools.ietf.org/html/rfc7235#section-3.1");
-        }
-
         return TypedResults.Ok(result.Value);
     }
 
@@ -81,16 +58,6 @@ public class Users : EndpointGroupBase
     {
         var result = await sender.Send(command);
 
-        if (!result.IsSuccess)
-        {
-            var errorMessage = result.Errors.FirstOrDefault()?.ToString() ?? "Invalid or expired refresh token";
-            return TypedResults.Problem(
-                detail: errorMessage,
-                title: "Token Refresh Failed",
-                statusCode: StatusCodes.Status401Unauthorized,
-                type: "https://tools.ietf.org/html/rfc7235#section-3.1");
-        }
-
         return TypedResults.Ok(result.Value);
     }
 
@@ -98,15 +65,6 @@ public class Users : EndpointGroupBase
         ISender sender)
     {
         var result = await sender.Send(new GetCurrentUserQuery());
-
-        if (!result.IsSuccess)
-        {
-            return TypedResults.Problem(
-                detail: "User is not authenticated or session has expired",
-                title: "Unauthorized",
-                statusCode: StatusCodes.Status401Unauthorized,
-                type: "https://tools.ietf.org/html/rfc7235#section-3.1");
-        }
 
         return TypedResults.Ok(result.Value);
     }

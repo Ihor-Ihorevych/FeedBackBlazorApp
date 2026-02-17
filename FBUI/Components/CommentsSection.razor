@@ -1,0 +1,94 @@
+@using FBUI.ApiClient.Contracts
+<FluentCard Class="p-6 space-y-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <h2 class="text-xl font-semibold text-neutral-100">Comments (@(Comments?.Count ?? 0))</h2>
+        <AuthorizeView>
+            <Authorized>
+                <FluentButton Appearance="Appearance.Accent" OnClick="ToggleCommentForm">
+                    <FluentIcon Value="@(new Icons.Regular.Size20.Add())" Slot="start" />
+                    Add Comment
+                </FluentButton>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+
+    <AuthorizeView>
+        <Authorized>
+            @if (ShowCommentForm)
+            {
+                <CommentForm Content="@_commentContent"
+                             ContentChanged="@((value) => _commentContent = value)"
+                             IsSubmitting="@IsSubmittingComment"
+                             OnSubmit="HandleCommentSubmit"
+                             OnCancel="@(() => ShowCommentForm = false)" />
+            }
+        </Authorized>
+    </AuthorizeView>
+
+    @if (Comments is null || !Comments.Any())
+    {
+        <p class="text-sm text-neutral-400">No comments yet.</p>
+    }
+    else
+    {
+        <div class="space-y-4">
+            @foreach (var comment in Comments)
+            {
+                <CommentItem Comment="@comment"
+                             IsModeratingComment="@ModeratingComments.Contains(comment.Id)"
+                             OnApprove="HandleApproveComment"
+                             OnReject="HandleRejectComment" />
+            }
+        </div>
+    }
+</FluentCard>
+
+@code {
+    [Parameter]
+    public List<CommentDetailDto>? Comments { get; set; }
+
+    [Parameter]
+    public bool ShowCommentForm { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ShowCommentFormChanged { get; set; }
+
+    [Parameter]
+    public bool IsSubmittingComment { get; set; }
+
+    [Parameter]
+    public HashSet<Guid> ModeratingComments { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<string> OnCommentSubmit { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnCommentApprove { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnCommentReject { get; set; }
+
+    private string _commentContent = string.Empty;
+
+    private async Task ToggleCommentForm()
+    {
+        ShowCommentForm = !ShowCommentForm;
+        await ShowCommentFormChanged.InvokeAsync(ShowCommentForm);
+    }
+
+    private async Task HandleCommentSubmit(string content)
+    {
+        await OnCommentSubmit.InvokeAsync(content);
+        _commentContent = string.Empty;
+    }
+
+    private async Task HandleApproveComment(Guid commentId)
+    {
+        await OnCommentApprove.InvokeAsync(commentId);
+    }
+
+    private async Task HandleRejectComment(Guid commentId)
+    {
+        await OnCommentReject.InvokeAsync(commentId);
+    }
+}

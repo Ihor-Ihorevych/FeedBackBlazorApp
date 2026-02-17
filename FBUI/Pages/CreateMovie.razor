@@ -127,11 +127,7 @@
         }
         catch (ApiException<HttpValidationProblemDetails> ex)
         {
-            _errorMessage = string.Join(',', ex.Result.Errors
-                                        .Select(c =>
-                                        {
-                                            return $"{c.Key}: {string.Join(", ", c.Value)}";
-                                        }));
+            _errorMessage = ex.GetValidationErrors();
         }
         catch (Exception ex)
         {

@@ -90,32 +90,12 @@ public class Movies : EndpointGroupBase
         }
 
         var result = await sender.Send(command);
-
-        if (!result.IsSuccess)
-        {
-            return TypedResults.Problem(
-                detail: $"Movie with ID '{id}' was not found",
-                title: "Movie Not Found",
-                statusCode: StatusCodes.Status404NotFound,
-                type: "https://tools.ietf.org/html/rfc7231#section-6.5.4");
-        }
-
         return TypedResults.NoContent();
     }
 
     public static async Task<Results<NoContent, ProblemHttpResult>> DeleteMovie(ISender sender, Guid id)
     {
         var result = await sender.Send(new DeleteMovieCommand(id));
-
-        if (!result.IsSuccess)
-        {
-            return TypedResults.Problem(
-                detail: $"Movie with ID '{id}' was not found",
-                title: "Movie Not Found",
-                statusCode: StatusCodes.Status404NotFound,
-                type: "https://tools.ietf.org/html/rfc7231#section-6.5.4");
-        }
-
         return TypedResults.NoContent();
     }
 }
