@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Comments.Commands.CreateComment;
 
 [TestFixture]
-public class CreateCommentCommandValidatorTests
+public sealed class CreateCommentCommandValidatorTests
 {
     private CreateCommentCommandValidator _validator = null!;
 

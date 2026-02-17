@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace FB_App.Web.Services;
 
 
-public class AdminNotificationService : IAdminNotificationService
+public sealed class AdminNotificationService : IAdminNotificationService
 {
     private const string AdminGroupName_ = "Administrators";
     private const string RecieveNotification_ = "ReceiveNotification";

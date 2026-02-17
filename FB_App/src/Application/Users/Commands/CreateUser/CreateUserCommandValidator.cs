@@ -2,7 +2,7 @@ using FB_App.Application.Common.Interfaces;
 
 namespace FB_App.Application.Users.Commands.CreateUser;
 
-public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
     private readonly IIdentityService _identityService;
     public CreateUserCommandValidator(IIdentityService identityService)

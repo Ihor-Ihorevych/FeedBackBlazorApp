@@ -1,6 +1,6 @@
 namespace FB_App.Application.Movies.Commands.UpdateMovie;
 
-public class UpdateMovieCommandValidator : AbstractValidator<UpdateMovieCommand>
+public sealed class UpdateMovieCommandValidator : AbstractValidator<UpdateMovieCommand>
 {
     public UpdateMovieCommandValidator()
     {

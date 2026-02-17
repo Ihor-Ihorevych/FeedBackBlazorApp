@@ -12,7 +12,7 @@ public interface IAuthStateProvider
     void NotifyUserLogout();
 }
 
-public class AuthStateProvider : AuthenticationStateProvider, IAuthStateProvider
+public sealed class AuthStateProvider : AuthenticationStateProvider, IAuthStateProvider
 {
     private const string AccessTokenKey_ = "accessToken";
     private const string RefreshTokenKey_ = "refreshToken";

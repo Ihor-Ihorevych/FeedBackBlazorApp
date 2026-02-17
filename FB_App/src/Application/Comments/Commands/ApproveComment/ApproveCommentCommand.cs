@@ -11,7 +11,7 @@ namespace FB_App.Application.Comments.Commands.ApproveComment;
 public record ApproveCommentCommand(Guid MovieId, Guid CommentId) : IRequest<Result>;
 
 
-public class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentCommand, Result>
+public sealed class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentCommand, Result>
 {
     private readonly IApplicationDbContext _context;
     private readonly IUser _user;

@@ -2,7 +2,7 @@
 
 namespace FB_App.Application.Common.Behaviours;
 
-public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public sealed class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
    where TRequest : notnull
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;

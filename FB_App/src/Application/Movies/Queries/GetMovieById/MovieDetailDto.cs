@@ -2,7 +2,7 @@ using FB_App.Application.Comments.Queries;
 
 namespace FB_App.Application.Movies.Queries.GetMovieById;
 
-public class MovieDetailDto
+public sealed class MovieDetailDto
 {
     public Guid Id { get; init; }
     public string Title { get; init; } = string.Empty;

@@ -10,7 +10,7 @@ using Shouldly;
 namespace FB_App.Application.UnitTests.Movies.Commands.DeleteMovie;
 
 [TestFixture]
-public class DeleteMovieCommandHandlerTests
+public sealed class DeleteMovieCommandHandlerTests
 {
     private Mock<IApplicationDbContext> _contextMock = null!;
     private Mock<ICacheService> _cacheMock = null!;

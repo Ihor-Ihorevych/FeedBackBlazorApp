@@ -4,9 +4,9 @@ using FB_App.Domain.Entities;
 
 namespace FB_App.Application.Movies.Queries.GetMovieById;
 
-public record GetMovieByIdQuery(Guid Id) : IRequest<Result<MovieDetailDto>>;
+public sealed record GetMovieByIdQuery(Guid Id) : IRequest<Result<MovieDetailDto>>;
 
-public class GetMovieByIdQueryHandler : IRequestHandler<GetMovieByIdQuery, Result<MovieDetailDto>>
+public sealed class GetMovieByIdQueryHandler : IRequestHandler<GetMovieByIdQuery, Result<MovieDetailDto>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;

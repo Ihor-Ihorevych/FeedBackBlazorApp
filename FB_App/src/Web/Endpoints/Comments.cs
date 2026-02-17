@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FB_App.Web.Endpoints;
 
-public class Comments : EndpointGroupBase
+public sealed class Comments : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {

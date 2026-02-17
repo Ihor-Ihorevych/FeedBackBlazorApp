@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Comments.Commands.CreateComment;
 
 [TestFixture]
-public class CreateCommentCommandHandlerTests
+public sealed class CreateCommentCommandHandlerTests
 {
     private Mock<IApplicationDbContext> _contextMock = null!;
     private Mock<IUser> _userMock = null!;

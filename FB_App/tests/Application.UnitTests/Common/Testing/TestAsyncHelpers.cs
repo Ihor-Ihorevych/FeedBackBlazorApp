@@ -5,7 +5,7 @@ namespace FB_App.Application.UnitTests.Common.Testing;
 /// <summary>
 /// Async query provider for mocking DbSet in unit tests.
 /// </summary>
-public class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
+public sealed class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
 {
     private readonly IQueryProvider _inner;
 

@@ -1,6 +1,6 @@
 ﻿namespace FB_App.Application.Common.Models;
 
-public class PaginatedList<T>
+public sealed class PaginatedList<T>
 {
     public IReadOnlyCollection<T> Items { get; init; } = Array.Empty<T>();
     public int PageNumber { get; init; }

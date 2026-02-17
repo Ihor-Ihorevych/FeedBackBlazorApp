@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Movies.Commands.CreateMovie;
 
 [TestFixture]
-public class CreateMovieCommandValidatorTests
+public sealed class CreateMovieCommandValidatorTests
 {
     private CreateMovieCommandValidator _validator = null!;
 

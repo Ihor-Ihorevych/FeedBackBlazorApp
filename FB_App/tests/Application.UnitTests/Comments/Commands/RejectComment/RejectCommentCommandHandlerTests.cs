@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Comments.Commands.RejectComment;
 
 [TestFixture]
-public class RejectCommentCommandHandlerTests
+public sealed class RejectCommentCommandHandlerTests
 {
     private Mock<IApplicationDbContext> _contextMock = null!;
     private Mock<IUser> _userMock = null!;

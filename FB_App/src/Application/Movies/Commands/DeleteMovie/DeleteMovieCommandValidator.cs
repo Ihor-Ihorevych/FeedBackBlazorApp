@@ -1,6 +1,6 @@
 namespace FB_App.Application.Movies.Commands.DeleteMovie;
 
-public class DeleteMovieCommandValidator : AbstractValidator<DeleteMovieCommand>
+public sealed class DeleteMovieCommandValidator : AbstractValidator<DeleteMovieCommand>
 {
     public DeleteMovieCommandValidator()
     {

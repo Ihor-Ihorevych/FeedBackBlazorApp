@@ -296,7 +296,7 @@ public class ApplicationDbContextInitialiser
                 var comment7 = movies[6].AddComment(regularUser.Id, "One of the most powerful films about the Holocaust.");
                 var comment8 = movies[11].AddComment(regularUser.Id, "The music, the visuals, the story - perfection!");
 
-               
+
                 await _context.SaveChangesAsync();
 
                 if (adminUser != null)

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FB_App.Infrastructure.Data.Configurations;
 
-public class MovieConfiguration : IEntityTypeConfiguration<Movie>
+public sealed class MovieConfiguration : IEntityTypeConfiguration<Movie>
 {
     public void Configure(EntityTypeBuilder<Movie> builder)
     {

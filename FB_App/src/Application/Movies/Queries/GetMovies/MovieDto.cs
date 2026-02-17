@@ -1,6 +1,6 @@
 namespace FB_App.Application.Movies.Queries.GetMovies;
 
-public class MovieDto
+public sealed class MovieDto
 {
     public Guid Id { get; init; }
     public string Title { get; init; } = string.Empty;

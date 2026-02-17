@@ -9,7 +9,7 @@ namespace FB_App.Web.Hubs;
 /// Only users with the Administrator role can connect to this hub.
 /// </summary>
 [Authorize(Roles = Roles.Administrator)]
-public class AdminNotificationHub : Hub
+public sealed class AdminNotificationHub : Hub
 {
     private readonly ILogger<AdminNotificationHub> _logger;
 

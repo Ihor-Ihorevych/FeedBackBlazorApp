@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 namespace FB_App.Application.UnitTests.Common.Mappings;
 
-public class MappingTests
+public sealed class MappingTests
 {
     private ILoggerFactory? _loggerFactory;
     private MapperConfiguration? _configuration;

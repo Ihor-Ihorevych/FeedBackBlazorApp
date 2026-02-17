@@ -3,7 +3,7 @@ using FB_App.Domain.Enums;
 
 namespace FB_App.Application.Comments.Queries.GetCommentsByMovie;
 
-public class CommentDetailDto
+public sealed class CommentDetailDto
 {
     public Guid Id { get; init; }
     public Guid MovieId { get; init; }

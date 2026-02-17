@@ -7,13 +7,13 @@ using FB_App.Domain.Entities;
 namespace FB_App.Application.Comments.Commands.CreateComment;
 
 [Authorize(Roles = $"{Roles.Administrator},{Roles.User}")]
-public record CreateCommentCommand : IRequest<Result<Guid>>
+public sealed record CreateCommentCommand : IRequest<Result<Guid>>
 {
     public Guid MovieId { get; init; }
     public string Text { get; init; } = string.Empty;
 }
 
-public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand, Result<Guid>>
+public sealed class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand, Result<Guid>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IUser _user;

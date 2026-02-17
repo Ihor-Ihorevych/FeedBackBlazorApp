@@ -1,6 +1,6 @@
 namespace FB_App.Application.Comments.Queries;
 
-public class CommentDto
+public sealed class CommentDto
 {
     public Guid Id { get; init; }
     public string Text { get; init; } = string.Empty;

@@ -8,8 +8,8 @@ using FB_App.Domain.Entities.Values;
 namespace FB_App.Application.Comments.Commands.RejectComment;
 
 [Authorize(Roles = Roles.Administrator)]
-public record RejectCommentCommand(Guid MovieId, Guid CommentId) : IRequest<Result>;
-public class RejectCommentCommandHandler : IRequestHandler<RejectCommentCommand, Result>
+public sealed record RejectCommentCommand(Guid MovieId, Guid CommentId) : IRequest<Result>;
+public sealed class RejectCommentCommandHandler : IRequestHandler<RejectCommentCommand, Result>
 {
     private readonly IApplicationDbContext _context;
     private readonly IUser _user;

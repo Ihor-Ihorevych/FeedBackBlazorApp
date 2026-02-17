@@ -4,7 +4,7 @@ using FB_App.Application.Common.Interfaces;
 
 namespace FB_App.Web.Services;
 
-public class CurrentUser : IUser
+public sealed class CurrentUser : IUser
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 

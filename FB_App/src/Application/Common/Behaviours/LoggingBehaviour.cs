@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FB_App.Application.Common.Behaviours;
 
-public class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest>
+public sealed class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest>
     where TRequest : notnull
 {
     private readonly ILogger _logger;

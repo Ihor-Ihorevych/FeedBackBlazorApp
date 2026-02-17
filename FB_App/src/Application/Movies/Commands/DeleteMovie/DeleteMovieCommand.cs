@@ -9,9 +9,9 @@ using FB_App.Domain.Events.Movies;
 namespace FB_App.Application.Movies.Commands.DeleteMovie;
 
 [Authorize(Roles = Roles.Administrator)]
-public record DeleteMovieCommand(Guid Id) : IRequest<Result>;
+public sealed record DeleteMovieCommand(Guid Id) : IRequest<Result>;
 
-public class DeleteMovieCommandHandler : IRequestHandler<DeleteMovieCommand, Result>
+public sealed class DeleteMovieCommandHandler : IRequestHandler<DeleteMovieCommand, Result>
 {
     private readonly IApplicationDbContext _context;
     private readonly ICacheService _cache;

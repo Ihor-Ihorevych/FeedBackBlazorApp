@@ -1,6 +1,6 @@
 namespace FB_App.Application.Comments.Commands.CreateComment;
 
-public class CreateCommentCommandValidator : AbstractValidator<CreateCommentCommand>
+public sealed class CreateCommentCommandValidator : AbstractValidator<CreateCommentCommand>
 {
     public CreateCommentCommandValidator()
     {

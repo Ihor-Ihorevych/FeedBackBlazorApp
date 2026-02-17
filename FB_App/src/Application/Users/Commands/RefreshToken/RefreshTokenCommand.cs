@@ -4,12 +4,12 @@ using FB_App.Application.Common.Models;
 
 namespace FB_App.Application.Users.Commands.RefreshToken;
 
-public record RefreshTokenCommand : IRequest<Result<AccessTokenResponse>>
+public sealed record RefreshTokenCommand : IRequest<Result<AccessTokenResponse>>
 {
     public string RefreshToken { get; init; } = string.Empty;
 }
 
-public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, Result<AccessTokenResponse>>
+public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, Result<AccessTokenResponse>>
 {
     private readonly IIdentityService _identityService;
 

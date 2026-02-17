@@ -4,7 +4,7 @@ using FB_App.Application.Common.Models;
 
 namespace FB_App.Application.Movies.Queries.GetMovies;
 
-public record GetMoviesQuery : IRequest<PaginatedList<MovieDto>>
+public sealed record GetMoviesQuery : IRequest<PaginatedList<MovieDto>>
 {
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
@@ -12,7 +12,7 @@ public record GetMoviesQuery : IRequest<PaginatedList<MovieDto>>
     public string? Genre { get; init; }
 }
 
-public class GetMoviesQueryHandler : IRequestHandler<GetMoviesQuery, PaginatedList<MovieDto>>
+public sealed class GetMoviesQueryHandler : IRequestHandler<GetMoviesQuery, PaginatedList<MovieDto>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;

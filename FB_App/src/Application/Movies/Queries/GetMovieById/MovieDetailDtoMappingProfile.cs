@@ -3,7 +3,7 @@ using FB_App.Domain.Enums;
 
 namespace FB_App.Application.Movies.Queries.GetMovieById;
 
-public class MovieDetailDtoMappingProfile : Profile
+public sealed class MovieDetailDtoMappingProfile : Profile
 {
     public MovieDetailDtoMappingProfile()
     {

@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Movies.Commands.CreateMovie;
 
 [TestFixture]
-public class CreateMovieCommandHandlerTests
+public sealed class CreateMovieCommandHandlerTests
 {
     private Mock<IApplicationDbContext> _contextMock = null!;
     private Mock<DbSet<Movie>> _moviesDbSetMock = null!;

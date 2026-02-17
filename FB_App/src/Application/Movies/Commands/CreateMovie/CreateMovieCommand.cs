@@ -7,7 +7,7 @@ using FB_App.Domain.Entities;
 namespace FB_App.Application.Movies.Commands.CreateMovie;
 
 [Authorize(Roles = Roles.Administrator)]
-public record CreateMovieCommand : IRequest<Result<Guid>>
+public sealed record CreateMovieCommand : IRequest<Result<Guid>>
 {
     public string Title { get; init; } = string.Empty;
     public string? Description { get; init; }
@@ -18,7 +18,7 @@ public record CreateMovieCommand : IRequest<Result<Guid>>
     public double? Rating { get; init; }
 }
 
-public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, Result<Guid>>
+public sealed class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, Result<Guid>>
 {
     private readonly IApplicationDbContext _context;
 

@@ -26,7 +26,7 @@ public interface IAdminNotificationService : IAsyncDisposable
     Task StopAsync();
 }
 
-public class AdminNotificationService : IAdminNotificationService
+public sealed class AdminNotificationService : IAdminNotificationService
 {
     private readonly ITokenStorageService _tokenStorage;
     private readonly ApiSettings _apiSettings;

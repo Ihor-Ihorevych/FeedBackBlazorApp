@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Users.Commands.CreateUser;
 
 [TestFixture]
-public class CreateUserCommandValidatorTests
+public sealed class CreateUserCommandValidatorTests
 {
     private CreateUserCommandValidator _validator = null!;
 

@@ -5,7 +5,7 @@ using Shouldly;
 
 namespace FB_App.Application.UnitTests.Common.Exceptions;
 
-public class ValidationExceptionTests
+public sealed class ValidationExceptionTests
 {
     [Test]
     public void DefaultConstructorCreatesAnEmptyErrorDictionary()

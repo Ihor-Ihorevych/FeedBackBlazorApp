@@ -13,8 +13,6 @@ using Microsoft.FluentUI.AspNetCore.Components;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-
-// Configure API settings
 builder.Services.Configure<ApiSettings>(options =>
 {
     options.BaseAddress = builder.Configuration["ApiBaseAddress"] ?? "https://localhost:5001";

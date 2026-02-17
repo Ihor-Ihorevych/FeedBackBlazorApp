@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FB_App.Infrastructure.Data.Configurations;
 
-public class CommentConfiguration : IEntityTypeConfiguration<Comment>
+public sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
 {
     public void Configure(EntityTypeBuilder<Comment> builder)
     {

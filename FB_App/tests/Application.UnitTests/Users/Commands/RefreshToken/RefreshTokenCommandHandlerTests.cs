@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Users.Commands.RefreshToken;
 
 [TestFixture]
-public class RefreshTokenCommandHandlerTests
+public sealed class RefreshTokenCommandHandlerTests
 {
     private Mock<IIdentityService> _identityServiceMock = null!;
     private RefreshTokenCommandHandler _handler = null!;

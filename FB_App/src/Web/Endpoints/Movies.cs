@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FB_App.Web.Endpoints;
 
-public class Movies : EndpointGroupBase
+public sealed class Movies : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {

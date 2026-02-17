@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 
 namespace FBUI.Services;
 
-public class AuthorizationMessageHandler : DelegatingHandler
+public sealed class AuthorizationMessageHandler : DelegatingHandler
 {
     private readonly ITokenStorageService _tokenStorage;
     private readonly ILocalStorageService _localStorage;

@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Movies.Commands.UpdateMovie;
 
 [TestFixture]
-public class UpdateMovieCommandHandlerTests
+public sealed class UpdateMovieCommandHandlerTests
 {
     private Mock<IApplicationDbContext> _contextMock = null!;
     private Mock<ICacheService> _cacheMock = null!;

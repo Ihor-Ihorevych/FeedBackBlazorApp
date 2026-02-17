@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FB_App.Application.Common.Behaviours;
 
-public class AtomicOperationCommandBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public sealed class AtomicOperationCommandBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
     private readonly ILogger<AtomicOperationCommandBehaviour<TRequest, TResponse>> _logger;

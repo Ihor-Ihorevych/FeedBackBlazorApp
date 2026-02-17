@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Users.Commands.LoginUser;
 
 [TestFixture]
-public class LoginUserCommandHandlerTests
+public sealed class LoginUserCommandHandlerTests
 {
     private Mock<IIdentityService> _identityServiceMock = null!;
     private LoginUserCommandHandler _handler = null!;

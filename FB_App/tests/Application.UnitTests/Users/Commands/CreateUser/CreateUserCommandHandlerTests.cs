@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Users.Commands.CreateUser;
 
 [TestFixture]
-public class CreateUserCommandHandlerTests
+public sealed class CreateUserCommandHandlerTests
 {
     private Mock<IIdentityService> _identityServiceMock = null!;
     private CreateUserCommandHandler _handler = null!;

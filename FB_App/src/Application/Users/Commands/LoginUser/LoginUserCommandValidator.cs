@@ -1,6 +1,6 @@
 namespace FB_App.Application.Users.Commands.LoginUser;
 
-public class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
+public sealed class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
 {
     public LoginUserCommandValidator()
     {

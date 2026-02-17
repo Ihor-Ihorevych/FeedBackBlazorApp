@@ -5,13 +5,13 @@ using FB_App.Domain.Enums;
 namespace FB_App.Application.Comments.Queries.GetCommentsByMovie;
 
 
-public record GetCommentsByMovieQuery : IRequest<List<CommentDetailDto>>
+public sealed record GetCommentsByMovieQuery : IRequest<List<CommentDetailDto>>
 {
     public Guid MovieId { get; init; }
     public CommentStatus? Status { get; init; }
 }
 
-public class GetCommentsByMovieQueryHandler : IRequestHandler<GetCommentsByMovieQuery, List<CommentDetailDto>>
+public sealed class GetCommentsByMovieQueryHandler : IRequestHandler<GetCommentsByMovieQuery, List<CommentDetailDto>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;

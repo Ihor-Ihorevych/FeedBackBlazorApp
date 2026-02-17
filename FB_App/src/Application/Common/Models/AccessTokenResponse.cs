@@ -1,6 +1,6 @@
 namespace FB_App.Application.Common.Models;
 
-public record AccessTokenResponse(
+public sealed record AccessTokenResponse(
     string TokenType,
     string AccessToken,
     long ExpiresIn,

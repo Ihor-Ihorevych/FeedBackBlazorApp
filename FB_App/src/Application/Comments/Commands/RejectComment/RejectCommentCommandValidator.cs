@@ -1,6 +1,6 @@
 namespace FB_App.Application.Comments.Commands.RejectComment;
 
-public class RejectCommentCommandValidator : AbstractValidator<RejectCommentCommand>
+public sealed class RejectCommentCommandValidator : AbstractValidator<RejectCommentCommand>
 {
     public RejectCommentCommandValidator()
     {

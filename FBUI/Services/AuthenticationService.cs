@@ -15,7 +15,7 @@ public interface IAuthenticationService
     Task<Result> TryRefreshTokenAsync();
 }
 
-public class AuthenticationService : IAuthenticationService
+public sealed class AuthenticationService : IAuthenticationService
 {
     private readonly IFBApiClient _apiClient;
     private readonly ILocalStorageService _localStorage;

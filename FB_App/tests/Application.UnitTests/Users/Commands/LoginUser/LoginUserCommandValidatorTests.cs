@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Users.Commands.LoginUser;
 
 [TestFixture]
-public class LoginUserCommandValidatorTests
+public sealed class LoginUserCommandValidatorTests
 {
     private LoginUserCommandValidator _validator = null!;
 

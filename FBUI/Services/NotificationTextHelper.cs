@@ -28,7 +28,7 @@ public static class NotificationTypes
 }
 
 
-public class NotificationTextHelper : INotificationTextHelper
+public sealed class NotificationTextHelper : INotificationTextHelper
 {
     public string GetTitle(AdminNotification notification)
     {

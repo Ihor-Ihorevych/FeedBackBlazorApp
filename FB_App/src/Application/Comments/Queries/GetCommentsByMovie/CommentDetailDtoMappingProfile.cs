@@ -2,7 +2,7 @@ using FB_App.Domain.Entities;
 
 namespace FB_App.Application.Comments.Queries.GetCommentsByMovie;
 
-public class CommentDetailDtoMappingProfile : Profile
+public sealed class CommentDetailDtoMappingProfile : Profile
 {
     public CommentDetailDtoMappingProfile()
     {

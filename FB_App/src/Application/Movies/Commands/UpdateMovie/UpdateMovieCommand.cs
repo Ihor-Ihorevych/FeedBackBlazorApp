@@ -8,7 +8,7 @@ using FB_App.Domain.Entities.Values;
 namespace FB_App.Application.Movies.Commands.UpdateMovie;
 
 [Authorize(Roles = Roles.Administrator)]
-public record UpdateMovieCommand : IRequest<Result>
+public sealed record UpdateMovieCommand : IRequest<Result>
 {
     public Guid Id { get; init; }
     public string Title { get; init; } = string.Empty;

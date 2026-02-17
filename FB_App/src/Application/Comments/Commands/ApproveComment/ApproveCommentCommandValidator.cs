@@ -1,6 +1,6 @@
 namespace FB_App.Application.Comments.Commands.ApproveComment;
 
-public class ApproveCommentCommandValidator : AbstractValidator<ApproveCommentCommand>
+public sealed class ApproveCommentCommandValidator : AbstractValidator<ApproveCommentCommand>
 {
     public ApproveCommentCommandValidator()
     {

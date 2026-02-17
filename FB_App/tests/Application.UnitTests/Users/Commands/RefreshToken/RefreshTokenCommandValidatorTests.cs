@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace FB_App.Application.UnitTests.Users.Commands.RefreshToken;
 
 [TestFixture]
-public class RefreshTokenCommandValidatorTests
+public sealed class RefreshTokenCommandValidatorTests
 {
     private RefreshTokenCommandValidator _validator = null!;
 

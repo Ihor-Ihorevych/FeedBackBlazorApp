@@ -1,6 +1,6 @@
 namespace FB_App.Application.Movies.Commands.CreateMovie;
 
-public class CreateMovieCommandValidator : AbstractValidator<CreateMovieCommand>
+public sealed class CreateMovieCommandValidator : AbstractValidator<CreateMovieCommand>
 {
     public CreateMovieCommandValidator()
     {

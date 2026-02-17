@@ -1,6 +1,6 @@
 namespace FB_App.Application.Users.Commands.RefreshToken;
 
-public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
+public sealed class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
 {
     public RefreshTokenCommandValidator()
     {

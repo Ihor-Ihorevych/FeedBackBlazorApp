@@ -5,10 +5,10 @@ using FB_App.Application.Common.Security;
 namespace FB_App.Application.Users.Queries.GetCurrentUser;
 
 [Authorize]
-public record GetCurrentUserQuery : IRequest<Result<CurrentUserDto>>;
+public sealed record GetCurrentUserQuery : IRequest<Result<CurrentUserDto>>;
 
 
-public class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, Result<CurrentUserDto>>
+public sealed class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, Result<CurrentUserDto>>
 {
     private readonly IUser _user;
     private readonly IIdentityService _identityService;
