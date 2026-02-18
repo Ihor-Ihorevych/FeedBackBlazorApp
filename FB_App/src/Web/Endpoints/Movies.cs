@@ -75,7 +75,7 @@ public sealed class Movies : EndpointGroupBase
         return TypedResults.Created($"/api/movies/{id}", id.Value);
     }
 
-    public static async Task<Results<NoContent, ProblemHttpResult>> UpdateMovie(
+    public static async Task<Results<NoContent, ProblemHttpResult, ValidationProblem>> UpdateMovie(
         ISender sender,
         Guid id,
         UpdateMovieCommand command)

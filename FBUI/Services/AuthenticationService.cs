@@ -51,9 +51,9 @@ public sealed class AuthenticationService : IAuthenticationService
             await _apiClient.PostApiUsersRegisterAsync(command);
             return Result.Success();
         }
-        catch (ApiException<HttpValidationProblemDetails> ex)
+        catch (ApiException<ProblemDetails> ex)
         {
-            return Result.Error(ex.GetValidationErrors());
+            return Result.Error(ex.GetProblemDetails());
         }
         catch (ApiException ex)
         {

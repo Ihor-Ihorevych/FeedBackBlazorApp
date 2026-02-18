@@ -92,7 +92,7 @@
         }
         catch (ApiException<ProblemDetails> ex)
         {
-            _errorMessage = ex.Result?.Detail ?? ex.Result?.Title ?? "Authentication failed";
+            _errorMessage = ex.GetProblemDetails();
         }
         catch (ApiException<HttpValidationProblemDetails> ex)
         {
@@ -100,11 +100,12 @@
         }
         catch (Exception ex)
         {
-            _errorMessage = "An error occurred. Please try again.";
+            _errorMessage = $"An error occurred. {ex.Message}";
         }
         finally
         {
             _isLoading = false;
+			StateHasChanged();
         }
     }
 

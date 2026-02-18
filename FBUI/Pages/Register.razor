@@ -123,13 +123,9 @@
                 _errorMessage = string.Join(", ", result.Errors);
             }
         }
-        catch (ApiException<HttpValidationProblemDetails> ex)
+        catch (ApiException<ProblemDetails> ex)
         {
-            _errorMessage = ex.GetValidationErrors();
-        }
-        catch (Exception ex)
-        {
-            _errorMessage = ex.Message;
+            _errorMessage = ex.GetProblemDetails();
         }
         finally
         {

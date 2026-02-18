@@ -16,7 +16,6 @@ public sealed class CreateUserCommandValidatorTests
     public void SetUp()
     {
         var mock = new Mock<IIdentityService>();
-        // Setup mock behavior for GetUserNameAsync
         mock.Setup(s => s.GetUserNameAsync(It.IsAny<string>())).ReturnsAsync((string?)null);
         _validator = new CreateUserCommandValidator(mock.Object);
     }

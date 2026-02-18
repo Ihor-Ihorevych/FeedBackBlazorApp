@@ -74,6 +74,17 @@
                         Style="width: 100%;" />
                 </div>
 
+                <div>
+                    <FluentNumberField
+                        @bind-Value="_model.Rating"
+                        Immediate="true"
+                        Label="Rating"
+                        TValue="double?"
+                        Placeholder="e.g., 8.5"
+						Style="width: 100%;" />
+                </div>
+                
+
                 @if (!string.IsNullOrEmpty(_errorMessage))
                 {
                     <FluentMessageBar Intent="MessageIntent.Error">
@@ -117,6 +128,7 @@
                 Title = _model.Title,
                 Description = _model.Description,
                 Director = _model.Director,
+				Rating = _model.Rating,
                 Genre = _model.Genre,
                 ReleaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : null
             };
@@ -125,13 +137,13 @@
             ToastService.ShowSuccess("Movie created successfully!");
             Navigation.NavigateTo($"/movies/{movieId}");
         }
-        catch (ApiException<HttpValidationProblemDetails> ex)
+        catch (ApiException<ProblemDetails> ex)
         {
-            _errorMessage = ex.GetValidationErrors();
+            _errorMessage = ex.GetProblemDetails();
         }
         catch (Exception ex)
         {
-            _errorMessage = ex.Message;
+            _errorMessage = "Problem occured:" + ex.Message;
         }
         finally
         {
@@ -142,7 +154,8 @@
 
     private class CreateMovieModel
     {
-        public string Title { get; set; } = string.Empty;
+		public string Title { get; set; } = string.Empty;
+        public double? Rating { get; set; }
         public string? Description { get; set; }
         public string? Director { get; set; }
         public string? Genre { get; set; }

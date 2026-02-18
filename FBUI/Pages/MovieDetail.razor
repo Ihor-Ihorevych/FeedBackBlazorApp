@@ -161,6 +161,10 @@
         {
             ToastService.ShowError($"Validation error: {ex.GetValidationErrors()}");
         }
+        catch (ApiException<ProblemDetails> ex)
+        {
+            ToastService.ShowError(ex.GetProblemDetails());
+        }
         catch (Exception ex)
         {
             ToastService.ShowError($"Failed to submit comment: {ex.Message}");
@@ -168,6 +172,7 @@
         finally
         {
             _isSubmittingComment = false;
+            StateHasChanged();
         }
     }
 

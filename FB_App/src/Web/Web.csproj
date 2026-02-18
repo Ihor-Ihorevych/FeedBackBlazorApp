@@ -37,13 +37,7 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
 
-  <!-- 
-    Disabled: Using runtime OpenAPI generation via app.UseOpenApi() instead.
-    To manually generate OpenAPI spec, run: dotnet build -p:GenerateOpenApi=True
-  -->
-  
   <Target Name="NSwag" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' And '$(SkipNSwag)' != 'True' ">
-    <!-- Generate OpenAPI JSON specification -->
     <Exec ConsoleToMSBuild="true" ContinueOnError="false" WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net100) aspnetcore2openapi /project:Web.csproj /documentName:v1 /configuration:$(Configuration) /targetFramework:$(TargetFramework) /noBuild:true /aspNetCoreEnvironment:Development /output:..\..\..\FBUI\OpenAPIs\swagger.json">
       <Output TaskParameter="ExitCode" PropertyName="NSwagExitCode" />
       <Output TaskParameter="ConsoleOutput" PropertyName="NSwagOutput" />

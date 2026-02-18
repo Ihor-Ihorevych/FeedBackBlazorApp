@@ -84,10 +84,9 @@
                                              Style="width: 100%;" />
                         </div>
                         <div>
-                            <FluentTextField @bind-Value="_model.Rating"
+                            <FluentNumberField TValue="double?" @bind-Value="_model.Rating"
                                              Immediate="true"
                                              Label="Rating"
-                                             TextFieldType="TextFieldType.Text"
                                              Placeholder="0-10"
                                              Style="width: 100%;" />
                         </div>
@@ -142,8 +141,8 @@
             _model.Genre = movie.Genre;
             _model.ReleaseYear = movie.ReleaseYear?.ToString();
             _model.PosterUrl = movie.PosterUrl;
-            _model.Rating = movie.Rating?.ToString();
-            
+            _model.Rating = movie.Rating;
+
             System.Diagnostics.Debug.WriteLine($"Movie loaded: Title={_model.Title}, Description={_model.Description}, Director={_model.Director}, Genre={_model.Genre}, ReleaseYear={_model.ReleaseYear}, PosterUrl={_model.PosterUrl}, Rating={_model.Rating}");
         }
         catch (Exception ex)
@@ -172,7 +171,7 @@
                 Genre = _model.Genre,
                 ReleaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : null,
                 PosterUrl = _model.PosterUrl,
-                Rating = double.TryParse(_model.Rating, out var rating) ? rating : null
+                Rating = _model.Rating
             };
 
             System.Diagnostics.Debug.WriteLine($"Submitting command: Title={command.Title}, Description={command.Description}, Director={command.Director}, Genre={command.Genre}, ReleaseYear={command.ReleaseYear}, PosterUrl={command.PosterUrl}, Rating={command.Rating}");
@@ -181,13 +180,9 @@
             ToastService.ShowSuccess("Movie updated successfully!");
             Navigation.NavigateTo($"/movies/{Id}");
         }
-        catch (ApiException<HttpValidationProblemDetails> ex)
+        catch (ApiException<ProblemDetails> ex)
         {
-            _errorMessage = ex.GetValidationErrors();
-        }
-        catch (Exception ex)
-        {
-            _errorMessage = $"Failed to update movie: {ex.Message}";
+            _errorMessage = ex.GetProblemDetails();
         }
         finally
         {
@@ -203,6 +198,6 @@
         public string? Genre { get; set; }
         public string? ReleaseYear { get; set; }
         public string? PosterUrl { get; set; }
-        public string? Rating { get; set; }
+        public double? Rating { get; set; }
     }
 }
