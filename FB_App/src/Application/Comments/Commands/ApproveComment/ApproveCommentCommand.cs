@@ -11,16 +11,10 @@ namespace FB_App.Application.Comments.Commands.ApproveComment;
 public record ApproveCommentCommand(Guid MovieId, Guid CommentId) : IRequest<Result>;
 
 
-public sealed class ApproveCommentCommandHandler : IRequestHandler<ApproveCommentCommand, Result>
+public sealed class ApproveCommentCommandHandler(IApplicationDbContext context, IUser user) : IRequestHandler<ApproveCommentCommand, Result>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IUser _user;
-
-    public ApproveCommentCommandHandler(IApplicationDbContext context, IUser user)
-    {
-        _context = context;
-        _user = user;
-    }
+    private readonly IApplicationDbContext _context = context;
+    private readonly IUser _user = user;
 
     public async Task<Result> Handle(ApproveCommentCommand request, CancellationToken cancellationToken)
     {

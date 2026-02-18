@@ -1,10 +1,6 @@
 namespace FB_App.Domain.Events.Comments;
 
-public sealed class CommentDeletedEvent : BaseEvent
+public sealed class CommentDeletedEvent(Comment comment) : BaseEvent
 {
-    public CommentDeletedEvent(Comment comment)
-    {
-        Comment = comment;
-    }
-    public Comment Comment { get; }
+    public Comment Comment { get; } = comment;
 }

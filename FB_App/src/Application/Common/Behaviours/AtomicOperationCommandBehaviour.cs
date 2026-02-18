@@ -4,19 +4,14 @@ using Microsoft.Extensions.Logging;
 
 namespace FB_App.Application.Common.Behaviours;
 
-public sealed class AtomicOperationCommandBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public sealed class AtomicOperationCommandBehaviour<TRequest, TResponse>(ILogger<AtomicOperationCommandBehaviour<TRequest, TResponse>> logger,
+                                 IApplicationDbContext context) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
-    private readonly ILogger<AtomicOperationCommandBehaviour<TRequest, TResponse>> _logger;
-    private readonly IApplicationDbContext _context;
+    private readonly ILogger<AtomicOperationCommandBehaviour<TRequest, TResponse>> _logger = logger;
+    private readonly IApplicationDbContext _context = context;
     private const string CommandSuffix_ = "Command";
     private const string ErrorMessage_ = "Error occurred during atomic operation. Transaction has been rolled back. Errors: {Message}";
-    public AtomicOperationCommandBehaviour(ILogger<AtomicOperationCommandBehaviour<TRequest, TResponse>> logger,
-                                     IApplicationDbContext context)
-    {
-        _logger = logger;
-        _context = context;
-    }
 
     public async Task<TResponse> Handle(TRequest request,
                                     RequestHandlerDelegate<TResponse> next,

@@ -1,3 +1,4 @@
+using FB_App.Application.Common.Extensions;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Domain.Events.Comments;
 using Microsoft.Extensions.Logging;
@@ -5,25 +6,18 @@ using Microsoft.Extensions.Logging;
 namespace FB_App.Application.Comments.EventHandlers;
 
 
-public class CommentCreatedEventHandler : INotificationHandler<CommentCreatedEvent>
+public class CommentCreatedEventHandler(
+    ILogger<CommentCreatedEventHandler> logger,
+    IAdminNotificationService adminNotificationService,
+    IApplicationDbContext context) : INotificationHandler<CommentCreatedEvent>
 {
-    private readonly ILogger<CommentCreatedEventHandler> _logger;
-    private readonly IAdminNotificationService _adminNotificationService;
-    private readonly IApplicationDbContext _context;
-
-    public CommentCreatedEventHandler(
-        ILogger<CommentCreatedEventHandler> logger,
-        IAdminNotificationService adminNotificationService,
-        IApplicationDbContext context)
-    {
-        _logger = logger;
-        _adminNotificationService = adminNotificationService;
-        _context = context;
-    }
+    private readonly ILogger<CommentCreatedEventHandler> _logger = logger;
+    private readonly IAdminNotificationService _adminNotificationService = adminNotificationService;
+    private readonly IApplicationDbContext _context = context;
 
     public async Task Handle(CommentCreatedEvent notification, CancellationToken cancellationToken)
     {
-        _logger.LogInformation(
+        _logger.LogIfLevel(LogLevel.Information,
             "Domain Event: {DomainEvent} - Comment {CommentId} created for Movie {MovieId} by User {UserId}",
             notification.GetType().Name,
             notification.Comment.Id,

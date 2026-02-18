@@ -23,9 +23,12 @@ public sealed class CreateMovieCommandValidatorTests
         var command = new CreateMovieCommand { Title = "The Matrix" };
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
-            f => f.PropertyName == nameof(command.Title)));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+                f => f.PropertyName == nameof(command.Title)));
+        }
     }
 
     [Test]
@@ -53,9 +56,12 @@ public sealed class CreateMovieCommandValidatorTests
         var command = new CreateMovieCommand { Title = new string('A', 200) };
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
-            f => f.PropertyName == nameof(command.Title)));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+                f => f.PropertyName == nameof(command.Title)));
+        }
     }
 
     #endregion
@@ -357,8 +363,11 @@ public sealed class CreateMovieCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Is.Empty);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Is.Empty);
+        }
     }
 
     #endregion

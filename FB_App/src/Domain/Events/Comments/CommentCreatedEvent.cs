@@ -1,11 +1,6 @@
 namespace FB_App.Domain.Events.Comments;
 
-public sealed class CommentCreatedEvent : BaseEvent
+public sealed class CommentCreatedEvent(Comment comment) : BaseEvent
 {
-    public CommentCreatedEvent(Comment comment)
-    {
-        Comment = comment;
-    }
-
-    public Comment Comment { get; }
+    public Comment Comment { get; } = comment;
 }

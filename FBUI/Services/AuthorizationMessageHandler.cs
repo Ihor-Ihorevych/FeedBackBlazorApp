@@ -6,26 +6,19 @@ using System.Net.Http.Headers;
 
 namespace FBUI.Services;
 
-public sealed class AuthorizationMessageHandler : DelegatingHandler
+public sealed class AuthorizationMessageHandler(
+    ITokenStorageService tokenStorage,
+    ILocalStorageService localStorage,
+    IServiceScopeFactory factory) : DelegatingHandler
 {
-    private readonly ITokenStorageService _tokenStorage;
-    private readonly ILocalStorageService _localStorage;
-    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ITokenStorageService _tokenStorage = tokenStorage;
+    private readonly ILocalStorageService _localStorage = localStorage;
+    private readonly IServiceScopeFactory _scopeFactory = factory;
 
     private static readonly SemaphoreSlim RefreshLock = new(1, 1);
     private const string AccessTokenKey_ = "accessToken";
     private const string RefreshTokenKey_ = "refreshToken";
     private const string BearerPrefix_ = "Bearer";
-
-    public AuthorizationMessageHandler(
-        ITokenStorageService tokenStorage,
-        ILocalStorageService localStorage,
-        IServiceScopeFactory factory)
-    {
-        _tokenStorage = tokenStorage;
-        _localStorage = localStorage;
-        _scopeFactory = factory;
-    }
 
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,

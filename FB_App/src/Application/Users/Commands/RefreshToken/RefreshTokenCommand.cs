@@ -9,14 +9,9 @@ public sealed record RefreshTokenCommand : IRequest<Result<AccessTokenResponse>>
     public string RefreshToken { get; init; } = string.Empty;
 }
 
-public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, Result<AccessTokenResponse>>
+public sealed class RefreshTokenCommandHandler(IIdentityService identityService) : IRequestHandler<RefreshTokenCommand, Result<AccessTokenResponse>>
 {
-    private readonly IIdentityService _identityService;
-
-    public RefreshTokenCommandHandler(IIdentityService identityService)
-    {
-        _identityService = identityService;
-    }
+    private readonly IIdentityService _identityService = identityService;
 
     public async Task<Result<AccessTokenResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {

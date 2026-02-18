@@ -22,7 +22,7 @@ public sealed class ApproveCommentCommandHandlerTests
     {
         _contextMock = new Mock<IApplicationDbContext>();
         _userMock = new Mock<IUser>();
-        _movies = new List<Movie>();
+        _movies = [];
 
         var moviesDbSetMock = CreateMockDbSet(_movies);
         _contextMock.Setup(x => x.Movies).Returns(moviesDbSetMock.Object);
@@ -94,9 +94,12 @@ public sealed class ApproveCommentCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
-        Assert.That(result.Errors.Single(), Does.Contain("Movie"));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
+            Assert.That(result.Errors.Single(), Does.Contain("Movie"));
+        }
     }
 
     [Test]
@@ -111,9 +114,12 @@ public sealed class ApproveCommentCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
-        Assert.That(result.Errors.Single(), Does.Contain("Comment"));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
+            Assert.That(result.Errors.Single(), Does.Contain("Comment"));
+        }
     }
 
     [Test]

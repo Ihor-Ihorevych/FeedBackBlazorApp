@@ -25,9 +25,12 @@ public sealed class RefreshTokenCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
-            f => f.PropertyName == nameof(command.RefreshToken)));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+                f => f.PropertyName == nameof(command.RefreshToken)));
+        }
     }
 
     [Test]
@@ -40,10 +43,13 @@ public sealed class RefreshTokenCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
-            f => f.PropertyName == nameof(command.RefreshToken) &&
-                 f.ErrorMessage == "Refresh token is required."));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+                f => f.PropertyName == nameof(command.RefreshToken) &&
+                     f.ErrorMessage == "Refresh token is required."));
+        }
     }
 
     [Test]
@@ -56,9 +62,12 @@ public sealed class RefreshTokenCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
-            f => f.PropertyName == nameof(command.RefreshToken)));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+                f => f.PropertyName == nameof(command.RefreshToken)));
+        }
     }
 
     [Test]
@@ -71,7 +80,10 @@ public sealed class RefreshTokenCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Is.Empty);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Is.Empty);
+        }
     }
 }

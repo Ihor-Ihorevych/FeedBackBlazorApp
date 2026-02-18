@@ -80,9 +80,11 @@ public sealed class CommentId : ValueObject
 
     public static bool operator ==(CommentId? left, CommentId? right)
     {
-        if (left is null)
-            return right is null;
-        return left.Equals(right);
+        return left switch
+        {
+            null => right is null,
+            _ => left.Equals(right)
+        };
     }
 
     public static bool operator !=(CommentId? left, CommentId? right)

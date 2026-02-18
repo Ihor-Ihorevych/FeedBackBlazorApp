@@ -12,21 +12,14 @@ public sealed record GetMoviesQuery : IRequest<PaginatedList<MovieDto>>
     public string? Genre { get; init; }
 }
 
-public sealed class GetMoviesQueryHandler : IRequestHandler<GetMoviesQuery, PaginatedList<MovieDto>>
+public sealed class GetMoviesQueryHandler(
+    IApplicationDbContext context,
+    IMapper mapper,
+    ICacheService cache) : IRequestHandler<GetMoviesQuery, PaginatedList<MovieDto>>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IMapper _mapper;
-    private readonly ICacheService _cache;
-
-    public GetMoviesQueryHandler(
-        IApplicationDbContext context,
-        IMapper mapper,
-        ICacheService cache)
-    {
-        _context = context;
-        _mapper = mapper;
-        _cache = cache;
-    }
+    private readonly IApplicationDbContext _context = context;
+    private readonly IMapper _mapper = mapper;
+    private readonly ICacheService _cache = cache;
 
     public async Task<PaginatedList<MovieDto>> Handle(GetMoviesQuery request, CancellationToken cancellationToken)
     {

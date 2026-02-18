@@ -55,14 +55,17 @@ public sealed class UpdateMovieCommandHandlerTests
         // Act
         await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(existingMovie.Title, Is.EqualTo("Updated Title"));
-        Assert.That(existingMovie.Description, Is.EqualTo("Updated Description"));
-        Assert.That(existingMovie.ReleaseYear, Is.EqualTo(2024));
-        Assert.That(existingMovie.Director, Is.EqualTo("Updated Director"));
-        Assert.That(existingMovie.Genre, Is.EqualTo("Action"));
-        Assert.That(existingMovie.PosterUrl, Is.EqualTo("https://example.com/new.jpg"));
-        Assert.That(existingMovie.Rating, Is.EqualTo(9.0));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(existingMovie.Title, Is.EqualTo("Updated Title"));
+            Assert.That(existingMovie.Description, Is.EqualTo("Updated Description"));
+            Assert.That(existingMovie.ReleaseYear, Is.EqualTo(2024));
+            Assert.That(existingMovie.Director, Is.EqualTo("Updated Director"));
+            Assert.That(existingMovie.Genre, Is.EqualTo("Action"));
+            Assert.That(existingMovie.PosterUrl, Is.EqualTo("https://example.com/new.jpg"));
+            Assert.That(existingMovie.Rating, Is.EqualTo(9.0));
+        }
     }
 
     [Test]
@@ -183,12 +186,15 @@ public sealed class UpdateMovieCommandHandlerTests
         // Act
         await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(existingMovie.Description, Is.Null);
-        Assert.That(existingMovie.ReleaseYear, Is.Null);
-        Assert.That(existingMovie.Director, Is.Null);
-        Assert.That(existingMovie.Genre, Is.Null);
-        Assert.That(existingMovie.PosterUrl, Is.Null);
-        Assert.That(existingMovie.Rating, Is.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(existingMovie.Description, Is.Null);
+            Assert.That(existingMovie.ReleaseYear, Is.Null);
+            Assert.That(existingMovie.Director, Is.Null);
+            Assert.That(existingMovie.Genre, Is.Null);
+            Assert.That(existingMovie.PosterUrl, Is.Null);
+            Assert.That(existingMovie.Rating, Is.Null);
+        }
     }
 }

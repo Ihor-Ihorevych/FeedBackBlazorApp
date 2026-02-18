@@ -3,14 +3,9 @@ using Microsoft.Extensions.Caching.Hybrid;
 
 namespace FB_App.Infrastructure.Caching;
 
-public sealed class CacheService : ICacheService
+public sealed class CacheService(HybridCache cache) : ICacheService
 {
-    private readonly HybridCache _cache;
-
-    public CacheService(HybridCache cache)
-    {
-        _cache = cache;
-    }
+    private readonly HybridCache _cache = cache;
 
     public async Task<T> GetOrCreateAsync<T>(
         string key,

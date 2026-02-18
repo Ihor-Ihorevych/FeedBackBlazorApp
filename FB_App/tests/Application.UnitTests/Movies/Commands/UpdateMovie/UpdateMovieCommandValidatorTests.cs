@@ -28,9 +28,12 @@ public sealed class UpdateMovieCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
-            f => f.PropertyName == nameof(command.Id)));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+                f => f.PropertyName == nameof(command.Id)));
+        }
     }
 
     [Test]
@@ -44,10 +47,13 @@ public sealed class UpdateMovieCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
-            f => f.PropertyName == nameof(command.Id) &&
-                 f.ErrorMessage == "Movie ID is required."));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.Errors, Has.One.Matches<FluentValidation.Results.ValidationFailure>(
+                f => f.PropertyName == nameof(command.Id) &&
+                     f.ErrorMessage == "Movie ID is required."));
+        }
     }
 
     #endregion
@@ -314,8 +320,11 @@ public sealed class UpdateMovieCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Is.Empty);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Is.Empty);
+        }
     }
 
     [Test]

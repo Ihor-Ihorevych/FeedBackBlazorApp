@@ -1,22 +1,16 @@
-﻿using FB_App.Application.Common.Interfaces;
+﻿using FB_App.Application.Common.Extensions;
+using FB_App.Application.Common.Interfaces;
 using MediatR.Pipeline;
 using Microsoft.Extensions.Logging;
 
 namespace FB_App.Application.Common.Behaviours;
 
-public sealed class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest>
+public sealed class LoggingBehaviour<TRequest>(ILogger<TRequest> logger, IUser user, IIdentityService identityService) : IRequestPreProcessor<TRequest>
     where TRequest : notnull
 {
-    private readonly ILogger _logger;
-    private readonly IUser _user;
-    private readonly IIdentityService _identityService;
-
-    public LoggingBehaviour(ILogger<TRequest> logger, IUser user, IIdentityService identityService)
-    {
-        _logger = logger;
-        _user = user;
-        _identityService = identityService;
-    }
+    private readonly ILogger _logger = logger;
+    private readonly IUser _user = user;
+    private readonly IIdentityService _identityService = identityService;
 
     public async Task Process(TRequest request, CancellationToken cancellationToken)
     {
@@ -29,7 +23,7 @@ public sealed class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest>
             userName = await _identityService.GetUserNameAsync(userId);
         }
 
-        _logger.LogInformation("FB_App Request: {Name} {@UserId} {@UserName} {@Request}",
+        _logger.LogIfLevel(LogLevel.Information, "FB_App Request: {Name} {@UserId} {@UserName} {@Request}",
             requestName, userId, userName, request);
     }
 }

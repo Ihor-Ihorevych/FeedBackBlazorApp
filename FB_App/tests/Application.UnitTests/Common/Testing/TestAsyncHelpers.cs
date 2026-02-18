@@ -5,14 +5,9 @@ namespace FB_App.Application.UnitTests.Common.Testing;
 /// <summary>
 /// Async query provider for mocking DbSet in unit tests.
 /// </summary>
-public sealed class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
+public sealed class TestAsyncQueryProvider<TEntity>(IQueryProvider inner) : IAsyncQueryProvider
 {
-    private readonly IQueryProvider _inner;
-
-    public TestAsyncQueryProvider(IQueryProvider inner)
-    {
-        _inner = inner;
-    }
+    private readonly IQueryProvider _inner = inner;
 
     public IQueryable CreateQuery(System.Linq.Expressions.Expression expression)
     {
@@ -54,7 +49,7 @@ public sealed class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
 /// <summary>
 /// Async enumerable wrapper for mocking DbSet queries in unit tests.
 /// </summary>
-public class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
+public sealed class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
 {
     public TestAsyncEnumerable(IEnumerable<T> enumerable)
         : base(enumerable)
@@ -75,14 +70,9 @@ public class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, I
 /// <summary>
 /// Async enumerator for mocking DbSet enumeration in unit tests.
 /// </summary>
-public class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
+public sealed class TestAsyncEnumerator<T>(IEnumerator<T> inner) : IAsyncEnumerator<T>
 {
-    private readonly IEnumerator<T> _inner;
-
-    public TestAsyncEnumerator(IEnumerator<T> inner)
-    {
-        _inner = inner;
-    }
+    private readonly IEnumerator<T> _inner = inner;
 
     public T Current => _inner.Current;
 
@@ -94,6 +84,7 @@ public class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
     public ValueTask DisposeAsync()
     {
         _inner.Dispose();
+        GC.SuppressFinalize(this);
         return ValueTask.CompletedTask;
     }
 }

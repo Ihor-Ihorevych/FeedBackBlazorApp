@@ -26,10 +26,10 @@ public interface IAdminNotificationService : IAsyncDisposable
     Task StopAsync();
 }
 
-public sealed class AdminNotificationService : IAdminNotificationService
+public sealed class AdminNotificationService(ITokenStorageService tokenStorage, IOptions<ApiSettings> apiSettings) : IAdminNotificationService
 {
-    private readonly ITokenStorageService _tokenStorage;
-    private readonly ApiSettings _apiSettings;
+    private readonly ITokenStorageService _tokenStorage = tokenStorage;
+    private readonly ApiSettings _apiSettings = apiSettings.Value;
     private HubConnection? _hubConnection;
 
     public event Action<AdminNotification>? OnNotificationReceived;
@@ -37,12 +37,6 @@ public sealed class AdminNotificationService : IAdminNotificationService
 
     public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
     public string ConnectionState => _hubConnection?.State.ToString() ?? ConnectionStates.Disconnected;
-
-    public AdminNotificationService(ITokenStorageService tokenStorage, IOptions<ApiSettings> apiSettings)
-    {
-        _tokenStorage = tokenStorage;
-        _apiSettings = apiSettings.Value;
-    }
 
     public async Task StartAsync()
     {

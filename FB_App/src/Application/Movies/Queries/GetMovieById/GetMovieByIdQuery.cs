@@ -6,21 +6,14 @@ namespace FB_App.Application.Movies.Queries.GetMovieById;
 
 public sealed record GetMovieByIdQuery(Guid Id) : IRequest<Result<MovieDetailDto>>;
 
-public sealed class GetMovieByIdQueryHandler : IRequestHandler<GetMovieByIdQuery, Result<MovieDetailDto>>
+public sealed class GetMovieByIdQueryHandler(
+    IApplicationDbContext context,
+    IMapper mapper,
+    ICacheService cache) : IRequestHandler<GetMovieByIdQuery, Result<MovieDetailDto>>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IMapper _mapper;
-    private readonly ICacheService _cache;
-
-    public GetMovieByIdQueryHandler(
-        IApplicationDbContext context,
-        IMapper mapper,
-        ICacheService cache)
-    {
-        _context = context;
-        _mapper = mapper;
-        _cache = cache;
-    }
+    private readonly IApplicationDbContext _context = context;
+    private readonly IMapper _mapper = mapper;
+    private readonly ICacheService _cache = cache;
 
     public async Task<Result<MovieDetailDto>> Handle(GetMovieByIdQuery request, CancellationToken cancellationToken)
     {
@@ -34,11 +27,10 @@ public sealed class GetMovieByIdQueryHandler : IRequestHandler<GetMovieByIdQuery
             TimeSpan.FromMinutes(5),
             cancellationToken);
 
-        if (movie == null)
+        return movie switch
         {
-            return Result<MovieDetailDto>.NotFound($"{nameof(Movie)} ({request.Id}) was not found.");
-        }
-
-        return Result<MovieDetailDto>.Success(movie);
+            null => Result<MovieDetailDto>.NotFound($"{nameof(Movie)} ({request.Id}) was not found."),
+            _ => Result<MovieDetailDto>.Success(movie)
+        };
     }
 }

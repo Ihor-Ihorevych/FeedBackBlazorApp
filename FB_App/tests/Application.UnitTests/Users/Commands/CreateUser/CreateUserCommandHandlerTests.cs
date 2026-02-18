@@ -62,9 +62,12 @@ public sealed class CreateUserCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Value, Is.EqualTo(expectedUserId));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Value, Is.EqualTo(expectedUserId));
+        }
     }
 
     [Test]
@@ -84,9 +87,12 @@ public sealed class CreateUserCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.False);
-        Assert.That(result.Errors.Select(e => e.ToString()), Does.Contain("Email already exists."));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.False);
+            Assert.That(result.Errors.Select(e => e.ToString()), Does.Contain("Email already exists."));
+        }
     }
 
     [Test]

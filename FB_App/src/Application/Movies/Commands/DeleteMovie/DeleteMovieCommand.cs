@@ -11,16 +11,10 @@ namespace FB_App.Application.Movies.Commands.DeleteMovie;
 [Authorize(Roles = Roles.Administrator)]
 public sealed record DeleteMovieCommand(Guid Id) : IRequest<Result>;
 
-public sealed class DeleteMovieCommandHandler : IRequestHandler<DeleteMovieCommand, Result>
+public sealed class DeleteMovieCommandHandler(IApplicationDbContext context, ICacheService cache) : IRequestHandler<DeleteMovieCommand, Result>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly ICacheService _cache;
-
-    public DeleteMovieCommandHandler(IApplicationDbContext context, ICacheService cache)
-    {
-        _context = context;
-        _cache = cache;
-    }
+    private readonly IApplicationDbContext _context = context;
+    private readonly ICacheService _cache = cache;
 
     public async Task<Result> Handle(DeleteMovieCommand request, CancellationToken cancellationToken)
     {

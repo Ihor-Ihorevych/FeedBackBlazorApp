@@ -5,14 +5,9 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace FB_App.Infrastructure.Data.Interceptors;
 
-public sealed class DispatchDomainEventsInterceptor : SaveChangesInterceptor
+public sealed class DispatchDomainEventsInterceptor(IMediator mediator) : SaveChangesInterceptor
 {
-    private readonly IMediator _mediator;
-
-    public DispatchDomainEventsInterceptor(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
+    private readonly IMediator _mediator = mediator;
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
@@ -35,7 +30,7 @@ public sealed class DispatchDomainEventsInterceptor : SaveChangesInterceptor
 
         var entities = context.ChangeTracker
             .Entries<IHasDomainEvents>()
-            .Where(e => e.Entity.DomainEvents.Any())
+            .Where(e => e.Entity is { DomainEvents.Count: > 0 })
             .Select(e => e.Entity)
             .ToList();
 

@@ -11,20 +11,12 @@ public sealed record GetCommentsByMovieQuery : IRequest<List<CommentDetailDto>>
     public CommentStatus? Status { get; init; }
 }
 
-public sealed class GetCommentsByMovieQueryHandler : IRequestHandler<GetCommentsByMovieQuery, List<CommentDetailDto>>
+public sealed class GetCommentsByMovieQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService, IUser user) : IRequestHandler<GetCommentsByMovieQuery, List<CommentDetailDto>>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IMapper _mapper;
-    private readonly IIdentityService _identityService;
-    private readonly IUser _user;
-
-    public GetCommentsByMovieQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService, IUser user)
-    {
-        _context = context;
-        _mapper = mapper;
-        _identityService = identityService;
-        _user = user;
-    }
+    private readonly IApplicationDbContext _context = context;
+    private readonly IMapper _mapper = mapper;
+    private readonly IIdentityService _identityService = identityService;
+    private readonly IUser _user = user;
 
     public async Task<List<CommentDetailDto>> Handle(GetCommentsByMovieQuery request, CancellationToken cancellationToken)
     {

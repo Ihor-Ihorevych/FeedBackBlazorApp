@@ -9,16 +9,10 @@ namespace FB_App.Application.Comments.Commands.RejectComment;
 
 [Authorize(Roles = Roles.Administrator)]
 public sealed record RejectCommentCommand(Guid MovieId, Guid CommentId) : IRequest<Result>;
-public sealed class RejectCommentCommandHandler : IRequestHandler<RejectCommentCommand, Result>
+public sealed class RejectCommentCommandHandler(IApplicationDbContext context, IUser user) : IRequestHandler<RejectCommentCommand, Result>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IUser _user;
-
-    public RejectCommentCommandHandler(IApplicationDbContext context, IUser user)
-    {
-        _context = context;
-        _user = user;
-    }
+    private readonly IApplicationDbContext _context = context;
+    private readonly IUser _user = user;
 
     public async Task<Result> Handle(RejectCommentCommand request, CancellationToken cancellationToken)
     {

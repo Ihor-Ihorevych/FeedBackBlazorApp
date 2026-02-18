@@ -10,14 +10,9 @@ public sealed record LoginUserCommand : IRequest<Result<AccessTokenResponse>>
     public string Password { get; init; } = string.Empty;
 }
 
-public sealed class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<AccessTokenResponse>>
+public sealed class LoginUserCommandHandler(IIdentityService identityService) : IRequestHandler<LoginUserCommand, Result<AccessTokenResponse>>
 {
-    private readonly IIdentityService _identityService;
-
-    public LoginUserCommandHandler(IIdentityService identityService)
-    {
-        _identityService = identityService;
-    }
+    private readonly IIdentityService _identityService = identityService;
 
     public async Task<Result<AccessTokenResponse>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {

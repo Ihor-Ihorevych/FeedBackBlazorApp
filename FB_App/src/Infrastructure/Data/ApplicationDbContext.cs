@@ -8,10 +8,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FB_App.Infrastructure.Data;
 
-public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
+public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options), IApplicationDbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
     public DbSet<Movie> Movies => Set<Movie>();
 
     public DbSet<Comment> Comments => Set<Comment>();

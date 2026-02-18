@@ -28,9 +28,12 @@ public sealed class LoginUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
-            f => f.PropertyName == nameof(command.Email)));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+                f => f.PropertyName == nameof(command.Email)));
+        }
     }
 
     [Test]
@@ -147,8 +150,11 @@ public sealed class LoginUserCommandValidatorTests
 
         var result = _validator.TestValidate(command);
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Is.Empty);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Is.Empty);
+        }
     }
 
     [Test]

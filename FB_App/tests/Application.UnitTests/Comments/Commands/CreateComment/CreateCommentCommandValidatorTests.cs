@@ -30,10 +30,13 @@ public sealed class CreateCommentCommandValidatorTests
         // Act
         var result = _validator.TestValidate(command);
 
-        // Assert
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
-            f => f.PropertyName == nameof(command.MovieId)));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+                f => f.PropertyName == nameof(command.MovieId)));
+        }
     }
 
     [Test]
@@ -70,10 +73,13 @@ public sealed class CreateCommentCommandValidatorTests
         // Act
         var result = _validator.TestValidate(command);
 
-        // Assert
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
-            f => f.PropertyName == nameof(command.Text)));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Has.None.Matches<FluentValidation.Results.ValidationFailure>(
+                f => f.PropertyName == nameof(command.Text)));
+        }
     }
 
     [Test]
@@ -194,9 +200,12 @@ public sealed class CreateCommentCommandValidatorTests
         // Act
         var result = _validator.TestValidate(command);
 
-        // Assert
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Is.Empty);
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Is.Empty);
+        }
     }
 
     [Test]

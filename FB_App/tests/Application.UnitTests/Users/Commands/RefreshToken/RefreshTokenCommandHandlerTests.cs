@@ -42,13 +42,20 @@ public sealed class RefreshTokenCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Value, Is.Not.Null);
-        Assert.That(result.Value.AccessToken, Is.EqualTo("new-access-token"));
-        Assert.That(result.Value.RefreshToken, Is.EqualTo("new-refresh-token"));
-        Assert.That(result.Value.TokenType, Is.EqualTo("Bearer"));
-        Assert.That(result.Value.ExpiresIn, Is.EqualTo(3600));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Value, Is.Not.Null);
+        }
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.Value.AccessToken, Is.EqualTo("new-access-token"));
+            Assert.That(result.Value.RefreshToken, Is.EqualTo("new-refresh-token"));
+            Assert.That(result.Value.TokenType, Is.EqualTo("Bearer"));
+            Assert.That(result.Value.ExpiresIn, Is.EqualTo(3600));
+        }
     }
 
     [Test]
@@ -67,9 +74,12 @@ public sealed class RefreshTokenCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.False);
-        Assert.That(result.Errors.Select(e => e.ToString()), Does.Contain("Invalid or expired refresh token."));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.False);
+            Assert.That(result.Errors.Select(e => e.ToString()), Does.Contain("Invalid or expired refresh token."));
+        }
     }
 
     [Test]
@@ -134,10 +144,17 @@ public sealed class RefreshTokenCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Value, Is.Not.Null);
-        Assert.That(result.Value.AccessToken, Is.EqualTo("completely-new-access-token"));
-        Assert.That(result.Value.ExpiresIn, Is.EqualTo(7200));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Value, Is.Not.Null);
+        }
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.Value.AccessToken, Is.EqualTo("completely-new-access-token"));
+            Assert.That(result.Value.ExpiresIn, Is.EqualTo(7200));
+        }
     }
 }

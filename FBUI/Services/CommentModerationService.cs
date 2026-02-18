@@ -10,14 +10,9 @@ public interface ICommentModerationService
     Task<Result> RejectCommentAsync(Guid movieId, Guid commentId);
 }
 
-public sealed class CommentModerationService : ICommentModerationService
+public sealed class CommentModerationService(IFBApiClient apiClient) : ICommentModerationService
 {
-    private readonly IFBApiClient _apiClient;
-
-    public CommentModerationService(IFBApiClient apiClient)
-    {
-        _apiClient = apiClient;
-    }
+    private readonly IFBApiClient _apiClient = apiClient;
 
     public async Task<Result> ApproveCommentAsync(Guid movieId, Guid commentId)
     {

@@ -20,16 +20,10 @@ public sealed record UpdateMovieCommand : IRequest<Result>
     public double? Rating { get; init; }
 }
 
-public class UpdateMovieCommandHandler : IRequestHandler<UpdateMovieCommand, Result>
+public class UpdateMovieCommandHandler(IApplicationDbContext context, ICacheService cache) : IRequestHandler<UpdateMovieCommand, Result>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly ICacheService _cache;
-
-    public UpdateMovieCommandHandler(IApplicationDbContext context, ICacheService cache)
-    {
-        _context = context;
-        _cache = cache;
-    }
+    private readonly IApplicationDbContext _context = context;
+    private readonly ICacheService _cache = cache;
 
     public async Task<Result> Handle(UpdateMovieCommand request, CancellationToken cancellationToken)
     {

@@ -1,10 +1,6 @@
 namespace FB_App.Domain.Events.Movies;
 
-public sealed class MovieDetailsUpdatedEvent : BaseEvent
+public sealed class MovieDetailsUpdatedEvent(Movie movie) : BaseEvent
 {
-    public Movie Movie { get; }
-    public MovieDetailsUpdatedEvent(Movie movie)
-    {
-        Movie = movie;
-    }
+    public Movie Movie { get; } = movie;
 }

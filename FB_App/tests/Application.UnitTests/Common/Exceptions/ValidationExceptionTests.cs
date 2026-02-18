@@ -25,8 +25,8 @@ public sealed class ValidationExceptionTests
 
         var actual = new ValidationException(failures).Errors;
 
-        actual.Keys.ShouldBe(new string[] { "Age" });
-        actual["Age"].ShouldBe(new string[] { "must be over 18" });
+        actual.Keys.ShouldBe(["Age"]);
+        actual["Age"].ShouldBe(["must be over 18"]);
     }
 
     [Test]
@@ -44,20 +44,20 @@ public sealed class ValidationExceptionTests
 
         var actual = new ValidationException(failures).Errors;
 
-        actual.Keys.ShouldBe(new string[] { "Password", "Age" }, ignoreOrder: true);
+        actual.Keys.ShouldBe(["Password", "Age"], ignoreOrder: true);
 
-        actual["Age"].ShouldBe(new string[]
-        {
+        actual["Age"].ShouldBe(
+        [
                 "must be 25 or younger",
                 "must be 18 or older",
-        }, ignoreOrder: true);
+        ], ignoreOrder: true);
 
-        actual["Password"].ShouldBe(new string[]
-        {
+        actual["Password"].ShouldBe(
+        [
                 "must contain lower case letter",
                 "must contain upper case letter",
                 "must contain at least 8 characters",
                 "must contain a digit",
-        }, ignoreOrder: true);
+        ], ignoreOrder: true);
     }
 }

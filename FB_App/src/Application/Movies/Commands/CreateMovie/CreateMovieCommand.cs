@@ -18,14 +18,9 @@ public sealed record CreateMovieCommand : IRequest<Result<Guid>>
     public double? Rating { get; init; }
 }
 
-public sealed class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, Result<Guid>>
+public sealed class CreateMovieCommandHandler(IApplicationDbContext context) : IRequestHandler<CreateMovieCommand, Result<Guid>>
 {
-    private readonly IApplicationDbContext _context;
-
-    public CreateMovieCommandHandler(IApplicationDbContext context)
-    {
-        _context = context;
-    }
+    private readonly IApplicationDbContext _context = context;
 
     public async Task<Result<Guid>> Handle(CreateMovieCommand request, CancellationToken cancellationToken)
     {

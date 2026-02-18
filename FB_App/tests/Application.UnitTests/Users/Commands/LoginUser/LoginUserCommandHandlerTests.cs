@@ -43,13 +43,20 @@ public sealed class LoginUserCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Value, Is.Not.Null);
-        Assert.That(result.Value.AccessToken, Is.EqualTo("access-token"));
-        Assert.That(result.Value.RefreshToken, Is.EqualTo("refresh-token"));
-        Assert.That(result.Value.TokenType, Is.EqualTo("Bearer"));
-        Assert.That(result.Value.ExpiresIn, Is.EqualTo(3600));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Value, Is.Not.Null);
+        }
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.Value.AccessToken, Is.EqualTo("access-token"));
+            Assert.That(result.Value.RefreshToken, Is.EqualTo("refresh-token"));
+            Assert.That(result.Value.TokenType, Is.EqualTo("Bearer"));
+            Assert.That(result.Value.ExpiresIn, Is.EqualTo(3600));
+        }
     }
 
     [Test]
@@ -69,9 +76,12 @@ public sealed class LoginUserCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.False);
-        Assert.That(result.Errors.Select(e => e.ToString()), Does.Contain("Invalid email or password."));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.False);
+            Assert.That(result.Errors.Select(e => e.ToString()), Does.Contain("Invalid email or password."));
+        }
     }
 
     [Test]
@@ -91,9 +101,12 @@ public sealed class LoginUserCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.False);
-        Assert.That(result.Errors.Select(e => e.ToString()), Does.Contain("Account is locked out. Please try again later."));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.False);
+            Assert.That(result.Errors.Select(e => e.ToString()), Does.Contain("Account is locked out. Please try again later."));
+        }
     }
 
     [Test]

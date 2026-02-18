@@ -10,31 +10,20 @@ using AppAccessTokenResponse = FB_App.Application.Common.Models.AccessTokenRespo
 
 namespace FB_App.Infrastructure.Identity;
 
-public class IdentityService : IIdentityService
+public class IdentityService(
+    UserManager<ApplicationUser> userManager,
+    SignInManager<ApplicationUser> signInManager,
+    IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
+    IAuthorizationService authorizationService,
+    TimeProvider timeProvider,
+    IOptionsMonitor<BearerTokenOptions> bearerTokenOptions) : IIdentityService
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
-    private readonly IAuthorizationService _authorizationService;
-    private readonly TimeProvider _timeProvider;
-    private readonly IOptionsMonitor<BearerTokenOptions> _bearerTokenOptions;
-
-
-    public IdentityService(
-        UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager,
-        IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
-        IAuthorizationService authorizationService,
-        TimeProvider timeProvider,
-        IOptionsMonitor<BearerTokenOptions> bearerTokenOptions)
-    {
-        _userManager = userManager;
-        _signInManager = signInManager;
-        _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
-        _authorizationService = authorizationService;
-        _timeProvider = timeProvider;
-        _bearerTokenOptions = bearerTokenOptions;
-    }
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+    private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
+    private readonly IAuthorizationService _authorizationService = authorizationService;
+    private readonly TimeProvider _timeProvider = timeProvider;
+    private readonly IOptionsMonitor<BearerTokenOptions> _bearerTokenOptions = bearerTokenOptions;
 
     public async Task<string?> GetUserNameAsync(string userId)
     {

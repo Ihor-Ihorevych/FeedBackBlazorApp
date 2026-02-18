@@ -225,8 +225,11 @@ public sealed class CreateUserCommandValidatorTests
 
         var result = await _validator.TestValidateAsync(command);
 
-        Assert.That(result.IsValid, Is.True);
-        Assert.That(result.Errors, Is.Empty);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsValid, Is.True);
+            Assert.That(result.Errors, Is.Empty);
+        }
     }
 
     [Test]

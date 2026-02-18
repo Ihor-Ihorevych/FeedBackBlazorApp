@@ -35,7 +35,7 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
     {
     }
 
-    private readonly HashSet<Comment> _comments = new();
+    private readonly HashSet<Comment> _comments = [];
 
     public override MovieId Id { get; } = MovieId.CreateNew();
 

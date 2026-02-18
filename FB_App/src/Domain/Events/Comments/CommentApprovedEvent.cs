@@ -1,13 +1,7 @@
 namespace FB_App.Domain.Events.Comments;
 
-public sealed class CommentApprovedEvent : BaseEvent
+public sealed class CommentApprovedEvent(Comment comment, string approvedBy) : BaseEvent
 {
-    public CommentApprovedEvent(Comment comment, string approvedBy)
-    {
-        Comment = comment;
-        ApprovedBy = approvedBy;
-    }
-
-    public Comment Comment { get; }
-    public string ApprovedBy { get; }
+    public Comment Comment { get; } = comment;
+    public string ApprovedBy { get; } = approvedBy;
 }

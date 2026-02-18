@@ -13,14 +13,9 @@ public interface IMovieService
     Task<Result<PaginatedListOfMovieDto>> GetMoviesAsync(int pageNumber, int pageSize, string? searchTerm = null, string? genreFilter = null);
 }
 
-public sealed class MovieService : IMovieService
+public sealed class MovieService(IFBApiClient apiClient) : IMovieService
 {
-    private readonly IFBApiClient _apiClient;
-
-    public MovieService(IFBApiClient apiClient)
-    {
-        _apiClient = apiClient;
-    }
+    private readonly IFBApiClient _apiClient = apiClient;
 
     public async Task<Result<Guid>> CreateMovieAsync(
         string title,

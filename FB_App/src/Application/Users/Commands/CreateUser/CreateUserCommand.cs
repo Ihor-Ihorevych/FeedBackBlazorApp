@@ -10,14 +10,9 @@ public sealed record CreateUserCommand : IRequest<Result<string>>
     public string UserName { get; init; } = string.Empty;
 }
 
-public sealed class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<string>>
+public sealed class CreateUserCommandHandler(IIdentityService identityService) : IRequestHandler<CreateUserCommand, Result<string>>
 {
-    private readonly IIdentityService _identityService;
-
-    public CreateUserCommandHandler(IIdentityService identityService)
-    {
-        _identityService = identityService;
-    }
+    private readonly IIdentityService _identityService = identityService;
 
     public async Task<Result<string>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {

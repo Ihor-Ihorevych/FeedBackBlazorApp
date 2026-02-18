@@ -70,18 +70,22 @@ public sealed class MovieId : ValueObject
 
     public override bool Equals(object? obj)
     {
-        if (obj is MovieId other)
-            return Value == other.Value;
-        return false;
+        return obj switch
+        {
+            MovieId other => Value == other.Value,
+            _ => false
+        };
     }
 
     public override int GetHashCode() => Value.GetHashCode();
 
     public static bool operator ==(MovieId? left, MovieId? right)
     {
-        if (left is null)
-            return right is null;
-        return left.Equals(right);
+        return left switch
+        {
+            null => right is null,
+            _ => left.Equals(right)
+        };
     }
 
     public static bool operator !=(MovieId? left, MovieId? right)

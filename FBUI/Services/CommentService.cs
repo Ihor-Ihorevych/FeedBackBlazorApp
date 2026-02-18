@@ -10,14 +10,9 @@ public interface ICommentService
     Task<Result<ICollection<CommentDetailDto>>> GetCommentsByMovieAsync(Guid movieId);
 }
 
-public sealed class CommentService : ICommentService
+public sealed class CommentService(IFBApiClient apiClient) : ICommentService
 {
-    private readonly IFBApiClient _apiClient;
-
-    public CommentService(IFBApiClient apiClient)
-    {
-        _apiClient = apiClient;
-    }
+    private readonly IFBApiClient _apiClient = apiClient;
 
     public async Task<Result> CreateCommentAsync(Guid movieId, string text)
     {

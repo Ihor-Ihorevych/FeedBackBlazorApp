@@ -11,13 +11,12 @@ public static class ApiExceptionExtensions
     /// <returns>A formatted string with all validation errors.</returns>
     public static string GetValidationErrors(this ApiException<HttpValidationProblemDetails> exception)
     {
-        if (exception?.Result?.Errors == null)
+        return exception?.Result?.Errors switch
         {
-            return exception?.Message ?? "An error occurred.";
-        }
-
-        return string.Join(", ", exception.Result.Errors
-            .Select(error => $"{error.Key}: {string.Join(", ", error.Value)}"));
+            null => exception?.Message ?? "An error occurred.",
+            _ => string.Join(", ", exception.Result.Errors
+            .Select(error => $"{error.Key}: {string.Join(", ", error.Value)}"))
+        };
     }
 
     /// <summary>

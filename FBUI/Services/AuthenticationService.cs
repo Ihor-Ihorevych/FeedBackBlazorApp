@@ -15,27 +15,19 @@ public interface IAuthenticationService
     Task<Result> TryRefreshTokenAsync();
 }
 
-public sealed class AuthenticationService : IAuthenticationService
+public sealed class AuthenticationService(
+    IFBApiClient apiClient,
+    ILocalStorageService localStorage,
+    IAuthStateProvider authStateProvider,
+    ITokenStorageService tokenStorage) : IAuthenticationService
 {
-    private readonly IFBApiClient _apiClient;
-    private readonly ILocalStorageService _localStorage;
-    private readonly IAuthStateProvider _authStateProvider;
-    private readonly ITokenStorageService _tokenStorage;
+    private readonly IFBApiClient _apiClient = apiClient;
+    private readonly ILocalStorageService _localStorage = localStorage;
+    private readonly IAuthStateProvider _authStateProvider = authStateProvider;
+    private readonly ITokenStorageService _tokenStorage = tokenStorage;
 
     private const string AccessTokenKey = "accessToken";
     private const string RefreshTokenKey = "refreshToken";
-
-    public AuthenticationService(
-        IFBApiClient apiClient,
-        ILocalStorageService localStorage,
-        IAuthStateProvider authStateProvider,
-        ITokenStorageService tokenStorage)
-    {
-        _apiClient = apiClient;
-        _localStorage = localStorage;
-        _authStateProvider = authStateProvider;
-        _tokenStorage = tokenStorage;
-    }
 
     public async Task<Result> RegisterAsync(string userName, string email, string password)
     {

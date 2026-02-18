@@ -13,16 +13,10 @@ public sealed record CreateCommentCommand : IRequest<Result<Guid>>
     public string Text { get; init; } = string.Empty;
 }
 
-public sealed class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand, Result<Guid>>
+public sealed class CreateCommentCommandHandler(IApplicationDbContext context, IUser user) : IRequestHandler<CreateCommentCommand, Result<Guid>>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IUser _user;
-
-    public CreateCommentCommandHandler(IApplicationDbContext context, IUser user)
-    {
-        _context = context;
-        _user = user;
-    }
+    private readonly IApplicationDbContext _context = context;
+    private readonly IUser _user = user;
 
     public async Task<Result<Guid>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
     {

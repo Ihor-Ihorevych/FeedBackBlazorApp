@@ -106,9 +106,12 @@ public sealed class CreateCommentCommandHandlerTests
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
-        Assert.That(result.Errors.Single(), Does.Contain("Movie"));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(result.Status, Is.EqualTo(ResultStatus.NotFound));
+            Assert.That(result.Errors.Single(), Does.Contain("Movie"));
+        }
     }
 
     [Test]

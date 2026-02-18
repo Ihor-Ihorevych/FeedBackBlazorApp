@@ -122,10 +122,13 @@ public sealed class CreateMovieCommandHandlerTests
 
         // Assert
         Assert.That(addedMovie, Is.Not.Null);
-        Assert.That(addedMovie!.Title, Is.EqualTo("Minimal Movie"));
-        Assert.That(addedMovie.Description, Is.Null);
-        Assert.That(addedMovie.Director, Is.Null);
-        Assert.That(addedMovie.Genre, Is.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(addedMovie!.Title, Is.EqualTo("Minimal Movie"));
+            Assert.That(addedMovie.Description, Is.Null);
+            Assert.That(addedMovie.Director, Is.Null);
+            Assert.That(addedMovie.Genre, Is.Null);
+        }
     }
 
     [Test]

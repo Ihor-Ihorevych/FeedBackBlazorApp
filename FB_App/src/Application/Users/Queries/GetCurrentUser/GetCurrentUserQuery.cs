@@ -8,16 +8,10 @@ namespace FB_App.Application.Users.Queries.GetCurrentUser;
 public sealed record GetCurrentUserQuery : IRequest<Result<CurrentUserDto>>;
 
 
-public sealed class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, Result<CurrentUserDto>>
+public sealed class GetCurrentUserQueryHandler(IUser user, IIdentityService identityService) : IRequestHandler<GetCurrentUserQuery, Result<CurrentUserDto>>
 {
-    private readonly IUser _user;
-    private readonly IIdentityService _identityService;
-
-    public GetCurrentUserQueryHandler(IUser user, IIdentityService identityService)
-    {
-        _user = user;
-        _identityService = identityService;
-    }
+    private readonly IUser _user = user;
+    private readonly IIdentityService _identityService = identityService;
 
     public async Task<Result<CurrentUserDto>> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
     {

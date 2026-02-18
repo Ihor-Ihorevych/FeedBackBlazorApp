@@ -1,3 +1,4 @@
+using FB_App.Application.Common.Extensions;
 using FB_App.Application.Common.Interfaces;
 using FB_App.Web.Hubs;
 using Microsoft.AspNetCore.SignalR;
@@ -5,20 +6,14 @@ using Microsoft.AspNetCore.SignalR;
 namespace FB_App.Web.Services;
 
 
-public sealed class AdminNotificationService : IAdminNotificationService
+public sealed class AdminNotificationService(
+    IHubContext<AdminNotificationHub> hubContext,
+    ILogger<AdminNotificationService> logger) : IAdminNotificationService
 {
     private const string AdminGroupName_ = "Administrators";
     private const string RecieveNotification_ = "ReceiveNotification";
-    private readonly IHubContext<AdminNotificationHub> _hubContext;
-    private readonly ILogger<AdminNotificationService> _logger;
-
-    public AdminNotificationService(
-        IHubContext<AdminNotificationHub> hubContext,
-        ILogger<AdminNotificationService> logger)
-    {
-        _hubContext = hubContext;
-        _logger = logger;
-    }
+    private readonly IHubContext<AdminNotificationHub> _hubContext = hubContext;
+    private readonly ILogger<AdminNotificationService> _logger = logger;
 
     public async Task NotifyNewCommentAsync(
         Guid movieId,
@@ -28,7 +23,7 @@ public sealed class AdminNotificationService : IAdminNotificationService
         string userId,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation(
+        _logger.LogIfLevel(LogLevel.Information,
             "Sending new comment notification to administrators. MovieId: {MovieId}, CommentId: {CommentId}",
             movieId,
             commentId);
@@ -54,7 +49,7 @@ public sealed class AdminNotificationService : IAdminNotificationService
         string movieTitle,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation(
+        _logger.LogIfLevel(LogLevel.Information,
             "Sending movie created notification to administrators. MovieId: {MovieId}",
             movieId);
 
@@ -76,7 +71,7 @@ public sealed class AdminNotificationService : IAdminNotificationService
         string movieTitle,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation(
+        _logger.LogIfLevel(LogLevel.Information,
             "Sending movie deleted notification to administrators. MovieId: {MovieId}",
             movieId);
 
@@ -99,7 +94,7 @@ public sealed class AdminNotificationService : IAdminNotificationService
         string reviewedBy,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation(
+        _logger.LogIfLevel(LogLevel.Information,
             "Sending comment status change notification. CommentId: {CommentId}, NewStatus: {NewStatus}",
             commentId,
             newStatus);

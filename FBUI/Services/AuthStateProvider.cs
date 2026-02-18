@@ -12,21 +12,14 @@ public interface IAuthStateProvider
     void NotifyUserLogout();
 }
 
-public sealed class AuthStateProvider : AuthenticationStateProvider, IAuthStateProvider
+public sealed class AuthStateProvider(ILocalStorageService localStorage, ITokenStorageService tokenStorage, IFBApiClient apiClient) : AuthenticationStateProvider, IAuthStateProvider
 {
     private const string AccessTokenKey_ = "accessToken";
     private const string RefreshTokenKey_ = "refreshToken";
-    private readonly ILocalStorageService _localStorage;
-    private readonly ITokenStorageService _tokenStorage;
-    private readonly IFBApiClient _apiClient;
+    private readonly ILocalStorageService _localStorage = localStorage;
+    private readonly ITokenStorageService _tokenStorage = tokenStorage;
+    private readonly IFBApiClient _apiClient = apiClient;
     private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
-
-    public AuthStateProvider(ILocalStorageService localStorage, ITokenStorageService tokenStorage, IFBApiClient apiClient)
-    {
-        _localStorage = localStorage;
-        _tokenStorage = tokenStorage;
-        _apiClient = apiClient;
-    }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
