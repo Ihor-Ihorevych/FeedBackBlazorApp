@@ -1,6 +1,6 @@
 @page "/movies/{Id:guid}/edit"
 @attribute [Authorize(Roles = "Administrator")]
-@inject IFBApiClient ApiClient
+@inject IMovieService MovieService
 @inject NavigationManager Navigation
 @inject IToastService ToastService
 
@@ -134,20 +134,25 @@
 
         try
         {
-            var movie = await ApiClient.GetMovieByIdAsync(Id);
-            _model.Title = movie.Title;
-            _model.Description = movie.Description;
-            _model.Director = movie.Director;
-            _model.Genre = movie.Genre;
-            _model.ReleaseYear = movie.ReleaseYear?.ToString();
-            _model.PosterUrl = movie.PosterUrl;
-            _model.Rating = movie.Rating;
+            var result = await MovieService.GetMovieByIdAsync(Id);
 
-            System.Diagnostics.Debug.WriteLine($"Movie loaded: Title={_model.Title}, Description={_model.Description}, Director={_model.Director}, Genre={_model.Genre}, ReleaseYear={_model.ReleaseYear}, PosterUrl={_model.PosterUrl}, Rating={_model.Rating}");
-        }
-        catch (Exception ex)
-        {
-            _errorMessage = $"Failed to load movie: {ex.Message}";
+            if (result.IsSuccess)
+            {
+                var movie = result.Value;
+                _model.Title = movie.Title;
+                _model.Description = movie.Description;
+                _model.Director = movie.Director;
+                _model.Genre = movie.Genre;
+                _model.ReleaseYear = movie.ReleaseYear?.ToString();
+                _model.PosterUrl = movie.PosterUrl;
+                _model.Rating = movie.Rating;
+
+                System.Diagnostics.Debug.WriteLine($"Movie loaded: Title={_model.Title}, Description={_model.Description}, Director={_model.Director}, Genre={_model.Genre}, ReleaseYear={_model.ReleaseYear}, PosterUrl={_model.PosterUrl}, Rating={_model.Rating}");
+            }
+            else
+            {
+                _errorMessage = string.Join(", ", result.Errors);
+            }
         }
         finally
         {
@@ -162,27 +167,29 @@
 
         try
         {
-            var command = new UpdateMovieCommand
+            var releaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : (int?)null;
+
+            System.Diagnostics.Debug.WriteLine($"Submitting command: Title={_model.Title}, Description={_model.Description}, Director={_model.Director}, Genre={_model.Genre}, ReleaseYear={releaseYear}, PosterUrl={_model.PosterUrl}, Rating={_model.Rating}");
+
+            var result = await MovieService.UpdateMovieAsync(
+                Id,
+                _model.Title,
+                _model.Description,
+                _model.Director,
+                _model.Genre,
+                releaseYear,
+                _model.PosterUrl,
+                _model.Rating);
+
+            if (result.IsSuccess)
             {
-                Id = Id,
-                Title = _model.Title,
-                Description = _model.Description,
-                Director = _model.Director,
-                Genre = _model.Genre,
-                ReleaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : null,
-                PosterUrl = _model.PosterUrl,
-                Rating = _model.Rating
-            };
-
-            System.Diagnostics.Debug.WriteLine($"Submitting command: Title={command.Title}, Description={command.Description}, Director={command.Director}, Genre={command.Genre}, ReleaseYear={command.ReleaseYear}, PosterUrl={command.PosterUrl}, Rating={command.Rating}");
-
-            await ApiClient.UpdateMovieAsync(Id, command);
-            ToastService.ShowSuccess("Movie updated successfully!");
-            Navigation.NavigateTo($"/movies/{Id}");
-        }
-        catch (ApiException<ProblemDetails> ex)
-        {
-            _errorMessage = ex.GetProblemDetails();
+                ToastService.ShowSuccess("Movie updated successfully!");
+                Navigation.NavigateTo($"/movies/{Id}");
+            }
+            else
+            {
+                _errorMessage = string.Join(", ", result.Errors);
+            }
         }
         finally
         {

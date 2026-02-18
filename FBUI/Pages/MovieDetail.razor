@@ -4,7 +4,8 @@
 @inject NavigationManager Navigation
 @inject IToastService ToastService
 @inject IDialogService DialogService
-@inject IFBApiClient ApiClient
+@inject IMovieService MovieService
+@inject ICommentService CommentService
 @inject ICommentModerationService CommentModerationService
 
 <PageTitle>@(_movie?.Title ?? "Movie") - FB App</PageTitle>
@@ -66,20 +67,21 @@
 
         try
         {
-            _movie = await ApiClient.GetMovieByIdAsync(Id);
-            await LoadCommentsAsync();
-        }
-        catch (ApiException ex) when (ex.StatusCode == 404)
-        {
-            _movie = null;
-        }
-        catch (ApiException<HttpValidationProblemDetails> ex)
-        {
-            ToastService.ShowError($"Validation error: {ex.GetValidationErrors()}");
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError($"Failed to load movie: {ex.Message}");
+            var result = await MovieService.GetMovieByIdAsync(Id);
+
+            if (result.IsSuccess)
+            {
+                _movie = result.Value;
+                await LoadCommentsAsync();
+            }
+            else if (result.Status == Ardalis.Result.ResultStatus.NotFound)
+            {
+                _movie = null;
+            }
+            else
+            {
+                ToastService.ShowError(string.Join(", ", result.Errors));
+            }
         }
         finally
         {
@@ -89,14 +91,8 @@
 
     private async Task LoadCommentsAsync()
     {
-        try
-        {
-            _comments = (await ApiClient.GetCommentsByMovieAsync(Id, null))?.ToList();
-        }
-        catch
-        {
-            _comments = [];
-        }
+        var result = await CommentService.GetCommentsByMovieAsync(Id);
+        _comments = result.IsSuccess ? result.Value.ToList() : [];
     }
 
     private void EditMovie()
@@ -116,19 +112,16 @@
 
         if (!result.Cancelled)
         {
-            try
+            var deleteResult = await MovieService.DeleteMovieAsync(Id);
+
+            if (deleteResult.IsSuccess)
             {
-                await ApiClient.DeleteMovieAsync(Id);
                 ToastService.ShowSuccess("Movie deleted successfully!");
                 Navigation.NavigateTo("/movies");
             }
-            catch (ApiException<HttpValidationProblemDetails> ex)
+            else
             {
-                ToastService.ShowError($"Validation error: {ex.GetValidationErrors()}");
-            }
-            catch (Exception ex)
-            {
-                ToastService.ShowError($"Failed to delete movie: {ex.Message}");
+                ToastService.ShowError(string.Join(", ", deleteResult.Errors));
             }
         }
     }
@@ -145,29 +138,18 @@
 
         try
         {
-            var command = new CreateCommentCommand
+            var result = await CommentService.CreateCommentAsync(Id, content);
+
+            if (result.IsSuccess)
             {
-                MovieId = Id,
-                Text = content,
-            };
-
-            await ApiClient.CreateCommentAsync(command);
-            ToastService.ShowSuccess("Comment submitted! It will appear after moderation.");
-
-            _showCommentForm = false;
-            await LoadDataAsync();
-        }
-        catch (ApiException<HttpValidationProblemDetails> ex)
-        {
-            ToastService.ShowError($"Validation error: {ex.GetValidationErrors()}");
-        }
-        catch (ApiException<ProblemDetails> ex)
-        {
-            ToastService.ShowError(ex.GetProblemDetails());
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError($"Failed to submit comment: {ex.Message}");
+                ToastService.ShowSuccess("Comment submitted! It will appear after moderation.");
+                _showCommentForm = false;
+                await LoadDataAsync();
+            }
+            else
+            {
+                ToastService.ShowError(string.Join(", ", result.Errors));
+            }
         }
         finally
         {

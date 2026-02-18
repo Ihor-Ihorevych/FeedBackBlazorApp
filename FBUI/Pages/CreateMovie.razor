@@ -1,6 +1,6 @@
 @page "/movies/create"
 @attribute [Authorize(Roles = "Administrator")]
-@inject IFBApiClient ApiClient
+@inject IMovieService MovieService
 @inject NavigationManager Navigation
 @inject IToastService ToastService
 
@@ -116,41 +116,38 @@
     private bool _isLoading;
     private string? _errorMessage;
 
-    private async Task HandleSubmitAsync()
-    {
-        _isLoading = true;
-        _errorMessage = null;
+	private async Task HandleSubmitAsync()
+	{
+		_isLoading = true;
+		_errorMessage = null;
 
-        try
-        {
-            var command = new CreateMovieCommand
-            {
-                Title = _model.Title,
-                Description = _model.Description,
-                Director = _model.Director,
-				Rating = _model.Rating,
-                Genre = _model.Genre,
-                ReleaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : null
-            };
+		try
+		{
+			var releaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : (int?)null;
+			var result = await MovieService.CreateMovieAsync(
+				_model.Title,
+				_model.Description,
+				_model.Director,
+				_model.Genre,
+				releaseYear,
+				_model.Rating);
 
-            var movieId = await ApiClient.CreateMovieAsync(command);
-            ToastService.ShowSuccess("Movie created successfully!");
-            Navigation.NavigateTo($"/movies/{movieId}");
-        }
-        catch (ApiException<ProblemDetails> ex)
-        {
-            _errorMessage = ex.GetProblemDetails();
-        }
-        catch (Exception ex)
-        {
-            _errorMessage = "Problem occured:" + ex.Message;
-        }
-        finally
-        {
-            _isLoading = false;
-            StateHasChanged();
-        }
-    }
+			if (result.IsSuccess)
+			{
+				ToastService.ShowSuccess("Movie created successfully!");
+				Navigation.NavigateTo($"/movies/{result.Value}");
+			}
+			else
+			{
+				_errorMessage = string.Join(", ", result.Errors);
+			}
+		}
+		finally
+		{
+			_isLoading = false;
+			StateHasChanged();
+		}
+	}
 
     private class CreateMovieModel
     {

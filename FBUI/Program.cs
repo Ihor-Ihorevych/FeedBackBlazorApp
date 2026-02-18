@@ -27,6 +27,8 @@ builder.Services.AddScoped<IAuthStateProvider, AuthStateProvider>();
 builder.Services.AddScoped(sp => (AuthenticationStateProvider)sp.GetRequiredService<IAuthStateProvider>());
 builder.Services.AddScoped<IAdminNotificationService, AdminNotificationService>();
 builder.Services.AddScoped<ICommentModerationService, CommentModerationService>();
+builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<AuthorizationMessageHandler>();
 builder.Services.AddHttpClient("FBApi", (sp, client) =>
 {
