@@ -2,6 +2,7 @@
 @inject IAuthenticationService AuthService
 @inject NavigationManager Navigation
 @inject IToastService ToastService
+@using FBUI.Pages.VMs
 
 <PageTitle>Sign in - FB App</PageTitle>
 
@@ -67,51 +68,45 @@
 </div>
 
 @code {
-    private readonly LoginModel _model = new();
-    private bool _isLoading;
-    private string? _errorMessage;
+	private readonly LoginViewModel _model = new();
+	private bool _isLoading;
+	private string? _errorMessage;
 
-    private async Task HandleLoginAsync()
-    {
-        _isLoading = true;
-        _errorMessage = null;
+	private async Task HandleLoginAsync()
+	{
+		_isLoading = true;
+		_errorMessage = null;
 
-        try
-        {
-            var result = await AuthService.LoginAsync(_model.Email, _model.Password);
+		try
+		{
+			var result = await AuthService.LoginAsync(_model.Email, _model.Password);
 
-            if (result.IsSuccess)
-            {
-                ToastService.ShowSuccess("Welcome back!");
-                Navigation.NavigateTo("/movies");
-            }
-            else
-            {
-                _errorMessage = "Invalid email or password";
-            }
-        }
-        catch (ApiException<ProblemDetails> ex)
-        {
-            _errorMessage = ex.GetProblemDetails();
-        }
-        catch (ApiException<HttpValidationProblemDetails> ex)
-        {
-            _errorMessage = ex.GetValidationErrors();
-        }
-        catch (Exception ex)
-        {
-            _errorMessage = $"An error occurred. {ex.Message}";
-        }
-        finally
-        {
-            _isLoading = false;
+			if (result.IsSuccess)
+			{
+				ToastService.ShowSuccess("Welcome back!");
+				Navigation.NavigateTo("/movies");
+			}
+			else
+			{
+				_errorMessage = "Invalid email or password";
+			}
+		}
+		catch (ApiException<ProblemDetails> ex)
+		{
+			_errorMessage = ex.GetProblemDetails();
+		}
+		catch (ApiException<HttpValidationProblemDetails> ex)
+		{
+			_errorMessage = ex.GetValidationErrors();
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = $"An error occurred. {ex.Message}";
+		}
+		finally
+		{
+			_isLoading = false;
 			StateHasChanged();
-        }
-    }
-
-    private class LoginModel
-    {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-    }
+		}
+	}
 }

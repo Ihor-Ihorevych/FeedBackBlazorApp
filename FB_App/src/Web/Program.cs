@@ -34,12 +34,10 @@ app.UseAuthorization();
 app.MapDefaultEndpoints();
 app.MapEndpoints();
 
-// Map SignalR hubs with CORS policy
+
 app.MapHub<AdminNotificationHub>("/hubs/admin-notifications")
    .RequireCors("BlazorClientPolicy");
 
-// Enable OpenAPI JSON document generation at runtime
-// Document available at: /swagger/v1/swagger.json
 app.UseOpenApi(settings =>
 {
     settings.DocumentName = "v1";

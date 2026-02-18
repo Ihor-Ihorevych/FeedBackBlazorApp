@@ -3,6 +3,7 @@
 @inject IMovieService MovieService
 @inject NavigationManager Navigation
 @inject IToastService ToastService
+@using FBUI.Pages.VMs
 
 <PageTitle>Edit Movie - FB App</PageTitle>
 
@@ -118,7 +119,7 @@
     [Parameter]
     public Guid Id { get; set; }
 
-    private readonly EditMovieModel _model = new();
+    private readonly EditMovieViewModel _model = new();
     private bool _isLoading = true;
     private bool _isSaving;
     private string? _errorMessage;
@@ -195,16 +196,5 @@
         {
             _isSaving = false;
         }
-    }
-
-    private class EditMovieModel
-    {
-        public string Title { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public string? Director { get; set; }
-        public string? Genre { get; set; }
-        public string? ReleaseYear { get; set; }
-        public string? PosterUrl { get; set; }
-        public double? Rating { get; set; }
     }
 }

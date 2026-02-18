@@ -90,7 +90,7 @@
 </div>
 
 @code {
-    private readonly RegisterModel _model = new();
+    private readonly RegisterViewModel _model = new();
     private bool _isLoading;
     private string? _errorMessage;
 
@@ -131,13 +131,5 @@
         {
             _isLoading = false;
         }
-    }
-
-    private sealed class RegisterModel
-    {
-        public string UserName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string ConfirmPassword { get; set; } = string.Empty;
     }
 }

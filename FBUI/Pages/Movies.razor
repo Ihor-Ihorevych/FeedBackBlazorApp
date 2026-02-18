@@ -1,9 +1,10 @@
 @page "/movies"
-@inject IFBApiClient ApiClient
+@inject IMovieService MovieService
 @inject NavigationManager Navigation
 @inject IToastService ToastService
 @inject IDialogService DialogService
 @using FBUI.Components;
+@using FBUI.Services;
 @using Microsoft.FluentUI.AspNetCore.Components;
 
 <PageTitle>Movies - FB App</PageTitle>
@@ -138,16 +139,18 @@
         _isLoading = true;
         _error = null;
 
-        try
-        {
-            var apiPageNumber = _paginationState.CurrentPageIndex + 1;
+        var apiPageNumber = _paginationState.CurrentPageIndex + 1;
 
-            _movies = await ApiClient.GetMoviesAsync(
-                apiPageNumber,
-                _paginationState.ItemsPerPage,
-                _searchTerm,
-                _genreFilter
-            );
+        var result = await MovieService.GetMoviesAsync(
+            apiPageNumber,
+            _paginationState.ItemsPerPage,
+            _searchTerm,
+            _genreFilter
+        );
+
+        if (result.IsSuccess)
+        {
+            _movies = result.Value;
 
             if (_movies is { TotalCount: { } itemsTotalCount })
             {
@@ -161,36 +164,30 @@
                 await _paginationState.SetCurrentPageIndexAsync(lastPageIndex);
                 var correctedPageNumber = lastPageIndex + 1;
 
-                _movies = await ApiClient.GetMoviesAsync(
+                var correctedResult = await MovieService.GetMoviesAsync(
                     correctedPageNumber,
                     _paginationState.ItemsPerPage,
                     _searchTerm,
                     _genreFilter
                 );
+
+                if (correctedResult.IsSuccess)
+                {
+                    _movies = correctedResult.Value;
+                }
+                else
+                {
+                    _error = string.Join(", ", correctedResult.Errors);
+                }
             }
         }
-        catch (ApiException ex)
+        else
         {
-            _error = $"API Error ({ex.StatusCode}): {ex.Message}";
-            Console.WriteLine($"API Exception: {ex.StatusCode} - {ex.Message}");
-            Console.WriteLine($"Response: {ex.Response}");
+            _error = string.Join(", ", result.Errors);
         }
-        catch (HttpRequestException ex)
-        {
-            _error = $"Network Error: {ex.Message}";
-            Console.WriteLine($"HTTP Exception: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            _error = $"Error: {ex.Message}";
-            Console.WriteLine($"Exception: {ex.GetType().Name} - {ex.Message}");
-            Console.WriteLine($"Stack: {ex.StackTrace}");
-        }
-        finally
-        {
-            _isLoading = false;
-            StateHasChanged();
-        }
+
+        _isLoading = false;
+        StateHasChanged();
     }
 
     private async Task OnPageIndexChangedAsync(int pageIndex)

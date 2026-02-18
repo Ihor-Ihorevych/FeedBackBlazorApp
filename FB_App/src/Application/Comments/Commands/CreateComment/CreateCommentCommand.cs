@@ -26,6 +26,12 @@ public sealed class CreateCommentCommandHandler : IRequestHandler<CreateCommentC
 
     public async Task<Result<Guid>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
     {
+        var userId = _user.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Result<Guid>.Unauthorized();
+        }
+
         var movie = await _context.Movies
             .FirstOrDefaultAsync(m => m.Id == request.MovieId, cancellationToken);
 
@@ -33,12 +39,7 @@ public sealed class CreateCommentCommandHandler : IRequestHandler<CreateCommentC
         {
             return Result<Guid>.NotFound($"{nameof(Movie)} ({request.MovieId}) was not found.");
         }
-
-        var userId = _user.Id;
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Result<Guid>.Unauthorized();
-        }
+       
 
         var comment = movie.AddComment(userId, request.Text);
 

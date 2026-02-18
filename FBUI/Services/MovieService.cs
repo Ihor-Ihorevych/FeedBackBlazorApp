@@ -10,6 +10,7 @@ public interface IMovieService
     Task<Result> UpdateMovieAsync(Guid id, string title, string? description, string? director, string? genre, int? releaseYear, string? posterUrl, double? rating);
     Task<Result> DeleteMovieAsync(Guid id);
     Task<Result<MovieDetailDto>> GetMovieByIdAsync(Guid id);
+    Task<Result<PaginatedListOfMovieDto>> GetMoviesAsync(int pageNumber, int pageSize, string? searchTerm = null, string? genreFilter = null);
 }
 
 public sealed class MovieService : IMovieService
@@ -138,6 +139,31 @@ public sealed class MovieService : IMovieService
         catch (Exception ex)
         {
             return Result.Error($"Failed to load movie: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<PaginatedListOfMovieDto>> GetMoviesAsync(
+        int pageNumber,
+        int pageSize,
+        string? searchTerm = null,
+        string? genreFilter = null)
+    {
+        try
+        {
+            var movies = await _apiClient.GetMoviesAsync(pageNumber, pageSize, searchTerm, genreFilter);
+            return Result.Success(movies);
+        }
+        catch (ApiException<ProblemDetails> ex)
+        {
+            return Result.Error(ex.GetProblemDetails());
+        }
+        catch (ApiException<HttpValidationProblemDetails> ex)
+        {
+            return Result.Error(ex.GetValidationErrors());
+        }
+        catch (Exception ex)
+        {
+            return Result.Error($"Failed to load movies: {ex.Message}");
         }
     }
 }

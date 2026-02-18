@@ -7,13 +7,23 @@ using NotFoundException = FB_App.Application.Common.Exceptions.NotFoundException
 
 namespace FB_App.Web.Infrastructure;
 
+/// <summary>
+/// Represents a method that handles exceptions that occur during HTTP request processing.
+/// </summary>
+/// <remarks>Implement this delegate to customize how exceptions are handled in the HTTP pipeline, such as logging
+/// errors or generating custom error responses. The delegate should not throw exceptions; any unhandled exceptions may
+/// result in an incomplete response.</remarks>
+/// <param name="httpContext">The HTTP context for the current request. Provides access to request and response information. Cannot be null.</param>
+/// <param name="exception">The exception that was thrown during request processing. Cannot be null.</param>
+/// <returns>A task that represents the asynchronous exception handling operation.</returns>
+public delegate Task ExceptionHandlerDelegate(HttpContext httpContext, Exception exception);
 public sealed class CustomExceptionHandler : IExceptionHandler
 {
-    private readonly FrozenDictionary<Type, Func<HttpContext, Exception, Task>> _exceptionHandlers;
+    private readonly FrozenDictionary<Type, ExceptionHandlerDelegate> _exceptionHandlers;
 
     public CustomExceptionHandler()
     {
-        _exceptionHandlers = new Dictionary<Type, Func<HttpContext, Exception, Task>>()
+        _exceptionHandlers = new Dictionary<Type, ExceptionHandlerDelegate>()
             {
                 { typeof(ValidationException), HandleValidationException },
                 { typeof(NotFoundException), HandleNotFoundException },
@@ -25,7 +35,6 @@ public sealed class CustomExceptionHandler : IExceptionHandler
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
         var exceptionType = exception.GetType();
-
         if (_exceptionHandlers.TryGetValue(exceptionType, out var value))
         {
             await value.Invoke(httpContext, exception);
