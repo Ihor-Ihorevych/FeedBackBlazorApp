@@ -12,7 +12,7 @@ public sealed class AuthenticationServiceTests
     private Mock<ILocalStorageService> _localStorageMock;
     private Mock<IAuthStateProvider> _authStateProviderMock;
     private Mock<ITokenStorageService> _tokenStorageMock;
-    private IAuthenticationService _sut;
+    private IAuthenticationService _authService;
 
     [SetUp]
     public void SetUp()
@@ -21,7 +21,7 @@ public sealed class AuthenticationServiceTests
         _localStorageMock = new Mock<ILocalStorageService>();
         _authStateProviderMock = new Mock<IAuthStateProvider>();
         _tokenStorageMock = new Mock<ITokenStorageService>();
-        _sut = new AuthenticationService(
+        _authService = new AuthenticationService(
             _apiClientMock.Object,
             _localStorageMock.Object,
             _authStateProviderMock.Object,
@@ -44,9 +44,9 @@ public sealed class AuthenticationServiceTests
     {
         _apiClientMock
             .Setup(x => x.PostApiUsersRegisterAsync(It.IsAny<CreateUserCommand>()))
-            .Returns(Task.FromResult("ok"));
+            .Returns(Task.FromResult("some-id"));
 
-        var result = await _sut.RegisterAsync("user", "email@test.com", "pass");
+        var result = await _authService.RegisterAsync("user", "email@test.com", "pass");
 
         Assert.That(result.IsSuccess, Is.True);
     }
@@ -58,7 +58,7 @@ public sealed class AuthenticationServiceTests
             .Setup(x => x.PostApiUsersRegisterAsync(It.IsAny<CreateUserCommand>()))
             .ThrowsAsync(new ApiException("fail", 400, null, null, null));
 
-        var result = await _sut.RegisterAsync("user", "email@test.com", "pass");
+        var result = await _authService.RegisterAsync("user", "email@test.com", "pass");
 
         Assert.That(result.IsError, Is.True);
     }
@@ -72,7 +72,7 @@ public sealed class AuthenticationServiceTests
             .Setup(x => x.PostApiUsersLoginAsync(It.IsAny<LoginUserCommand>()))
             .ReturnsAsync(response);
 
-        var result = await _sut.LoginAsync("email@test.com", "pass");
+        var result = await _authService.LoginAsync("email@test.com", "pass");
 
         Assert.That(result.IsSuccess, Is.True);
 
@@ -89,7 +89,7 @@ public sealed class AuthenticationServiceTests
             .Setup(x => x.PostApiUsersLoginAsync(It.IsAny<LoginUserCommand>()))
             .ReturnsAsync(new AccessTokenResponse());
 
-        var result = await _sut.LoginAsync("email@test.com", "pass");
+        var result = await _authService.LoginAsync("email@test.com", "pass");
 
         Assert.That(result.IsError, Is.True);
     }
@@ -103,7 +103,7 @@ public sealed class AuthenticationServiceTests
             .Setup(x => x.PostApiUsersLoginAsync(It.IsAny<LoginUserCommand>()))
             .ThrowsAsync(ex);
 
-        var result = await _sut.LoginAsync("email@test.com", "pass");
+        var result = await _authService.LoginAsync("email@test.com", "pass");
 
         Assert.That(result.Status, Is.EqualTo(ResultStatus.Unauthorized));
     }
@@ -111,7 +111,7 @@ public sealed class AuthenticationServiceTests
     [Test]
     public async Task LogoutAsync_RemovesTokensAndNotifies()
     {
-        await _sut.LogoutAsync();
+        await _authService.LogoutAsync();
 
         _localStorageMock.Verify(x => x.RemoveItemAsync("accessToken", CancellationToken.None), Times.Once);
         _localStorageMock.Verify(x => x.RemoveItemAsync("refreshToken", CancellationToken.None), Times.Once);
@@ -126,7 +126,7 @@ public sealed class AuthenticationServiceTests
             .Setup(x => x.GetItemAsync<string>("accessToken", CancellationToken.None))
             .ReturnsAsync("token");
 
-        var token = await _sut.GetAccessTokenAsync();
+        var token = await _authService.GetAccessTokenAsync();
 
         Assert.That(token, Is.EqualTo("token"));
     }
@@ -138,7 +138,7 @@ public sealed class AuthenticationServiceTests
             .Setup(x => x.GetItemAsync<string>("refreshToken", CancellationToken.None))
             .ReturnsAsync((string)null);
 
-        var result = await _sut.TryRefreshTokenAsync();
+        var result = await _authService.TryRefreshTokenAsync();
 
         Assert.That(result.IsError, Is.True);
     }
@@ -160,7 +160,7 @@ public sealed class AuthenticationServiceTests
             .Setup(x => x.PostApiUsersRefreshAsync(It.IsAny<RefreshTokenCommand>()))
             .ReturnsAsync(response);
 
-        var result = await _sut.TryRefreshTokenAsync();
+        var result = await _authService.TryRefreshTokenAsync();
 
         Assert.That(result.IsSuccess, Is.True);
 
@@ -181,7 +181,7 @@ public sealed class AuthenticationServiceTests
             .Setup(x => x.PostApiUsersRefreshAsync(It.IsAny<RefreshTokenCommand>()))
             .ThrowsAsync(new ApiException("fail", 400, null, null, null));
 
-        var result = await _sut.TryRefreshTokenAsync();
+        var result = await _authService.TryRefreshTokenAsync();
 
         Assert.That(result.IsError, Is.True);
 
@@ -202,7 +202,7 @@ public sealed class AuthenticationServiceTests
             .Setup(x => x.GetItemAsync<string>("refreshToken", CancellationToken.None))
             .ReturnsAsync("refresh");
 
-        await _sut.InitializeAsync();
+        await _authService.InitializeAsync();
 
         _tokenStorageMock.Verify(x => x.SetTokens("token", "refresh"), Times.Once);
     }
