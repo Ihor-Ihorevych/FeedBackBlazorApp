@@ -37,7 +37,7 @@ public static class ApiExceptionExtensions
             return exception?.Message ?? "An error occurred.";
         }
 
-        var message = props?.Values.Select(error => $"{string.Join(", ", error)}").Aggregate((a, b) => $"{a}{Environment.NewLine}{b}") 
+        var message = props?.Values.Select(error => $"{string.Join(", ", error)}").Aggregate((a, b) => $"{a}{Environment.NewLine}{b}")
                ?? exception?.Message ?? "An error occurred.";
 
         return message;

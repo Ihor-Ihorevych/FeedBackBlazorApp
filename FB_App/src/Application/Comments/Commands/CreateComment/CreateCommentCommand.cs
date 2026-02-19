@@ -33,7 +33,7 @@ public sealed class CreateCommentCommandHandler(IApplicationDbContext context, I
         {
             return Result<Guid>.NotFound($"{nameof(Movie)} ({request.MovieId}) was not found.");
         }
-       
+
 
         var comment = movie.AddComment(userId, request.Text);
 
