@@ -59,8 +59,8 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
 
         if (string.IsNullOrWhiteSpace(text))
             throw new ArgumentException("Comment text cannot be null or empty.", nameof(text));
-
-        return new Comment
+        
+        var comment = new Comment
         {
             MovieId = movieId,
             UserId = userId,
@@ -69,6 +69,9 @@ public sealed class Comment : BaseAuditableEntity<CommentId>
             ReviewedBy = null,
             ReviewedAt = null
         };
+        
+        comment.AddDomainEvent(new CommentCreatedEvent(comment));
+        return comment;
     }
 
     /// <summary>

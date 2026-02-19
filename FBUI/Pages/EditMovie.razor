@@ -85,8 +85,9 @@
                                              Style="width: 100%;" />
                         </div>
                         <div>
-                            <FluentNumberField TValue="double?" @bind-Value="_model.Rating"
+                            <FluentTextField @bind-Value="_model.Rating"
                                              Immediate="true"
+											 TextFieldType="TextFieldType.Text"
                                              Label="Rating"
                                              Placeholder="0-10"
                                              Style="width: 100%;" />
@@ -146,9 +147,7 @@
                 _model.Genre = movie.Genre;
                 _model.ReleaseYear = movie.ReleaseYear?.ToString();
                 _model.PosterUrl = movie.PosterUrl;
-                _model.Rating = movie.Rating;
-
-                System.Diagnostics.Debug.WriteLine($"Movie loaded: Title={_model.Title}, Description={_model.Description}, Director={_model.Director}, Genre={_model.Genre}, ReleaseYear={_model.ReleaseYear}, PosterUrl={_model.PosterUrl}, Rating={_model.Rating}");
+                _model.Rating = movie.Rating.ToString();
             }
             else
             {
@@ -170,8 +169,7 @@
         {
             var releaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : (int?)null;
 
-            System.Diagnostics.Debug.WriteLine($"Submitting command: Title={_model.Title}, Description={_model.Description}, Director={_model.Director}, Genre={_model.Genre}, ReleaseYear={releaseYear}, PosterUrl={_model.PosterUrl}, Rating={_model.Rating}");
-
+			var rating = double.TryParse(_model.Rating, out var r) ? r : (double?)null;
             var result = await MovieService.UpdateMovieAsync(
                 Id,
                 _model.Title,
@@ -180,7 +178,7 @@
                 _model.Genre,
                 releaseYear,
                 _model.PosterUrl,
-                _model.Rating);
+                rating);
 
             if (result.IsSuccess)
             {

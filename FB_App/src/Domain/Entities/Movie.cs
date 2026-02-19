@@ -91,9 +91,7 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
             throw new ArgumentException("Comment text cannot be null or empty.", nameof(text));
 
         var comment = Comment.Create(Id, userId, text);
-        _comments.Add(comment);
-
-        AddDomainEvent(new CommentCreatedEvent(comment));
+        _comments.Add(comment);;
 
         return comment;
     }
@@ -159,8 +157,13 @@ public sealed class Movie : BaseAuditableEntity<MovieId>
     /// </summary>
     public IReadOnlyCollection<Comment> GetPendingComments() =>
         _comments.Where(c => c.IsPending).ToList().AsReadOnly();
-
+    /// <summary>
+    /// Gets a value indicating whether there are any pending comments.
+    /// </summary>
     public bool HasPendingComments => PendingCommentsCount > 0;
+    /// <summary>
+    /// Gets the total number of comments.
+    /// </summary>
     public int TotalCommentsCount => _comments.Count;
 
     /// <summary>

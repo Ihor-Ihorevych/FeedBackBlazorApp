@@ -8,5 +8,5 @@ public sealed class EditMovieViewModel
     public string? Genre { get; set; }
     public string? ReleaseYear { get; set; }
     public string? PosterUrl { get; set; }
-    public double? Rating { get; set; }
+    public string? Rating { get; set; }
 }

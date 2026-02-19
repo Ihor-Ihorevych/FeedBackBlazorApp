@@ -75,11 +75,11 @@
                 </div>
 
                 <div>
-                    <FluentNumberField
+                    <FluentTextField
                         @bind-Value="_model.Rating"
                         Immediate="true"
                         Label="Rating"
-                        TValue="double?"
+                        TextFieldType="TextFieldType.Text"
                         Placeholder="e.g., 8.5"
 						Style="width: 100%;" />
                 </div>
@@ -124,13 +124,14 @@
 		try
 		{
 			var releaseYear = int.TryParse(_model.ReleaseYear, out var year) ? year : (int?)null;
+			var rating = double.TryParse(_model.Rating, out var r) ? r : (double?)null;
 			var result = await MovieService.CreateMovieAsync(
 				_model.Title,
 				_model.Description,
 				_model.Director,
 				_model.Genre,
 				releaseYear,
-				_model.Rating);
+                rating);
 
 			if (result.IsSuccess)
 			{
