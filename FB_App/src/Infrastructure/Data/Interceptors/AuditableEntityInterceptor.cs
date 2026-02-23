@@ -30,7 +30,7 @@ public sealed class AuditableEntityInterceptor(
     public void UpdateEntities(DbContext? context)
     {
         if (context == null) return;
-        Func<EntityEntry, bool> isAuditable = (e) => e.State is (EntityState.Added or EntityState.Modified) || e.HasChangedOwnedEntities();
+        static bool isAuditable(EntityEntry e) => e.State is (EntityState.Added or EntityState.Modified) || e.HasChangedOwnedEntities();
         foreach (var entry in context.ChangeTracker.Entries<IBaseAuditableEntity>())
         {
             if (!isAuditable(entry))

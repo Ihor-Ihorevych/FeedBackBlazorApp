@@ -29,11 +29,6 @@ public sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
             .HasMaxLength(450)
             .IsRequired();
 
-        builder.HasOne<ApplicationUser>()
-            .WithMany(user => user.Comments)
-            .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder.Property(c => c.Status)
             .HasConversion<int>()
             .IsRequired()
